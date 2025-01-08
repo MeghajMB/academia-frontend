@@ -1,5 +1,4 @@
-import EventsSection from "@/components/EventCard";
-import CoursesSection from "@/components/Course";
+import HomePage from "@/components/pages/HomePage";
 
 import ProtectedRoute from "@/components/ProtectedRoute";
 
@@ -8,8 +7,7 @@ export default function Home() {
     <>
 
         <ProtectedRoute role="student">
-          <CoursesSection />
-          <EventsSection />
+          <HomePage />
         </ProtectedRoute>
 
     </>

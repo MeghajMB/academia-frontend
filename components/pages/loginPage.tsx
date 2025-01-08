@@ -37,7 +37,13 @@ const LoginPage= () => {
   // Only run this code on the client-side
   useEffect(() => {
     setIsClient(true);
-    localStorage.setItem("persist", "false");
+    const localPersist=localStorage.getItem("persist");
+    if(localPersist==undefined){
+      localStorage.setItem("persist", "false");
+    }else{
+      setPersist(localPersist === "true")
+    }
+    
   }, []);
   if (!isClient) {
     // Prevent rendering client-side code during SSR

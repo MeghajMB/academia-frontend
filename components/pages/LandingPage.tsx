@@ -1,9 +1,22 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 import { motion } from "framer-motion";
 import RoleBadge from "../landingPage/RoleBadge";
+import { useAppSelector } from "@/lib/hooks";
+import { useRouter } from "next/navigation";
 
 const LandingPage = () => {
+  const { user } = useAppSelector((state) => state.auth);
+  const router = useRouter();
+  useEffect(() => {
+    if (user.role) {
+      if (user.role == "admin") {
+        router.push("/admin");
+      } else {
+        router.push("/home");
+      }
+    }
+  }, []);
   return (
     <>
       <main className="pt-24 pb-16 px-4">

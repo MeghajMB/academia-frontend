@@ -68,7 +68,7 @@ const CourseCard: React.FC<Course> = ({
   </motion.div>
 );
 
-const CoursesSection: React.FC = () => {
+export default function CoursesSection(){
   const courses: Course[] = [
     {
       id: '1',
@@ -88,7 +88,7 @@ const CoursesSection: React.FC = () => {
   return (
     <section className="max-w-7xl mx-auto px-4 py-12 bg-black">
       <div className="flex justify-between items-center mb-8">
-        <h2 className="text-3xl font-bold text-white">What to learn next</h2>
+        <h2 className="text-3xl font-bold text-white cursor-auto">What to learn next</h2>
         <button className="flex items-center text-indigo-400 hover:text-indigo-300">
           <span>View all</span>
           <ChevronRight size={20} />
@@ -105,5 +105,3 @@ const CoursesSection: React.FC = () => {
     </section>
   );
 };
-
-export default CoursesSection;
