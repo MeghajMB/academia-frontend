@@ -9,7 +9,7 @@ import { InternalAxiosRequestConfig } from "axios";
 export default function useAxiosPrivate(){
     const refresh=useRefreshToken();
     const accessToken = useSelector((state: RootState) => state.auth.accessToken)
-    console.log('The access Token----------------'+accessToken)
+    console.log('Hit Axiosprivate hook ')
     useEffect(()=>{
 
         const requestIntercept=axiosPrivate.interceptors.request.use(

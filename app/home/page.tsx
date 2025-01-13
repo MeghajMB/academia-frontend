@@ -5,11 +5,9 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 export default function Home() {
   return (
     <>
-
-        <ProtectedRoute role="student">
-          <HomePage />
-        </ProtectedRoute>
-
+      <ProtectedRoute role="common">
+        <HomePage />
+      </ProtectedRoute>
     </>
   );
 }

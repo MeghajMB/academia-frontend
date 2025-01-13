@@ -13,7 +13,7 @@ import { axiosPrivate } from "@/lib/axios";
 
 import { AxiosError } from "axios";
 import type { UserCredentials } from "@/types/auth";
-import { useAppDispatch } from "@/lib/hooks";
+import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 
 interface authErrors {
   email?: string;
@@ -31,12 +31,21 @@ const LoginPage= () => {
   const [loading, setLoading] = useState(false);
   const [persist, setPersist] = useState(false);
   const [isClient, setIsClient] = useState(false); // Track client-side mount
+  const {user}=useAppSelector(state=>state.auth)
   const router = useRouter();
 
   const dispatch = useAppDispatch();
+
+  
   // Only run this code on the client-side
   useEffect(() => {
     setIsClient(true);
+    if(user.role=='admin'){
+      router.push('/admin');
+    }
+    if(user.role=='student'||user.role=='instructor'){
+      router.push('/')
+    }
     const localPersist=localStorage.getItem("persist");
     if(localPersist==undefined){
       localStorage.setItem("persist", "false");

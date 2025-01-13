@@ -9,7 +9,7 @@ export default function useRefreshToken() {
   const refresh = async () => {
     try {
       const response = await axiosPrivate.post("/api/auth/refresh");
-      console.log(response.data)
+      console.log("Refresh token called")
       dispatch(login(response.data)); // add the access token to the redux store
       return response.data.accessToken;
     } catch (error) {

@@ -4,8 +4,22 @@ const nextConfig: NextConfig = {
   /* config options here */
   /* reactStrictMode: false, */
   images: {
-    domains: ["nextui.org","picsum.photos"], // Add all the external domains you want to allow
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'nextui.org', 
+        port: '',
+        pathname: '/**', 
+      },
+      {
+        protocol: 'https',
+        hostname: 'picsum.photos',
+        port: '',
+        pathname: '/**', 
+      },
+    ],
   }
+  
 };
 
 export default nextConfig;

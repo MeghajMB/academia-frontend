@@ -1,107 +1,106 @@
-import { useState } from 'react';
+'use client'
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { 
-  LayoutDashboard, 
-  Users, 
-  ShoppingCart, 
-  Package, 
-  BarChart2, 
-  MessageSquare,
-  Settings, 
-  Star, 
-  History,
-  LogOut,
-  Menu,
-  X
+import { usePathname } from 'next/navigation';
+import {
+    LayoutDashboard,
+    Users,
+    GraduationCap,
+    FolderTree,
+    BookOpen,
+    Wrench,
+    Star,
+    LogOut,
+    ChevronLeft,
+    ChevronRight,
 } from 'lucide-react';
+import { useAppSelector } from '@/lib/hooks';
 
-const AdminNavbar = () => {
-  const [activePage, setActivePage] = useState('Dashboard');
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+export default function AdminNavbar() {
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  const pathname = usePathname();
+  const {user}=useAppSelector((state)=>state.auth)
 
-  const menuItems = [
-    { title: 'Dashboard', icon: LayoutDashboard, path: '/' },
-    { title: 'Profile', icon: Users, path: '/profile' },
-    { title: 'Order', icon: ShoppingCart, path: '/order' },
-    { title: 'Product', icon: Package, path: '/product' },
-    { title: 'Sales Report', icon: BarChart2, path: '/sales' },
-    { title: 'Message', icon: MessageSquare, path: '/messages' },
-    { title: 'Settings', icon: Settings, path: '/settings' },
-    { title: 'Favourite', icon: Star, path: '/favourites' },
-    { title: 'History', icon: History, path: '/history' }
+  if(user.role!=='admin'){
+    return null;
+  }
+
+  const navigationItems = [
+    { name: 'Dashboard', icon: LayoutDashboard, href: '/admin/dashboard' },
+    { name: 'Students', icon: Users, href: '/admin/students' },
+    { name: 'Instructors', icon: GraduationCap, href: '/admin/instructors' },
+    { name: 'Categories', icon: FolderTree, href: '/admin/categories' },
+    { name: 'Courses', icon: BookOpen, href: '/admin/courses' },
+    { name: 'Services', icon: Wrench, href: '/admin/services' },
+    { name: 'Review Courses', icon: Star, href: '/admin/review-courses' },
   ];
 
-  const toggleMenu = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen);
-  };
-
   return (
-    <>
-      {/* Mobile Menu Button */}
-      <button 
-        onClick={toggleMenu}
-        className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-lg bg-gray-800 text-white"
-      >
-        {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-      </button>
+    <div 
+      className={` h-screen bg-gray-900 text-white transition-all duration-300
+        ${isCollapsed ? 'w-16' : 'w-64'}`}
+    >
+      {/* Logo Section */}
+      <div className="flex items-center h-16 px-4 border-b border-gray-800">
+        {!isCollapsed && (
+          <span className="text-xl font-bold">Admin Panel</span>
+        )}
+        <button
+          onClick={() => setIsCollapsed(!isCollapsed)}
+          className={`p-2 rounded-lg hover:bg-gray-800 transition-colors
+            ${isCollapsed ? 'mx-auto' : 'ml-auto'}`}
+        >
+          {isCollapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
+        </button>
+      </div>
 
-      {/* Overlay for mobile */}
-      {isMobileMenuOpen && (
-        <div 
-          className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-30"
-          onClick={toggleMenu}
-        />
-      )}
+      {/* Navigation Section */}
+      <nav className="p-2 space-y-1">
+        {navigationItems.map((item) => {
+          const isActive = pathname === item.href;
+          return (
+            <Link
+              key={item.name}
+              href={item.href}
+              className={`flex items-center px-2 py-3 rounded-lg transition-colors
+                ${isActive 
+                  ? 'bg-indigo-600 text-white' 
+                  : 'hover:bg-gray-800 text-gray-300 hover:text-white'
+                }`}
+            >
+              <item.icon size={20} className="min-w-[20px]" />
+              {!isCollapsed && (
+                <span className="ml-3">{item.name}</span>
+              )}
+              {!isCollapsed && isActive && (
+                <div className="w-1.5 h-8 bg-white rounded-full ml-auto"/>
+              )}
+            </Link>
+          );
+        })}
+      </nav>
 
-      {/* Navbar */}
-      <div className={`
-        fixed top-0 left-0 h-screen bg-gray-900 text-gray-300 p-4 z-40
-        transform transition-transform duration-300 ease-in-out
-        lg:translate-x-0 lg:w-64
-        ${isMobileMenuOpen ? 'w-64 translate-x-0' : 'w-64 -translate-x-full'}
-      `}>
-        <div className="mb-8 mt-14 lg:mt-0">
-          <button className="bg-gray-800 text-white px-4 py-2 rounded-lg w-full">
-            Dashboard
+      {/* Bottom Section */}
+      <div className="p-4">
+        <div className="border-t border-gray-800 pt-4">
+          {!isCollapsed && (
+            <div className="flex items-center px-2 mb-4">
+              <div className="w-8 h-8 rounded-full bg-gray-800"/>
+              <div className="ml-3">
+                <p className="text-sm font-medium">Admin Name</p>
+                <p className="text-xs text-gray-400">admin@example.com</p>
+              </div>
+            </div>
+          )}
+          <button
+            className={`w-full flex items-center px-2 py-3 rounded-lg text-red-400 
+              hover:bg-red-500/10 transition-colors`}
+          >
+            <LogOut size={20} />
+            {!isCollapsed && <span className="ml-3">Logout</span>}
           </button>
         </div>
-        
-        <nav className="space-y-2">
-          {menuItems.map((item) => (
-            <Link
-              key={item.title}
-              href={item.path}
-              className={`flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-800 transition-colors
-                ${activePage === item.title ? 'bg-gray-800 text-white' : ''}`}
-              onClick={() => {
-                setActivePage(item.title);
-                setIsMobileMenuOpen(false);
-              }}
-            >
-              <item.icon className="w-5 h-5" />
-              <span>{item.title}</span>
-            </Link>
-          ))}
-          
-          <button className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-800 text-red-400 w-full mt-8">
-            <LogOut className="w-5 h-5" />
-            <span>Signout</span>
-          </button>
-        </nav>
       </div>
-
-      {/* Main content spacer for larger screens */}
-      <div className="hidden lg:block w-64" >
-        <h1 className='text-lg'>Hello</h1>
-        <h1 className='text-lg'>Hello</h1>
-        <h1 className='text-lg'>Hello</h1>
-        <h1 className='text-lg'>Hello</h1>
-        <h1 className='text-lg'>Hello</h1>
-        <h1 className='text-lg'>Hello</h1>
-        <h1 className='text-lg'>Hello</h1>
-      </div>
-    </>
+    </div>
   );
 };
-
-export default AdminNavbar;

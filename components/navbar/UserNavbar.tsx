@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { Menu, X } from "lucide-react";
@@ -13,10 +13,15 @@ import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 const UserNavbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [loading, setLoading] = useState(false);
+  const [isClient,setIsClient]=useState(false)
   const { user } = useAppSelector((state: RootState) => state.auth);
   const dispatch = useAppDispatch();
   const router = useRouter();
   const path = usePathname();
+
+  useEffect(()=>{
+    setIsClient(true)
+  },[])
 
   const toggleMenu = (): void => {
     setIsOpen(!isOpen);
@@ -37,17 +42,27 @@ const UserNavbar: React.FC = () => {
   if (user.role == "student") {
     instructorRoute = ["/home/teaching", "Become an Instructor"];
   } else {
-    instructorRoute = ["/instructor", "Instructor"];
+    instructorRoute = ["/home/instructor", "Instructor"];
   }
   const loggedInRoutes = [
     ["/home", "Home"],
     instructorRoute,
-    ["/courses", "Courses"],
-    ["/events", "Events"],
-    ["/my-learning", "My Learning"],
-    ["/cart", "Cart"],
-    ["/profile", "Profile"],
+    ["/home/courses", "Courses"],
+    ["/home/services", "Services"],
+    ["/home/my-learning", "My Learning"],
+    ["/home/cart", "Cart"],
+    ["/home/shop", "Shop"],
+    ["/home/profile", "Profile"],
   ];
+
+  if (!isClient) {
+    // Show a loading indicator until hydration is complete
+    return (
+      <div className="flex items-center justify-center h-16 bg-black text-white">
+        <p>Loading...</p>
+      </div>
+    );
+  }
 
   return (
     <nav className="bg-black text-white w-full fixed top-0 z-50">

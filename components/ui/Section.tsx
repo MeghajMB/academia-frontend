@@ -70,7 +70,7 @@ export default function Section({label}:{label:string}) {
           </button>
         </div>
 
-        <div className="flex flex-wrap gap-4">
+        <div className="grid grid-cols-1  sm:grid-cols-2 md:grid-cols-4 gap-5 ">
           {courses.map((course: ICourse) => {
             return <CourseCard key={course.id} course={course} />;
           })}

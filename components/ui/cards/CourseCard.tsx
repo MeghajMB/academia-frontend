@@ -1,9 +1,11 @@
+'use client'
+
 import {
   Card,
   CardFooter,
-  Image,
   CardBody,
   CardHeader,
+  Image
 } from "@nextui-org/react";
 import { Star } from "lucide-react";
 
@@ -19,16 +21,18 @@ interface ICourse {
 
 export default function CourseCard({ course }: { course: ICourse }) {
   return (
-    <Card className="py-4">
-      <Image
+    <Card className="">
+      <div><Image
         alt="Card background"
         className="object-cover rounded-xl"
         src="https://nextui.org/images/hero-card-complete.jpeg"
-        width={270}
-      />
+        
+   
+      /></div>
+      
       <CardHeader className="pb-0 pt-2 px-4 flex-col items-start">
         <p className="text-large uppercase font-bold">{course.title}</p>
-        <small className="text-default-500 text-[#8680ff]">
+        <small className="text-[#8680ff]">
           {course.instructor}
         </small>
       </CardHeader>

@@ -96,6 +96,9 @@ const OTPVerification: React.FC = () => {
       setLoading(false);
     }
   };
+  function handleResendOtp(){
+    console.log("Otp Resend")
+  }
 
   return (
     <main className="min-h-screen bg-black text-white flex items-center justify-center px-4 pt-16">
@@ -153,10 +156,7 @@ const OTPVerification: React.FC = () => {
             <button
               type="button"
               className="text-indigo-400 hover:text-indigo-300"
-              onClick={() => {
-                // Add resend OTP logic here
-                console.log("Resend OTP");
-              }}
+              onClick={handleResendOtp}
             >
               Resend
             </button>

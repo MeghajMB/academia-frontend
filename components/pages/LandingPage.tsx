@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import RoleBadge from "../landingPage/RoleBadge";
 import { useAppSelector } from "@/lib/hooks";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 const LandingPage = () => {
   const { user } = useAppSelector((state) => state.auth);
@@ -61,12 +62,12 @@ const LandingPage = () => {
             className="max-w-md mx-auto mb-8"
           >
             <div className="flex justify-center  sm:flex-row gap-4">
-              <button
-                type="button"
+              <Link
+                href="/login"
                 className="px-6 py-3 bg-indigo-600 rounded-lg font-medium hover:bg-indigo-700 transition-colors"
               >
                 Get started
-              </button>
+              </Link>
             </div>
           </motion.div>
 

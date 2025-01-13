@@ -1,9 +1,4 @@
-
-
+import InstructorIntroductionPage from "@/components/pages/InstructorIntroductionPage";
 export default function Page() {
-  return (
-
-      <div>Instructor introduction page</div>
-
-  );
+  return <InstructorIntroductionPage />;
 }

@@ -1,28 +1,37 @@
 "use client";
 import { RootState } from "@/lib/store";
 import { useRouter } from "next/navigation";
-import { ReactNode, useEffect } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { useAppSelector } from "@/lib/hooks";
 
 interface ProtectedRouteProps {
-  role: string;
+  role: "common" | "admin" | "student" | "instructor";
   children: ReactNode;
 }
 
-export default function ProtectedRoute({ role, children }: ProtectedRouteProps) {
+export default function ProtectedRoute({
+  role,
+  children,
+}: ProtectedRouteProps) {
   const router = useRouter();
   const { user } = useAppSelector((state: RootState) => state.auth);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (user.role !== role) {
-      router.push(role === "admin" ? "/admin" : "/");
+    if(role==='common'){
+      if(user.role==='admin'){
+        router.push('/admin')
+      }
+      if(!user.role){
+        router.push('/')
+      }
+    }else if(role!==user.role){
+      router.push('/')
     }
+    setIsLoading(false)
   }, [user.role, role, router]);
-
-  if (user.role === role) {
-    return <>{children}</>;
+  if (isLoading) {
+    return null;
   }
-
-
-  return null;
+  return <>{children}</>;
 }
