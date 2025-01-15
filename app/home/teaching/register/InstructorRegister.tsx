@@ -2,8 +2,10 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { Loader2 } from "lucide-react";
-import { customAxios } from "@/lib/axios";
+import { Loader2, AlertCircle } from "lucide-react";
+import useAxiosPrivate from "@/hooks/useAxiosPrivate";
+import { useAppDispatch } from "@/lib/hooks";
+import { setRole } from "@/lib/features/auth/authSlice";
 
 interface InstructorForm {
   headline: string;
@@ -11,48 +13,122 @@ interface InstructorForm {
   facebook: string;
   linkedin: string;
   twitter: string;
-  website:string
+  website: string;
   agreement: boolean;
+}
+
+interface FormErrors {
+  headline?: string;
+  biography?: string;
+  facebook?: string;
+  linkedin?: string;
+  twitter?: string;
+  website?: string;
+  general?: string;
 }
 
 const InstructorRegister = () => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState<FormErrors>({});
   const [formData, setFormData] = useState<InstructorForm>({
     headline: "",
     biography: "",
     facebook: "",
     linkedin: "",
     twitter: "",
-    website:"",
+    website: "",
     agreement: false,
   });
   const [isClient, setIsClient] = useState(false);
+  const axiosPrivate = useAxiosPrivate();
+  const dispatch = useAppDispatch();
+
   useEffect(() => {
     setIsClient(true);
   }, []);
+
   if (!isClient) {
     return null;
   }
+
+  const validateForm = (): boolean => {
+    const newErrors: FormErrors = {};
+
+    // Headline validation
+    if (!formData.headline.trim()) {
+      newErrors.headline = "Professional headline is required";
+    } else if (formData.headline.length < 5) {
+      newErrors.headline = "Headline must be at least 5 characters long";
+    }
+
+    // Biography validation
+    if (!formData.biography.trim()) {
+      newErrors.biography = "Professional biography is required";
+    } else if (formData.biography.length < 100) {
+      newErrors.biography = "Biography must be at least 100 characters long";
+    }
+
+    // URL validations
+    const urlRegex =
+      /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/;
+
+    if (formData.website && !urlRegex.test(formData.website)) {
+      newErrors.website = "Please enter a valid website URL";
+    }
+    if (formData.facebook && !urlRegex.test(formData.facebook)) {
+      newErrors.facebook = "Please enter a valid Facebook URL";
+    }
+    if (formData.linkedin && !urlRegex.test(formData.linkedin)) {
+      newErrors.linkedin = "Please enter a valid LinkedIn URL";
+    }
+    if (formData.twitter && !urlRegex.test(formData.twitter)) {
+      newErrors.twitter = "Please enter a valid Twitter URL";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     setLoading(true);
+    if (!validateForm()) {
+      setLoading(false);
+      return;
+    }
 
     try {
-      // Replace with your actual API endpoint
-      const response = await customAxios.post(
-        "/api/instructor/verify",
+      const response = await axiosPrivate.post(
+        "/api/auth/register-instructor",
         formData
       );
 
       if (response.status === 200) {
-        console.log("Success");
-        router.push("/home");
+        dispatch(setRole({ role: "instructor" }));
+        router.push("/instructor");
       }
-    } catch (error) {
-      console.log(error);
+    } catch (error: any) {
+      console.error(error);
+      setErrors({
+        general:
+          error.response?.data?.message ||
+          "An unexpected error occurred. Please try again.",
+      });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    // Clear error for this field when user starts typing
+    if (errors[name as keyof FormErrors]) {
+      setErrors((prev) => ({ ...prev, [name]: undefined }));
     }
   };
 
@@ -70,7 +146,14 @@ const InstructorRegister = () => {
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        {errors.general && (
+          <div className="bg-red-900/50 border border-red-500 text-red-100 px-4 py-3 rounded flex items-center gap-2">
+            <AlertCircle className="w-5 h-5" />
+            <p>{errors.general}</p>
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-6" noValidate>
           {/* Headline */}
           <div>
             <label
@@ -81,15 +164,19 @@ const InstructorRegister = () => {
             </label>
             <input
               id="headline"
+              name="headline"
               type="text"
               required
               placeholder="e.g., Senior Web Developer | JavaScript Expert"
-              className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600"
+              className={`w-full px-4 py-3 bg-gray-800 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600 ${
+                errors.headline ? "border-red-500" : "border-gray-700"
+              }`}
               value={formData.headline}
-              onChange={(e) =>
-                setFormData({ ...formData, headline: e.target.value })
-              }
+              onChange={handleInputChange}
             />
+            {errors.headline && (
+              <p className="mt-1 text-sm text-red-500">{errors.headline}</p>
+            )}
           </div>
 
           {/* Biography */}
@@ -102,57 +189,71 @@ const InstructorRegister = () => {
             </label>
             <textarea
               id="biography"
+              name="biography"
               required
               rows={6}
               placeholder="Tell us about your experience and expertise..."
-              className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600"
+              className={`w-full px-4 py-3 bg-gray-800 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600 ${
+                errors.biography ? "border-red-500" : "border-gray-700"
+              }`}
               value={formData.biography}
-              onChange={(e) =>
-                setFormData({ ...formData, biography: e.target.value })
-              }
+              onChange={handleInputChange}
             />
+            {errors.biography && (
+              <p className="mt-1 text-sm text-red-500">{errors.biography}</p>
+            )}
           </div>
 
           {/* Social Media Links */}
           <div className="space-y-4">
-            <h3 className="text-lg font-medium">Social Media Links</h3>
+            <h3 className="text-lg font-medium">
+              Social Media Links(optional)
+            </h3>
 
             <div>
               <label
                 htmlFor="website"
                 className="block text-sm font-medium mb-2"
               >
-                Website (optional)
+                Website
               </label>
               <input
                 id="website"
+                name="website"
                 type="url"
                 placeholder="https://yourwebsite.com"
-                className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600"
+                className={`w-full px-4 py-3 bg-gray-800 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600 ${
+                  errors.website ? "border-red-500" : "border-gray-700"
+                }`}
                 value={formData.website}
-                onChange={(e) =>
-                  setFormData({ ...formData, website: e.target.value })
-                }
+                onChange={handleInputChange}
               />
+              {errors.website && (
+                <p className="mt-1 text-sm text-red-500">{errors.website}</p>
+              )}
             </div>
 
             <div>
               <label
-                htmlFor="website"
+                htmlFor="facebook"
                 className="block text-sm font-medium mb-2"
               >
                 Facebook Profile
               </label>
               <input
-                id="website"
+                id="facebook"
+                name="facebook"
                 type="url"
                 placeholder="https://facebook.com/yourprofile"
-                className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600"
+                className={`w-full px-4 py-3 bg-gray-800 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600 ${
+                  errors.facebook ? "border-red-500" : "border-gray-700"
+                }`}
                 value={formData.facebook}
-                onChange={(e) =>
-                  setFormData({ ...formData, facebook: e.target.value })
-                }
+                onChange={handleInputChange}
               />
+              {errors.facebook && (
+                <p className="mt-1 text-sm text-red-500">{errors.facebook}</p>
+              )}
             </div>
 
             <div>
@@ -164,14 +265,18 @@ const InstructorRegister = () => {
               </label>
               <input
                 id="linkedin"
+                name="linkedin"
                 type="url"
                 placeholder="https://linkedin.com/in/yourprofile"
-                className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600"
+                className={`w-full px-4 py-3 bg-gray-800 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600 ${
+                  errors.linkedin ? "border-red-500" : "border-gray-700"
+                }`}
                 value={formData.linkedin}
-                onChange={(e) =>
-                  setFormData({ ...formData, linkedin: e.target.value })
-                }
+                onChange={handleInputChange}
               />
+              {errors.linkedin && (
+                <p className="mt-1 text-sm text-red-500">{errors.linkedin}</p>
+              )}
             </div>
 
             <div>
@@ -183,14 +288,18 @@ const InstructorRegister = () => {
               </label>
               <input
                 id="twitter"
+                name="twitter"
                 type="url"
                 placeholder="https://twitter.com/yourhandle"
-                className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600"
+                className={`w-full px-4 py-3 bg-gray-800 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600 ${
+                  errors.twitter ? "border-red-500" : "border-gray-700"
+                }`}
                 value={formData.twitter}
-                onChange={(e) =>
-                  setFormData({ ...formData, twitter: e.target.value })
-                }
+                onChange={handleInputChange}
               />
+              {errors.twitter && (
+                <p className="mt-1 text-sm text-red-500">{errors.twitter}</p>
+              )}
             </div>
           </div>
 
@@ -217,6 +326,7 @@ const InstructorRegister = () => {
               <input
                 type="checkbox"
                 id="agreement"
+                name="agreement"
                 required
                 className="w-4 h-4 rounded border-gray-700 bg-gray-800 text-indigo-600 focus:ring-indigo-600"
                 checked={formData.agreement}

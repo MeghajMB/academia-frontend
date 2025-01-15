@@ -1,5 +1,5 @@
 "use client"
-import { axiosPrivate } from "@/lib/axios";
+import { axiosPrivate } from "@/api/axios";
 import useRefreshToken from "./useRefreshToken";
 import { useEffect } from "react";
 import { useSelector } from 'react-redux'
@@ -9,7 +9,6 @@ import { InternalAxiosRequestConfig } from "axios";
 export default function useAxiosPrivate(){
     const refresh=useRefreshToken();
     const accessToken = useSelector((state: RootState) => state.auth.accessToken)
-    console.log('Hit Axiosprivate hook ')
     useEffect(()=>{
 
         const requestIntercept=axiosPrivate.interceptors.request.use(

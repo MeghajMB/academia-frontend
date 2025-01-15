@@ -59,8 +59,8 @@ export default function Section({label}:{label:string}) {
   }, []);
   return (
     <>
-      <section>
-        <div className="flex gap-20 items-center mb-8">
+      <section className="pt-10 pb-5">
+        <div className="flex gap-20 items-center justify-between mb-8">
           <h2 className="text-3xl font-bold text-white cursor-auto">
             {label}
           </h2>

@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { LockKeyhole, User } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
-import { customAxios } from "@/lib/axios";
+import { customAxios } from "@/api/axios";
 import { login } from "@/lib/features/auth/authSlice";
 import { AxiosError } from "axios";
 

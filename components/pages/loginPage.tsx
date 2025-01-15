@@ -9,7 +9,7 @@ import { Eye, EyeOff } from "lucide-react";
 
 import GoogleSvg from "@/components/icons/GoogleSvg";
 
-import { axiosPrivate } from "@/lib/axios";
+import { axiosPrivate } from "@/api/axios";
 
 import { AxiosError } from "axios";
 import type { UserCredentials } from "@/types/auth";

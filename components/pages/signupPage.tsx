@@ -7,7 +7,7 @@ import type { SignupCredentials } from "@/types/auth";
 import GoogleSvg from "@/components/icons/GoogleSvg";
 import { login } from "@/lib/features/auth/authSlice";
 import { useRouter } from "next/navigation";
-import { customAxios } from "@/lib/axios";
+import { customAxios } from "@/api/axios";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 
 const SignupPage = () => {

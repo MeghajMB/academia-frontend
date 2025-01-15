@@ -47,6 +47,9 @@ const authSlice = createSlice({
     setPersist(state){
       state.persist=!state.persist
     },
+    setRole(state,action:PayloadAction<{role:string}>){
+      state.user.role=action.payload.role
+    },
     logout: (state) => {
       state.user = {
         id: null,
@@ -59,5 +62,5 @@ const authSlice = createSlice({
   },
 });
 
-export const { login, logout,setAccessToken,setPersist } = authSlice.actions;
+export const { login, logout,setAccessToken,setPersist,setRole } = authSlice.actions;
 export default authSlice.reducer;

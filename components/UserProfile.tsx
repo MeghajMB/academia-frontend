@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import ProfileImage from "@/public/images/blankUserProfile.jpeg";
 import {
   User,
@@ -9,13 +9,47 @@ import {
   BookOpen,
   Clock,
   Award,
-  Settings,
   Edit,
 } from "lucide-react";
+import moment from 'moment';
 import { motion } from "framer-motion";
 import Image from "next/image";
+import useAxiosPrivate from "@/hooks/useAxiosPrivate";
+
+interface IUser {
+  name: string;
+  headline: string;
+  totalStudents: number;
+  reviews: number;
+  links: {
+    website?: string;
+    twitter?: string;
+    linkedin?: string;
+    facebook?: string;
+  };
+  email:string;
+  createdAt:string;
+  purpleCoin: number;
+  biography: string;
+  profilePicture: string;
+}
 
 export default function ProfilePage() {
+  const [user,setUser]=useState<IUser>();
+  const axiosPrivate=useAxiosPrivate();
+
+  useEffect(()=>{
+    async function fetchProfile(){
+      try {
+        const response=await axiosPrivate.get('/api/user/profile');
+        setUser(response.data.user)
+      } catch (error) {
+        console.log(errror)
+      }
+    }
+    fetchProfile()
+    
+  },[])
   return (
     <main className=" pt-24 px-4 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto">
@@ -34,15 +68,17 @@ export default function ProfilePage() {
           <div className="flex flex-col sm:flex-row items-start sm:items-end space-y-4 sm:space-y-0 sm:space-x-4 -mt-16 px-4">
             <div className="w-32 h-32 rounded-full border-4 border-black bg-neutral-900 overflow-hidden">
               <Image
-                src={ProfileImage}
+                src={user?.profilePicture ? user.profilePicture :ProfileImage}
                 alt="Profile"
                 className="w-full h-full object-cover"
+                width={200}
+                height={200}
               />
             </div>
             <div className="flex-1">
-              <h1 className="text-2xl font-bold">John Doe</h1>
+              <h1 className="text-2xl font-bold">{user?.name}</h1>
               <p className="text-neutral-400">
-                Software Developer & AI Enthusiast
+                {user?.headline}
               </p>
             </div>
             <button className="flex items-center space-x-2 px-4 py-2 bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors">
@@ -66,15 +102,15 @@ export default function ProfilePage() {
               <div className="space-y-4">
                 <div className="flex items-center space-x-3 text-neutral-400">
                   <User size={20} />
-                  <span>@johndoe</span>
+                  <span>@{user?.name.toLowerCase()}</span>
                 </div>
                 <div className="flex items-center space-x-3 text-neutral-400">
                   <Mail size={20} />
-                  <span>john.doe@example.com</span>
+                  <span>{user?.email}</span>
                 </div>
                 <div className="flex items-center space-x-3 text-neutral-400">
                   <Calendar size={20} />
-                  <span>Joined January 2024</span>
+                  <span>{ moment(user?.createdAt).format('MMM DD, YYYY HH:mm:ss')}</span>
                 </div>
               </div>
             </motion.div>

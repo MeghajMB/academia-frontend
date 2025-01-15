@@ -2,8 +2,10 @@
 import React, { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { customAxios } from "@/lib/axios";
 import axios from "axios";
+import Timer from "../Timer";
+import useAuthApi from "@/hooks/useAuthApi";
+import { toast } from "react-toastify";
 
 const OTPVerification: React.FC = () => {
   const router = useRouter();
@@ -11,8 +13,11 @@ const OTPVerification: React.FC = () => {
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const [resend,setResend]=useState(false)
   const [isClient, setIsClient] = useState(false);
   const email = useRef("");
+  const {verifyOtp,resendOtp}=useAuthApi()
+
 
   // Initialize refs array
   useEffect(() => {
@@ -77,11 +82,8 @@ const OTPVerification: React.FC = () => {
 
     try {
       // Replace this with your actual OTP verification API call
-      const response = await customAxios.post("/api/auth/verify-otp", {
-        otp: otpString,
-        email: email.current,
-      });
-      if (response.data) {
+      const response = await verifyOtp(otpString,email.current)
+      if (response) {
         sessionStorage.removeItem("userEmail");
         router.push("/login");
       } else {
@@ -96,8 +98,33 @@ const OTPVerification: React.FC = () => {
       setLoading(false);
     }
   };
-  function handleResendOtp(){
-    console.log("Otp Resend")
+  async function handleResendOtp(){
+    try {
+      // Replace this with your actual OTP verification API call
+      const response = await resendOtp(email.current)
+      if (response) {
+        toast('New Otp Send!', {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: true,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+          });
+
+      } else {
+        setError("Cannot Set Otp. Login Again.");
+      }
+    } catch (err) {
+      if (axios.isAxiosError(err)) {
+        const { errors } = err.response?.data;
+        setError(errors[0].message);
+      }
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -113,6 +140,7 @@ const OTPVerification: React.FC = () => {
           <p className="mt-2 text-gray-400">
             Enter the 6-digit code sent to your email
           </p>
+          <Timer onChangeResend={setResend} />
         </div>
 
         <form onSubmit={handleSubmit} className="mt-8 space-y-6">
@@ -151,7 +179,7 @@ const OTPVerification: React.FC = () => {
             {loading ? "Verifying..." : "Verify OTP"}
           </button>
 
-          <p className="text-center text-sm text-gray-400">
+          {resend && <p className="text-center text-sm text-gray-400">
             Didn&apos;t receive the code?
             <button
               type="button"
@@ -160,7 +188,7 @@ const OTPVerification: React.FC = () => {
             >
               Resend
             </button>
-          </p>
+          </p>}
         </form>
       </motion.div>
     </main>

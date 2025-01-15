@@ -14,11 +14,16 @@ import {
     ChevronLeft,
     ChevronRight,
 } from 'lucide-react';
-import { useAppSelector } from '@/lib/hooks';
+import { useAppDispatch, useAppSelector } from '@/lib/hooks';
+import useAxiosPrivate from '@/hooks/useAxiosPrivate';
+import { logout } from '@/lib/features/auth/authSlice';
 
 export default function AdminNavbar() {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [loading,setLoading]=useState(false)
   const pathname = usePathname();
+  const axiosPrivate=useAxiosPrivate()
+  const dispatch=useAppDispatch()
   const {user}=useAppSelector((state)=>state.auth)
 
   if(user.role!=='admin'){
@@ -34,6 +39,18 @@ export default function AdminNavbar() {
     { name: 'Services', icon: Wrench, href: '/admin/services' },
     { name: 'Review Courses', icon: Star, href: '/admin/review-courses' },
   ];
+  async function handleLogout() {
+    setLoading(true);
+    try {
+      const response = await axiosPrivate.post("/api/auth/signout");
+      console.log(response.data);
+      dispatch(logout());
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  }
 
   return (
     <div 
@@ -95,6 +112,8 @@ export default function AdminNavbar() {
           <button
             className={`w-full flex items-center px-2 py-3 rounded-lg text-red-400 
               hover:bg-red-500/10 transition-colors`}
+              onClick={handleLogout}
+              disabled={loading}
           >
             <LogOut size={20} />
             {!isCollapsed && <span className="ml-3">Logout</span>}

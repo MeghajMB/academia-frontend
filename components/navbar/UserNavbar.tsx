@@ -6,7 +6,7 @@ import { Menu, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { RootState } from "@/lib/store";
 import { usePathname } from "next/navigation";
-import { customAxios } from "@/lib/axios";
+import { customAxios } from "@/api/axios";
 import { logout } from "@/lib/features/auth/authSlice";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 
@@ -42,7 +42,7 @@ const UserNavbar: React.FC = () => {
   if (user.role == "student") {
     instructorRoute = ["/home/teaching", "Become an Instructor"];
   } else {
-    instructorRoute = ["/home/instructor", "Instructor"];
+    instructorRoute = ["/instructor", "Instructor"];
   }
   const loggedInRoutes = [
     ["/home", "Home"],

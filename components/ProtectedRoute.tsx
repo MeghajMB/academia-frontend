@@ -21,12 +21,15 @@ export default function ProtectedRoute({
     if(role==='common'){
       if(user.role==='admin'){
         router.push('/admin')
+        return;
       }
       if(!user.role){
         router.push('/')
+        return;
       }
     }else if(role!==user.role){
       router.push('/')
+      return;
     }
     setIsLoading(false)
   }, [user.role, role, router]);

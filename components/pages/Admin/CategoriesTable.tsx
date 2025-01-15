@@ -1,12 +1,5 @@
 "use client";
-import {
-  Input,
-  Spinner,
-  Pagination,
-  User,
-  Chip,
-  Tooltip,
-} from "@nextui-org/react";
+import { Input, Spinner, Pagination, Chip, Tooltip } from "@nextui-org/react";
 import {
   Table,
   TableHeader,
@@ -15,68 +8,64 @@ import {
   TableRow,
   TableCell,
 } from "@nextui-org/table";
-import { EyeIcon, SearchIcon } from "lucide-react";
+import { EditIcon, SearchIcon } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import useAdminApi from "@/hooks/useAdminApi";
+import useAxiosPrivate from "@/hooks/useAxiosPrivate";
 
-interface IUser {
+interface ICategory {
   id: string;
   name: string;
-  email: string;
-  profilePicture: string;
+  description: string;
   isBlocked: boolean;
 }
+import CategoryModal from "@/components/Modal/CategoryModal";
 
-export default function UsersTable({
-  role,
-}: {
-  role: "instructor" | "student";
-}) {
-  const [users, setUsers] = useState<IUser[]>([]);
+export default function CategoriesTable() {
+  const [categories, setCategories] = useState<ICategory[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
+
   const [filterValue, setFilterValue] = useState("");
-
   const [isLoading, setIsLoading] = useState(false);
-  const [loadingId, setLoadingId] = useState<string | null>(null);
 
-  const {fetchUsers,blockUser} = useAdminApi()
+  const axiosPrivate = useAxiosPrivate();
 
-  const fetchPaginatedUsers = async (page: number) => {
+  const fetchPaginatedCategories = useCallback(async (page: number) => {
     setIsLoading(true);
     try {
-     
-      const response = await fetchUsers(role,page)
-      setUsers(response.users);
-      setTotalPages(response.pagination.totalPages);
+      const response = await axiosPrivate.get("/api/admin/get-categories", {
+        params: {
+          page,
+        },
+      });
+      setCategories(response.data.categories);
+      setTotalPages(response.data.pagination.totalPages);
     } catch (error) {
-      console.error("Error fetching users:", error);
+      console.error("Error fetching categories:", error);
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
-    fetchPaginatedUsers(currentPage);
+    fetchPaginatedCategories(currentPage);
   }, [currentPage]);
 
-  async function handleBlockUser(id: string) {
-    setLoadingId(id); // Set the loading state for the user being blocked/unblocked
+  async function handleBlockCategory(id: string) {
     try {
-      await blockUser(id)
-      setUsers((prevUsers) =>
-        prevUsers.map((user) =>
-          user.id == id
-            ? { ...user, isBlocked: !user.isBlocked }
-            : user
+      await axiosPrivate.put(
+        `/api/admin/block-category/${id}`
+      );
+      setCategories((prevCategories) =>
+        prevCategories.map((category) =>
+          category.id == id ? { ...category, isBlocked: !category.isBlocked } : category
         )
       );
     } catch (error) {
       console.error("Error blocking/unblocking user:", error);
-    } finally {
-      setLoadingId(null); // Reset the loading state
     }
   }
+
   const onSearchChange = useCallback((value?: string) => {
     if (value) {
       setFilterValue(value);
@@ -109,7 +98,7 @@ export default function UsersTable({
         />
       </div>
     );
-  }, [currentPage,totalPages]);
+  }, [currentPage, totalPages]);
 
   const topContent = useMemo(() => {
     return (
@@ -129,6 +118,7 @@ export default function UsersTable({
             onClear={() => setFilterValue("")}
             onValueChange={onSearchChange}
           />
+          <CategoryModal setCategories={setCategories} />
         </div>
       </div>
     );
@@ -143,8 +133,12 @@ export default function UsersTable({
     },
 
     {
-      key: "isBlocked",
+      key: "status",
       label: "STATUS",
+    },
+    {
+      key: "description",
+      label: "DESCRIPTION",
     },
     {
       key: "actions",
@@ -152,61 +146,44 @@ export default function UsersTable({
     },
   ];
 
-  const renderCell = (user: IUser, columnKey: React.Key) => {
-    const cellValue = user[columnKey as keyof IUser];
+  const renderCell = (category: ICategory, columnKey: React.Key) => {
+    const cellValue = category[columnKey as keyof ICategory];
     switch (columnKey) {
       case "name":
-        return (
-          <User
-            avatarProps={{ radius: "lg", src: user.profilePicture }}
-            description={user.email}
-            name={cellValue}
-          >
-            {user.email}
-          </User>
-        );
-      case "isBlocked":
+        return <span>{category.name}</span>;
+      case "description":
+        return <p>{category.description}</p>;
+      case "status":
         return (
           <Chip
             className="capitalize"
-            color={user.isBlocked ? "danger" : "success"}
+            color={category.isBlocked ? "danger" : "success"}
             size="sm"
             variant="flat"
           >
-            {user.isBlocked ? "Not Active" : "Active"}
+            {category.isBlocked ? "Not Active" : "Active"}
           </Chip>
         );
       case "actions":
         return (
           <div className="relative flex items-center gap-2">
-            {role === "instructor" && (
-              <Tooltip content="Details">
-                <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                  <EyeIcon />
-                </span>
-              </Tooltip>
-            )}
+            <Tooltip content="Edit Category">
+              <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
+                <EditIcon />
+              </span>
+            </Tooltip>
             <Tooltip
               color="danger"
-              content={user.isBlocked ? "Unblock User" : "Block User"}
+              content={
+                category.isBlocked ? "Unblock Category" : "Block Category"
+              }
             >
               <span
                 className={`text-lg ${
-                  user.isBlocked ? "text-success" : "text-danger"
+                  category.isBlocked ? "text-success" : "text-danger"
                 } cursor-pointer active:opacity-50`}
               >
-                <button
-                  onClick={() => handleBlockUser(user.id)}
-                  disabled={loadingId == user.id}
-                >
-                  {loadingId == user.id ? (
-                    <Spinner size="sm" />
-                  ) : user.isBlocked ? (
-                    "Unblock"
-                  ) : (
-                    "Block"
-                  )}
-                </button>
+                <button onClick={() => handleBlockCategory(category.id)}>{category.isBlocked ? "Unblock" : "Block"}</button>
               </span>
             </Tooltip>
           </div>
@@ -220,7 +197,7 @@ export default function UsersTable({
     <>
       <Table
         removeWrapper
-        aria-label="Student collection table"
+        aria-label="Category collection table"
         bottomContent={bottomContent}
         bottomContentPlacement="outside"
         topContent={topContent}
@@ -233,15 +210,15 @@ export default function UsersTable({
         </TableHeader>
 
         <TableBody
-          emptyContent={"No users found"}
-          items={users}
+          emptyContent={"No categories found"}
+          items={categories}
           loadingContent={<Spinner />}
           loadingState={loadingState}
         >
-          {(user) => (
-            <TableRow key={user.id}>
+          {(category) => (
+            <TableRow key={category.id}>
               {(columnKey) => (
-                <TableCell>{renderCell(user, columnKey)}</TableCell>
+                <TableCell>{renderCell(category, columnKey)}</TableCell>
               )}
             </TableRow>
           )}
