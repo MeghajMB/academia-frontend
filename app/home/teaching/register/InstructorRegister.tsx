@@ -3,9 +3,8 @@ import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { Loader2, AlertCircle } from "lucide-react";
-import useAxiosPrivate from "@/hooks/useAxiosPrivate";
-import { useAppDispatch } from "@/lib/hooks";
-import { setRole } from "@/lib/features/auth/authSlice";
+import { useAppSelector } from "@/lib/hooks";
+import useAuthApi from "@/hooks/useAuthApi";
 
 interface InstructorForm {
   headline: string;
@@ -41,10 +40,14 @@ const InstructorRegister = () => {
     agreement: false,
   });
   const [isClient, setIsClient] = useState(false);
-  const axiosPrivate = useAxiosPrivate();
-  const dispatch = useAppDispatch();
+  const {user}=useAppSelector(state=>state.auth);
+  const {registerInstructor}=useAuthApi()
 
   useEffect(() => {
+    if(user.verified=='pending'){
+      router.push('/home');
+      return
+    }
     setIsClient(true);
   }, []);
 
@@ -73,16 +76,16 @@ const InstructorRegister = () => {
     const urlRegex =
       /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/;
 
-    if (formData.website && !urlRegex.test(formData.website)) {
+    if (!urlRegex.test(formData.website)) {
       newErrors.website = "Please enter a valid website URL";
     }
-    if (formData.facebook && !urlRegex.test(formData.facebook)) {
+    if (!urlRegex.test(formData.facebook)) {
       newErrors.facebook = "Please enter a valid Facebook URL";
     }
-    if (formData.linkedin && !urlRegex.test(formData.linkedin)) {
+    if (!urlRegex.test(formData.linkedin)) {
       newErrors.linkedin = "Please enter a valid LinkedIn URL";
     }
-    if (formData.twitter && !urlRegex.test(formData.twitter)) {
+    if (!urlRegex.test(formData.twitter)) {
       newErrors.twitter = "Please enter a valid Twitter URL";
     }
 
@@ -100,15 +103,8 @@ const InstructorRegister = () => {
     }
 
     try {
-      const response = await axiosPrivate.post(
-        "/api/auth/register-instructor",
-        formData
-      );
-
-      if (response.status === 200) {
-        dispatch(setRole({ role: "instructor" }));
-        router.push("/instructor");
-      }
+      await registerInstructor(formData)
+      window.location.reload()
     } catch (error: any) {
       console.error(error);
       setErrors({
@@ -206,9 +202,7 @@ const InstructorRegister = () => {
 
           {/* Social Media Links */}
           <div className="space-y-4">
-            <h3 className="text-lg font-medium">
-              Social Media Links(optional)
-            </h3>
+            <h3 className="text-lg font-medium">Social Media Links</h3>
 
             <div>
               <label

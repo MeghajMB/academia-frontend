@@ -2,7 +2,7 @@ import { AxiosInstance } from "axios";
 
 const createAdminApi = (axiosInstance: AxiosInstance) => ({
 
-  fetchUsers: async (role: string, page: number ) => {
+  fetchUsersApi: async (role: string, page: number ) => {
     const response = await axiosInstance.get("/api/admin/get-users", {
         params: {
           role,
@@ -12,13 +12,16 @@ const createAdminApi = (axiosInstance: AxiosInstance) => ({
     return response.data;
   },
 
-  blockUser: async (userId:string) => {
+  blockUserApi: async (userId:string) => {
     const response =await axiosInstance.put(`/api/admin/block-user/${userId}`);
     return response.data;
   },
-
-  logout: async () => {
-    const response = await axiosInstance.post("/api/auth/logout");
+  fetchInstructorRequestsApi: async (page:number) => {
+    const response =await axiosInstance.get(`/api/admin/instructor-requests`,{
+      params:{
+        page
+      }
+    });
     return response.data;
   },
   

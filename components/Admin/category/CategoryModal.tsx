@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import {useState } from "react";
 import {
   Modal,
   ModalContent,
@@ -32,17 +32,8 @@ export default function CategoryModal({ setCategories }) {
   });
   const [errors, setErrors] = useState<FormErrors>({});
   const [isLoading, setIsLoading] = useState(false);
-  const controllerRef = useRef<AbortController | null>(null);
 
   const axiosPrivate = useAxiosPrivate();
-
-  useEffect(() => {
-    if (!isOpen) {
-      if (controllerRef.current) {
-        controllerRef.current.abort();
-      }
-    }
-  }, [isOpen]);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>

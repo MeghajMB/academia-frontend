@@ -1,5 +1,4 @@
 import createAuthApi from "@/services/authApi";
-//import { customAxios } from "@/api/axios";
 import useAxiosPrivate from "./useAxiosPrivate";
 
 export default function useAuthApi() {

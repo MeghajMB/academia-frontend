@@ -1,13 +1,5 @@
 "use client";
-import { Input, Spinner, Pagination, Chip, Tooltip } from "@nextui-org/react";
-import {
-  Table,
-  TableHeader,
-  TableBody,
-  TableColumn,
-  TableRow,
-  TableCell,
-} from "@nextui-org/table";
+import { Input, Pagination, Chip, Tooltip } from "@nextui-org/react";
 import { EditIcon, SearchIcon } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import useAxiosPrivate from "@/hooks/useAxiosPrivate";
@@ -18,7 +10,8 @@ interface ICategory {
   description: string;
   isBlocked: boolean;
 }
-import CategoryModal from "@/components/Modal/CategoryModal";
+import CategoryModal from "@/components/Admin/category/CategoryModal";
+import AdminTable from "../../Table";
 
 export default function CategoriesTable() {
   const [categories, setCategories] = useState<ICategory[]>([]);
@@ -53,12 +46,12 @@ export default function CategoriesTable() {
 
   async function handleBlockCategory(id: string) {
     try {
-      await axiosPrivate.put(
-        `/api/admin/block-category/${id}`
-      );
+      await axiosPrivate.put(`/api/admin/block-category/${id}`);
       setCategories((prevCategories) =>
         prevCategories.map((category) =>
-          category.id == id ? { ...category, isBlocked: !category.isBlocked } : category
+          category.id == id
+            ? { ...category, isBlocked: !category.isBlocked }
+            : category
         )
       );
     } catch (error) {
@@ -183,7 +176,9 @@ export default function CategoriesTable() {
                   category.isBlocked ? "text-success" : "text-danger"
                 } cursor-pointer active:opacity-50`}
               >
-                <button onClick={() => handleBlockCategory(category.id)}>{category.isBlocked ? "Unblock" : "Block"}</button>
+                <button onClick={() => handleBlockCategory(category.id)}>
+                  {category.isBlocked ? "Unblock" : "Block"}
+                </button>
               </span>
             </Tooltip>
           </div>
@@ -195,35 +190,16 @@ export default function CategoriesTable() {
 
   return (
     <>
-      <Table
-        removeWrapper
-        aria-label="Category collection table"
+      <AdminTable
         bottomContent={bottomContent}
-        bottomContentPlacement="outside"
+        columns={columns}
+        items={categories}
+        loadingState={loadingState}
+        renderCell={renderCell}
         topContent={topContent}
-        topContentPlacement="outside"
-      >
-        <TableHeader columns={columns}>
-          {(column) => (
-            <TableColumn key={column.key}>{column.label}</TableColumn>
-          )}
-        </TableHeader>
-
-        <TableBody
-          emptyContent={"No categories found"}
-          items={categories}
-          loadingContent={<Spinner />}
-          loadingState={loadingState}
-        >
-          {(category) => (
-            <TableRow key={category.id}>
-              {(columnKey) => (
-                <TableCell>{renderCell(category, columnKey)}</TableCell>
-              )}
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
+        label={"Category collection table"}
+        emptyContent={"No categories found"}
+      />
     </>
   );
 }

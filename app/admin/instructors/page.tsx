@@ -1,4 +1,4 @@
-import UsersTable from "@/components/pages/Admin/UsersTable";
+import UsersTable from "@/components/Admin/UsersTable";
 import ProtectedRoute from "@/components/ProtectedRoute";
 
 import React from "react";

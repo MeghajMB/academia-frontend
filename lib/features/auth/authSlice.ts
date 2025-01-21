@@ -6,7 +6,8 @@ interface authState {
     id: string | null;
     userName: string | null;
     role: string | null;
-    email:string|null
+    email:string|null;
+    verified:string|null;
   };
   accessToken: string | null;
   persist:boolean
@@ -17,7 +18,8 @@ const initialState: authState = {
     id: null,
     userName: null,
     role: null,
-    email:null
+    email:null,
+    verified:null,
   },
   accessToken: null,
   persist:false,
@@ -31,36 +33,32 @@ const authSlice = createSlice({
       state,
       action: PayloadAction<{
         id: string;
-        userName: string;
+        name: string;
         role: string;
         accessToken: string;
         email:string
+        verified:string;
       }>
     ) => {
-      const { id, userName, role, accessToken,email } = action.payload;
-      state.user = { id, userName, role,email };
+      const { id, name, role, accessToken,email,verified } = action.payload;
+      state.user = { id, userName:name, role,email,verified };
       state.accessToken = accessToken;
-    },
-    setAccessToken(state,action:PayloadAction<string>){
-      state.accessToken=action.payload
     },
     setPersist(state){
       state.persist=!state.persist
-    },
-    setRole(state,action:PayloadAction<{role:string}>){
-      state.user.role=action.payload.role
     },
     logout: (state) => {
       state.user = {
         id: null,
         userName: null,
         role: null,
-        email:null
+        email:null,
+        verified:null,
       };
       state.accessToken = null;
     },
   },
 });
 
-export const { login, logout,setAccessToken,setPersist,setRole } = authSlice.actions;
+export const { login, logout,setPersist } = authSlice.actions;
 export default authSlice.reducer;

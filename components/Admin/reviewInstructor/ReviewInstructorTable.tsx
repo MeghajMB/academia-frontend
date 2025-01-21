@@ -1,7 +1,6 @@
 "use client";
 import {
   Input,
-  Spinner,
   Pagination,
   User,
   Chip,
@@ -18,6 +17,7 @@ import {
 import { EyeIcon, SearchIcon } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import useAdminApi from "@/hooks/useAdminApi";
+import AdminTable from "../../Table";
 
 interface IUser {
   id: string;
@@ -27,11 +27,7 @@ interface IUser {
   isBlocked: boolean;
 }
 
-export default function UsersTable({
-  role,
-}: {
-  role: "instructor" | "student";
-}) {
+export default function ReviewInstructorTable() {
   const [users, setUsers] = useState<IUser[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
@@ -40,14 +36,14 @@ export default function UsersTable({
   const [isLoading, setIsLoading] = useState(false);
   const [loadingId, setLoadingId] = useState<string | null>(null);
 
-  const {fetchUsers,blockUser} = useAdminApi()
+  const { fetchInstructorRequestsApi } = useAdminApi();
 
-  const fetchPaginatedUsers = async (page: number) => {
+  const fetchPaginatedRequests = async (page: number) => {
     setIsLoading(true);
     try {
-     
-      const response = await fetchUsers(role,page)
-      setUsers(response.users);
+      const response = await fetchInstructorRequestsApi(page);
+      console.log(response)
+      setUsers(response.requests);
       setTotalPages(response.pagination.totalPages);
     } catch (error) {
       console.error("Error fetching users:", error);
@@ -57,25 +53,11 @@ export default function UsersTable({
   };
 
   useEffect(() => {
-    fetchPaginatedUsers(currentPage);
+    fetchPaginatedRequests(currentPage);
   }, [currentPage]);
 
-  async function handleBlockUser(id: string) {
-    setLoadingId(id); // Set the loading state for the user being blocked/unblocked
-    try {
-      await blockUser(id)
-      setUsers((prevUsers) =>
-        prevUsers.map((user) =>
-          user.id == id
-            ? { ...user, isBlocked: !user.isBlocked }
-            : user
-        )
-      );
-    } catch (error) {
-      console.error("Error blocking/unblocking user:", error);
-    } finally {
-      setLoadingId(null); // Reset the loading state
-    }
+  async function handleBlockUser() {
+    console.log("Hello")
   }
   const onSearchChange = useCallback((value?: string) => {
     if (value) {
@@ -109,7 +91,7 @@ export default function UsersTable({
         />
       </div>
     );
-  }, [currentPage,totalPages]);
+  }, [currentPage, totalPages]);
 
   const topContent = useMemo(() => {
     return (
@@ -179,33 +161,18 @@ export default function UsersTable({
       case "actions":
         return (
           <div className="relative flex items-center gap-2">
-            {role === "instructor" && (
-              <Tooltip content="Details">
-                <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                  <EyeIcon />
-                </span>
-              </Tooltip>
-            )}
             <Tooltip
               color="danger"
               content={user.isBlocked ? "Unblock User" : "Block User"}
             >
               <span
-                className={`text-lg ${
-                  user.isBlocked ? "text-success" : "text-danger"
-                } cursor-pointer active:opacity-50`}
+                className={`text-lg text-danger cursor-pointer active:opacity-50`}
               >
                 <button
-                  onClick={() => handleBlockUser(user.id)}
+                  onClick={() => handleBlockUser()}
                   disabled={loadingId == user.id}
                 >
-                  {loadingId == user.id ? (
-                    <Spinner size="sm" />
-                  ) : user.isBlocked ? (
-                    "Unblock"
-                  ) : (
-                    "Block"
-                  )}
+                  Reject
                 </button>
               </span>
             </Tooltip>
@@ -218,35 +185,16 @@ export default function UsersTable({
 
   return (
     <>
-      <Table
-        removeWrapper
-        aria-label="Student collection table"
+      <AdminTable
         bottomContent={bottomContent}
-        bottomContentPlacement="outside"
+        columns={columns}
+        items={users}
+        loadingState={loadingState}
+        renderCell={renderCell}
         topContent={topContent}
-        topContentPlacement="outside"
-      >
-        <TableHeader columns={columns}>
-          {(column) => (
-            <TableColumn key={column.key}>{column.label}</TableColumn>
-          )}
-        </TableHeader>
-
-        <TableBody
-          emptyContent={"No users found"}
-          items={users}
-          loadingContent={<Spinner />}
-          loadingState={loadingState}
-        >
-          {(user) => (
-            <TableRow key={user.id}>
-              {(columnKey) => (
-                <TableCell>{renderCell(user, columnKey)}</TableCell>
-              )}
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
+        label={"Instructor Request table"}
+        emptyContent={"No request found"}
+      />
     </>
   );
 }

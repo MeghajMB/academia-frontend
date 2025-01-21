@@ -81,8 +81,7 @@ const LoginPage= () => {
 
     try {
       const response = await axiosPrivate.post("/api/auth/signin", credentials);
-      const { id, accessToken, name, role,email } = response.data;
-      dispatch(login({ id, accessToken, role, userName: name,email:email }));
+      dispatch(login(response.data));
 
       router.push("/home");
     } catch (err) {
@@ -108,13 +107,7 @@ const LoginPage= () => {
       if (data) {
         
         dispatch(
-          login({
-            id: data.id,
-            accessToken: data.accessToken,
-            role: data.role,
-            userName: data.userName,
-            email:data.email
-          })
+          login(data)
         );
 
         // Redirect to dashboard or show logged-in content

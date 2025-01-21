@@ -1,5 +1,5 @@
-"use client";
-import InstructorDetail from "@/components/InstructorDetail";
+
+import InstructorDetail from "@/components/instructor/InstructorDetail";
 
 export default function Page() {
 

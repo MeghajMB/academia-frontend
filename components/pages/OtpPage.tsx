@@ -16,7 +16,7 @@ const OTPVerification: React.FC = () => {
   const [resend,setResend]=useState(false)
   const [isClient, setIsClient] = useState(false);
   const email = useRef("");
-  const {verifyOtp,resendOtp}=useAuthApi()
+  const {verifyOtpApi,resendOtpApi}=useAuthApi()
 
 
   // Initialize refs array
@@ -82,7 +82,7 @@ const OTPVerification: React.FC = () => {
 
     try {
       // Replace this with your actual OTP verification API call
-      const response = await verifyOtp(otpString,email.current)
+      const response = await verifyOtpApi(otpString,email.current)
       if (response) {
         sessionStorage.removeItem("userEmail");
         router.push("/login");
@@ -101,7 +101,7 @@ const OTPVerification: React.FC = () => {
   async function handleResendOtp(){
     try {
       // Replace this with your actual OTP verification API call
-      const response = await resendOtp(email.current)
+      const response = await resendOtpApi(email.current)
       if (response) {
         toast('New Otp Send!', {
           position: "top-right",

@@ -30,7 +30,7 @@ export default function InstructorLayout({
       <ProtectedRoute role="instructor">
         <main className="pt-24">
           <button
-            className="fixed top-24 left-4 z-40 p-2 hover:bg-white/10 rounded-lg transition-colors"
+            className="fixed top-24 left-4 z-50 p-2 hover:bg-white/10 rounded-lg transition-colors"
             onClick={() => setOpen((prevState) => !prevState)}
           >
             {open ? (
@@ -43,7 +43,7 @@ export default function InstructorLayout({
           <AnimatePresence mode="wait">
             {open && (
               <motion.div
-                className="fixed top-20 left-0 w-64 h-[calc(100vh-5rem)] bg-gradient-to-r from-[#190f43] to-black shadow-xl z-39 rounded-r-xl"
+                className="fixed top-20 left-0 w-64 h-[calc(100vh-5rem)] bg-gradient-to-r from-[#190f43] to-black shadow-xl z-40 rounded-r-xl z-48"
                 initial={{ x: "-100%", opacity: 0 }}
                 animate={{ x: "0%", opacity: 1 }}
                 exit={{ x: "-100%", opacity: 0 }}
