@@ -1,5 +1,5 @@
 import UsersTable from "@/components/Admin/UsersTable";
-import ProtectedRoute from "@/components/ProtectedRoute";
+import ProtectedRoute from "@/hoc/ProtectedRoute";
 
 import React from "react";
 

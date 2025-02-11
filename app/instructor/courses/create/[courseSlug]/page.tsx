@@ -1,4 +1,6 @@
 "use client";
+import AddLecture from "@/components/instructor/courses/AddLecture";
+import AddSection from "@/components/instructor/courses/AddSection";
 import useCourseApi from "@/hooks/useCourseApi";
 import useInstructorApi from "@/hooks/useInstructorApi";
 import { closestCorners, DndContext, DragOverlay } from "@dnd-kit/core";
@@ -8,8 +10,11 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { Button, Form, Input, Spinner, Textarea } from "@nextui-org/react";
+import { Button, Input } from "@nextui-org/react";
+import { Grip } from "lucide-react";
+import Link from "next/link";
 import { useParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
 interface ILecture {
@@ -27,12 +32,14 @@ interface ISection {
 export default function Page() {
   const [sections, setSections] = useState<ISection[]>([]);
   const [activeLecture, setActiveLecture] = useState<ILecture | null>(null);
+  const [isClient, setIsClient] = useState(false);
+  const router = useRouter();
 
   const { courseSlug } = useParams();
   //function api calls
-  const { fetchCurriculum } = useCourseApi();
-  const { createCourseLecture, reorderCurriculum } =
-    useInstructorApi();
+  const { fetchCurriculum,submitCourseForReview } = useCourseApi();
+  const { createCourseLecture, reorderCurriculum } = useInstructorApi();
+
 
   useEffect(() => {
     async function fetchData() {
@@ -40,13 +47,21 @@ export default function Page() {
         if (typeof courseSlug === "string") {
           const data = await fetchCurriculum(courseSlug);
           setSections(data.sections);
+          setIsClient(true);
         }
       } catch (error) {
+        router.push("/instructor/courses");
         console.log(error);
       }
     }
     fetchData();
   }, []);
+  if (!isClient) {
+    return null;
+  }
+  async function handleSendSubmitReviewREquest(){
+    const reponse=await submitCourseForReview()
+  }
 
   const handleDragStart = (event: any) => {
     const [type, id] = event.active.id.split("-");
@@ -110,7 +125,8 @@ export default function Page() {
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
       >
-        <Button color="success">Submit for review</Button>
+        <Button color="success" onPress={handleSendSubmitReviewREquest}>Submit for review</Button>
+        <Link href={`${courseSlug}/preview`} className="bg-primary-400 rounded-lg p-2">Preview Course</Link>
         <div className="p-20 max-h-screen">
           <SortableContext
             items={sections.map((section) => `section-${section.id}`)}
@@ -122,6 +138,9 @@ export default function Page() {
                   key={section.id}
                   section={section}
                   sectionIndex={index}
+                  setSections={setSections}
+                  courseId={courseSlug as string}
+                  sectionId={section.id}
                 />
               );
             })}
@@ -144,14 +163,20 @@ export default function Page() {
 const Section = ({
   section,
   sectionIndex,
+  setSections,
+  courseId,
+  sectionId,
 }: {
   section: ISection;
   sectionIndex: number;
+  setSections: React.Dispatch<React.SetStateAction<ISection[]>>;
+  courseId: string;
+  sectionId: string;
 }) => {
   return (
     <div className="p-4 bg-neutral-900 text-white rounded-md">
       <h3 className="font-bold mb-3">
-        Section {sectionIndex+1}: {section.title}
+        Section {sectionIndex + 1}: {section.title}
       </h3>
       <SortableContext
         items={section.lectures.map((lecture) => `lecture-${lecture.id}`)}
@@ -166,6 +191,11 @@ const Section = ({
             />
           ))}
         </div>
+        <AddLecture
+          setSections={setSections}
+          courseId={courseId}
+          sectionId={sectionId}
+        />
       </SortableContext>
     </div>
   );
@@ -182,132 +212,93 @@ const LectureCard = ({
 }) => {
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id: `lecture-${lecture.id}`, data: { sectionIndex } });
+  const [isEditing, setIsEditing] = useState(false);
+  const [title, setTitle] = useState(lecture.title);
+  const [videoKey, setVideoKey] = useState(lecture.content);
 
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
-    backgroundColor: "#2d2d2d",
+    backgroundColor: "rgb(31 41 55 / var(--tw-bg-opacity, 1))",
     padding: "12px",
     borderRadius: "4px",
-    cursor: "grab",
   };
-  const overlayStyle = isOverlay
-    ? {
-        backgroundColor: "rgba(50, 50, 50, 0.8)",
-        boxShadow: "0 4px 8px rgba(0,0,0,0.3)",
-      }
-    : {};
-  return (
-    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
-      <div
-        className={`p-3 bg-gray-800 text-white rounded-md ${
-          isOverlay && "opacity-90"
-        }`}
-        style={overlayStyle}
-      >
-        Lecture {lecture.id}: {lecture.title}
-      </div>
-    </div>
-  );
-};
 
-const AddSection = ({setSections,courseId}) => {
-
-  const [isActive, setIsActive] = useState(false);
-  const [errors, setErrors] = useState("");
-  const [isLoading,setIsLoading]=useState(false)
-  const { createCourseSection } =
-  useInstructorApi();
-
-  async function handleSubmit(e) {
-    e.preventDefault();
-    setIsLoading(true)
-    const formData = Object.fromEntries(new FormData(e.currentTarget)) as {id:string,title:string,description:string};
-    try {
-      const response=await createCourseSection(courseId,formData);
-      console.log(response)
-      setIsActive(false);
-      setSections((prevSections)=> [...prevSections,response]);
-    } catch (error) {
-      console.log(error)
-    }finally{
-      setIsLoading(false)
-    }
-    
+  function handleChangeLecture(){
+   //do the edit function here
+   
   }
 
   return (
-    <>
-      <div className="p-4">
-        <Button
-          color="secondary"
-          onPress={() => setIsActive((prevState) => !prevState)}
-          className="mb-4"
+    <div
+      ref={setNodeRef}
+      style={style}
+      className="flex flex-col space-y-4 p-4 rounded-md bg-gray-800"
+    >
+      <div className="flex">
+        <button
+          {...attributes}
+          {...listeners}
+          className="text-gray-400 hover:text-gray-600"
         >
-          {isActive ? "Close" : "+ Section"}
-        </Button>
+          <Grip />
+        </button>
+        <p className="text-lg">{title}</p>
+        <button
+          onClick={() => setIsEditing((prevState) => !prevState)}
+          className="text-blue-400 hover:text-blue-600 text-sm"
+        >
+          {isEditing ? "Cancel" : "Edit"}
+        </button>
+      </div>
+      {/* Lecture Content */}
+      <div className={`text-white ${isOverlay && "opacity-70"}`}>
+        {/* Editing Form */}
+        {isEditing && (
+          <div className="mt-4 space-y-4">
+            {/* Title Input */}
 
-        {isActive && (
-          <Form
-            validationBehavior="native"
-            onSubmit={handleSubmit}
-            className="p-4 rounded-lg shadow-md bg-neutral-900 border border-gray-700"
-          >
-            <Input
-              isRequired
-              errorMessage={errors || ""}
-              label="Section Title"
-              labelPlacement="outside"
-              name="title"
-              placeholder="Enter the Title"
-              type="text"
-              variant="bordered"
-              className="mb-4"
-              validate={(value) => {
-                if (value.trim().length <= 0) {
-                  return "Enter Title";
-                }
-                return null;
-              }}
-            />
+              <Input
+                id="title"
+                label="Title"
+                labelPlacement="outside"
+                type="text"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="Enter new title"
+              />
 
-            <h2 className="font-semibold mb-2 text-lg text-gray-200">
-              What will the students be able to do at the end of the section?
-            </h2>
-            <Textarea
-              name="description"
-              placeholder="Enter the learning outcome for this section"
-              className="mb-4"
-              isRequired
-              validate={(value) => {
-                if (value.trim().length <= 0) {
-                  return "Please fill out this field.";
-                }
-                if(value.length <=10){
-                  return 'Must be greater than 10 characters'
-                }
-                return null;
-              }}
-              classNames={{
-                input: "bg-gray-700 text-gray-200 placeholder-gray-400",
-              }}
-            />
+            {/* Video Upload */}
+            <div>
+              <label htmlFor="videoKey" className="block text-sm text-gray-400">
+                Upload New Video
+              </label>
+              <Input
+                id="videoKey"
+                type="file"
+                accept="video/*"
+                onChange={(e) => setVideoKey(e.target.files?.[0]?.name || "")}
+                className=" text-white p-2 rounded-md w-full"
+              />
+            </div>
 
-            <div className="flex justify-between gap-3">
-              <Button
-                onPress={() => setIsActive(false)}
-                variant="ghost"
-                className="mr-2 text-gray-200"
+            <div className="flex justify-between mt-4">
+              <button
+                onClick={() => setIsEditing(false)}
+                className="text-red-400 hover:text-red-600 px-4 py-2 rounded-md"
               >
                 Cancel
-              </Button>
-              <Button type="submit" color="secondary" disabled={isLoading}>
-                {isLoading ? <Spinner /> :"Add Section"}
-              </Button>
+              </button>
+              <button
+                onClick={handleChangeLecture}
+                className="text-green-400 hover:text-green-600 px-4 py-2 rounded-md"
+              >
+                Save
+              </button>
             </div>
-          </Form>
+          </div>
         )}
       </div>
-    </>
+    </div>
   );
 };

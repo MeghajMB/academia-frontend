@@ -110,7 +110,7 @@ export default function CourseCreation() {
     const thumbnailKey = `thumbnails/${Date.now()}_${uuidv4()}_${
       imageFile.name
     }`;
-    const videoKey = `videos/${Date.now()}_${uuidv4()}_${videoFile.name}`;
+    const videoKey = `previewVideos/${Date.now()}_${uuidv4()}_${videoFile.name}`;
     const thumbnailContentType = imageFile.type;
     const videoContentType = videoFile.type;
     try {
@@ -118,14 +118,15 @@ export default function CourseCreation() {
       const thumbnailSignedUrl = await generatePutSignedUrlApi(
         thumbnailKey,
         thumbnailContentType,
-        true
+        true,
+        false
       );
       const videoSignedUrl = await generatePutSignedUrlApi(
         videoKey,
         videoContentType,
-        true
+        true,
+        false
       );
-      console.log({ thumbnailContentType, videoContentType });
       // Uploading files to s3
       await axios.put(thumbnailSignedUrl, imageFile, {
         headers: { "Content-Type": thumbnailContentType },

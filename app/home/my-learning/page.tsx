@@ -1,4 +1,4 @@
-import ProtectedRoute from "@/components/ProtectedRoute";
+import ProtectedRoute from "@/hoc/ProtectedRoute";
 import LearningPage from "@/components/userpage/MyLearningPage";
 import React from "react";
 

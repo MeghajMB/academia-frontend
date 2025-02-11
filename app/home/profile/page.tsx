@@ -1,4 +1,4 @@
-import ProtectedRoute from "@/components/ProtectedRoute";
+import ProtectedRoute from "@/hoc/ProtectedRoute";
 import ProfilePage from "@/components/UserProfile";
 import React from "react";
 

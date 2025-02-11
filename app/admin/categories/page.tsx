@@ -1,5 +1,5 @@
 import CategoriesTable from "@/components/Admin/category/CategoriesTable";
-import ProtectedRoute from "@/components/ProtectedRoute";
+import ProtectedRoute from "@/hoc/ProtectedRoute";
 import React from "react";
 
 export default function page() {

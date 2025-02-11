@@ -21,7 +21,7 @@ interface authErrors {
   common?: string;
 }
 
-const LoginPage= () => {
+const LoginPage = () => {
   const [credentials, setCredentials] = useState<UserCredentials>({
     email: "",
     password: "",
@@ -30,29 +30,26 @@ const LoginPage= () => {
   const [errors, setErrors] = useState<authErrors>({});
   const [loading, setLoading] = useState(false);
   const [persist, setPersist] = useState(false);
-  const {user}=useAppSelector(state=>state.auth)
+  const { user } = useAppSelector((state) => state.auth);
   const router = useRouter();
 
   const dispatch = useAppDispatch();
 
   // Only run this code on the client-side
   useEffect(() => {
-
-    if(user.role=='admin'){
-      router.push('/admin');
+    if (user.role == "admin") {
+      router.push("/admin");
     }
-    if(user.role=='student'||user.role=='instructor'){
-      router.push('/')
+    if (user.role == "student" || user.role == "instructor") {
+      router.push("/");
     }
-    const localPersist=localStorage.getItem("persist");
-    if(localPersist==undefined){
+    const localPersist = localStorage.getItem("persist");
+    if (localPersist == undefined) {
       localStorage.setItem("persist", "false");
-    }else{
-      setPersist(localPersist === "true")
+    } else {
+      setPersist(localPersist === "true");
     }
-    
   }, []);
-
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -100,10 +97,7 @@ const LoginPage= () => {
 
       const data = event.data; // Extract token from the message
       if (data) {
-        
-        dispatch(
-          login(data)
-        );
+        dispatch(login(data));
 
         // Redirect to dashboard or show logged-in content
         router.push("/home");
@@ -210,21 +204,24 @@ const LoginPage= () => {
                 {loading ? "Signing in..." : "Sign in"}
               </button>
             </div>
-            <div className="flex items-center space-x-2">
-              <input
-                type="checkbox"
-                name="remember-me"
-                id="remember-me"
-                onChange={handleChangePersist}
-                checked={persist}
-                className="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500 cursor-pointer"
-              />
-              <label
-                htmlFor="remember-me"
-                className="block text-md font-medium "
-              >
-                Remember me
-              </label>
+            <div className="flex justify-between">
+              <div className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  name="remember-me"
+                  id="remember-me"
+                  onChange={handleChangePersist}
+                  checked={persist}
+                  className="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500 cursor-pointer"
+                />
+                <label
+                  htmlFor="remember-me"
+                  className="block text-md font-medium "
+                >
+                  Remember me
+                </label>
+              </div>
+              <button className="text-sm hover:text-purple-500" onClick={()=>router.push('/login/forgot-password')}>Forgot password?</button>
             </div>
 
             <div className="relative">

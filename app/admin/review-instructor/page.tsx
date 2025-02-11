@@ -1,5 +1,5 @@
 import ReviewInstructorTable from '@/components/Admin/reviewInstructor/ReviewInstructorTable'
-import ProtectedRoute from '@/components/ProtectedRoute'
+import ProtectedRoute from '@/hoc/ProtectedRoute'
 import React from 'react'
 
 export default function page() {

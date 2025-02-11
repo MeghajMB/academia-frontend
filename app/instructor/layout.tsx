@@ -11,7 +11,7 @@ import {
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
-import ProtectedRoute from "@/components/ProtectedRoute";
+import ProtectedRoute from "@/hoc/ProtectedRoute";
 
 const menuItems = [
   { title: "Courses", icon: BookOpen, path: "/instructor/courses" },
