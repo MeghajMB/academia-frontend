@@ -5,6 +5,7 @@ import {
   User,
   Chip,
   Tooltip,
+  useDisclosure,
 } from "@nextui-org/react";
 import {
   Table,
@@ -18,31 +19,38 @@ import { EyeIcon, SearchIcon } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import useAdminApi from "@/hooks/useAdminApi";
 import AdminTable from "../../Table";
+import GenericModal from "@/components/ui/GenericModal";
+import RejectRequestModal from "./RejectRequestModal";
+import { toast } from "react-toastify";
+import Link from "next/link";
 
 interface IUser {
   id: string;
   name: string;
   email: string;
+  verified: "pending" | "rejected" | "notRequested" | "verified";
   profilePicture: string;
   isBlocked: boolean;
 }
 
 export default function ReviewInstructorTable() {
   const [users, setUsers] = useState<IUser[]>([]);
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
   const [filterValue, setFilterValue] = useState("");
+  const [activeUserId, setActiveUserId] = useState<null | string>(null);
 
   const [isLoading, setIsLoading] = useState(false);
   const [loadingId, setLoadingId] = useState<string | null>(null);
 
-  const { fetchInstructorRequestsApi } = useAdminApi();
+  const { fetchInstructorRequestsApi, approveInstructorRequestApi } =
+    useAdminApi();
 
   const fetchPaginatedRequests = async (page: number) => {
     setIsLoading(true);
     try {
       const response = await fetchInstructorRequestsApi(page);
-      console.log(response)
       setUsers(response.requests);
       setTotalPages(response.pagination.totalPages);
     } catch (error) {
@@ -56,9 +64,29 @@ export default function ReviewInstructorTable() {
     fetchPaginatedRequests(currentPage);
   }, [currentPage]);
 
-  async function handleBlockUser() {
-    console.log("Hello")
+  async function handleApproveRequest(userId: string) {
+    try {
+      const response = await approveInstructorRequestApi(userId);
+      setUsers((prevUsers) => {
+       return prevUsers.filter((user) => {
+          return user.id != userId;
+        });
+      });
+      toast("Request Approved!", {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: true,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+      });
+    } catch (error) {
+      console.log(error);
+    }
   }
+
   const onSearchChange = useCallback((value?: string) => {
     if (value) {
       setFilterValue(value);
@@ -125,8 +153,12 @@ export default function ReviewInstructorTable() {
     },
 
     {
-      key: "isBlocked",
+      key: "verified",
       label: "STATUS",
+    },
+    {
+      key: "profile",
+      label: "PROFILE",
     },
     {
       key: "actions",
@@ -147,29 +179,52 @@ export default function ReviewInstructorTable() {
             {user.email}
           </User>
         );
-      case "isBlocked":
+      case "profile":
+        return (
+          <Tooltip content="Profile">
+            <Link
+              className="text-lg text-default-400 cursor-pointer active:opacity-50"
+              href={`/admin/review-instructor/${user.id}`}
+            >
+              <EyeIcon />
+            </Link>
+          </Tooltip>
+        );
+      case "verified":
         return (
           <Chip
             className="capitalize"
-            color={user.isBlocked ? "danger" : "success"}
+            color={user.verified == "pending" ? "success" : "danger"}
             size="sm"
             variant="flat"
           >
-            {user.isBlocked ? "Not Active" : "Active"}
+            {user.verified === "pending" ? "pending" : "rejected"}
           </Chip>
         );
       case "actions":
         return (
-          <div className="relative flex items-center gap-2">
-            <Tooltip
-              color="danger"
-              content={user.isBlocked ? "Unblock User" : "Block User"}
-            >
+          <div className="relative flex items-center gap-4">
+            <Tooltip color="success" content="Approve request">
+              <span
+                className={`text-lg text-success cursor-pointer active:opacity-50`}
+              >
+                <button
+                  onClick={() => handleApproveRequest(user.id)}
+                  disabled={loadingId == user.id}
+                >
+                  Approve
+                </button>
+              </span>
+            </Tooltip>
+            <Tooltip color="danger" content="Reject Request">
               <span
                 className={`text-lg text-danger cursor-pointer active:opacity-50`}
               >
                 <button
-                  onClick={() => handleBlockUser()}
+                  onClick={() => {
+                    setActiveUserId(user.id);
+                    onOpen();
+                  }}
                   disabled={loadingId == user.id}
                 >
                   Reject
@@ -185,6 +240,13 @@ export default function ReviewInstructorTable() {
 
   return (
     <>
+      <RejectRequestModal
+        isOpen={isOpen}
+        onOpen={onOpen}
+        onOpenChange={onOpenChange}
+        activeUserId={activeUserId}
+        setUsers={setUsers}
+      />
       <AdminTable
         bottomContent={bottomContent}
         columns={columns}

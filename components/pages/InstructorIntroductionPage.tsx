@@ -23,9 +23,9 @@ export default function InstructorIntroductionPage() {
             ) : (
               <Link
                 href="/home/teaching/register"
-                className="mt-8 inline-block bg-blue-700 text-white py-3 px-6 rounded-lg"
+                className={`mt-8 inline-block text-white py-3 px-6 rounded-lg ${ user.verified == 'rejected'? 'bg-red-500' : 'bg-blue-700'}`}
               >
-                Get Started
+                {user.verified =='rejected' ? "Request Rejected" : "Get Started"}
               </Link>
             )}
           </div>

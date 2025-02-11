@@ -1,6 +1,6 @@
 "use client";
 
-import {useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Modal,
   ModalContent,
@@ -8,24 +8,49 @@ import {
   ModalBody,
   ModalFooter,
   Button,
-  useDisclosure,
   Input,
   Textarea,
 } from "@nextui-org/react";
-import useAxiosPrivate from "@/hooks/useAxiosPrivate";
+import useAdminApi from "@/hooks/useAdminApi";
 
+// Define the structure of category data
+export interface Category {
+  id: string;
+  name: string;
+  description: string;
+  isBlocked: boolean;
+}
+
+// Define the shape of form data
 interface FormData {
   name: string;
   description: string;
 }
 
+// Define the shape of form validation errors
 interface FormErrors {
   name?: string;
   description?: string;
+  common?:string
 }
 
-export default function CategoryModal({ setCategories }) {
-  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+// Define the props for the CategoryModal component
+interface ICategoryModalProps {
+  setCategories: React.Dispatch<React.SetStateAction<Category[]>>;
+  isOpen: boolean;
+  onOpen: () => void;
+  onOpenChange: () => void;
+  isEditMode?: boolean;
+  selectedCategory?: Category | null;
+}
+
+export default function CategoryModal({
+  setCategories,
+  isOpen,
+  onOpenChange,
+  isEditMode = false,
+  selectedCategory,
+}:ICategoryModalProps) {
   const [formData, setFormData] = useState<FormData>({
     name: "",
     description: "",
@@ -33,7 +58,16 @@ export default function CategoryModal({ setCategories }) {
   const [errors, setErrors] = useState<FormErrors>({});
   const [isLoading, setIsLoading] = useState(false);
 
-  const axiosPrivate = useAxiosPrivate();
+  const { createCategoryApi, editCategoryApi } = useAdminApi();
+
+  useEffect(() => {
+    if (isEditMode && selectedCategory) {
+      setFormData({
+        name: selectedCategory.name,
+        description: selectedCategory.description,
+      });
+    }
+  }, [isEditMode, selectedCategory,isOpen]);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -63,24 +97,24 @@ export default function CategoryModal({ setCategories }) {
     if (!validateForm()) return;
 
     setIsLoading(true);
-    controllerRef.current = new AbortController();
     try {
       // Replace with your actual API endpoint
-      const response = await axiosPrivate.post(
-        "/api/admin/create-category",
-        formData,
-        {
-          signal: controllerRef.current.signal,
-        }
-      );
+      const response = isEditMode
+        ? await editCategoryApi(formData, selectedCategory!.id)
+        : await createCategoryApi(formData);
 
-      console.log(response);
       setFormData({ name: "", description: "" }); // Reset form
-      setCategories((prevCategories)=> [...prevCategories, response.data])
+      setCategories((prevCategories) =>
+        isEditMode
+          ? prevCategories.map((category) =>
+              category.id === selectedCategory?.id ? response : category
+            )
+          : [...prevCategories, response.data]
+      );
       onClose(); // Close the modal
     } catch (error) {
-      console.error("Error adding category:", error);
-      setErrors({ name: "Failed to add category. Please try again." });
+      const errors=error.response.data.errors[0].message
+      setErrors({ common: errors ?errors :"Failed to add category. Please try again." });
     } finally {
       setIsLoading(false);
     }
@@ -88,10 +122,6 @@ export default function CategoryModal({ setCategories }) {
 
   return (
     <>
-      <Button color="default" onPress={onOpen}>
-        +Add Category
-      </Button>
-
       <Modal
         isOpen={isOpen}
         onOpenChange={(open) => {
@@ -110,6 +140,7 @@ export default function CategoryModal({ setCategories }) {
                 Enter The Category
               </ModalHeader>
               <ModalBody>
+                {errors.common && <p className="text-red-600">{errors.common}</p>}
                 <Input
                   name="name"
                   label="Name"
@@ -132,11 +163,7 @@ export default function CategoryModal({ setCategories }) {
                 />
               </ModalBody>
               <ModalFooter>
-                <Button
-                  color="danger"
-                  variant="flat"
-                  onPress={onClose}
-                >
+                <Button color="danger" variant="flat" onPress={onClose}>
                   Close
                 </Button>
                 <Button
@@ -144,7 +171,7 @@ export default function CategoryModal({ setCategories }) {
                   onPress={() => handleSubmit(onClose)}
                   isLoading={isLoading}
                 >
-                  Add Category
+                  {isEditMode ? "Update" :"Add"} Category
                 </Button>
               </ModalFooter>
             </>

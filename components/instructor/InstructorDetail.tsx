@@ -1,21 +1,8 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import {
-  Medal,
-  BookOpen,
-  Users,
-  Star,
-  Clock,
-  Globe,
-  MessageSquare,
-  Languages,
-  GraduationCap,
-  Calendar,
-} from "lucide-react";
+import React from "react";
+import { Globe, GraduationCap, Calendar } from "lucide-react";
 import InstructorHeaderSection from "./InstructorHeaderSection";
-import Review from "./Review";
-import useInstructorApi from "@/hooks/useInstructorApi";
 import TwitterSvg from "../icons/TwitterSvg";
 import FacebookSvg from "../icons/FacebookSvg";
 import LinkedinSvg from "../icons/LinkedinSvg";
@@ -35,38 +22,18 @@ interface IInstructorDetail {
   purpleCoin: number;
   biography: string;
   profilePicture: string;
-  createdAt:string
+  createdAt: string;
 }
 
 export default function InstructorDetail({
   totalStudents,
   reviews,
+  user,
 }: {
   totalStudents: number;
   reviews: number;
+  user: IInstructorDetail;
 }) {
-  const [user, setUser] = useState<IInstructorDetail>();
-  const [isLoading, setIsLoading] = useState(false);
-  const [isClient, setIsClient] = useState(false);
-  const { fetchUInstructorProfileApi } = useInstructorApi();
-
-  useEffect(() => {
-    async function getProfile() {
-      try {
-        const profile = await fetchUInstructorProfileApi();
-        setUser(profile);
-        console.log(profile);
-        console.log(profile);
-        setIsClient(true);
-      } catch (error) {
-        console.log(error);
-      }
-    }
-    getProfile();
-  }, []);
-  if (!isClient) {
-    return null;
-  }
   return (
     <>
       {/* Hero Section */}
@@ -93,7 +60,6 @@ export default function InstructorDetail({
           <div className="bg-gray-900/50 rounded-xl p-6 border border-purple-500/20">
             <h2 className="text-xl font-semibold text-white mb-4">About</h2>
             <div className="space-y-4">
-
               <div>
                 <div className="flex items-center gap-2">
                   <GraduationCap size={20} className="text-purple-400" />
@@ -112,9 +78,11 @@ export default function InstructorDetail({
                 <p className="text-gray-400 mt-1">MIT, 2012</p>
               </div>
               <div className="flex items-center space-x-3 text-neutral-400">
-                  <Calendar size={20} className="text-purple-400" />
-                  <span>{ moment(user?.createdAt).format('MMM DD, YYYY HH:mm:ss')}</span>
-                </div>
+                <Calendar size={20} className="text-purple-400" />
+                <span>
+                  {moment(user?.createdAt).format("MMM DD, YYYY HH:mm:ss")}
+                </span>
+              </div>
             </div>
           </div>
 
@@ -170,9 +138,7 @@ export default function InstructorDetail({
                 </div>
                 <span className="font-medium">Website</span>
               </a>
-
             </div>
-
           </div>
         </div>
       </div>

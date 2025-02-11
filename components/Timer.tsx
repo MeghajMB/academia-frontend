@@ -6,11 +6,11 @@ export default function Timer({
 }: {
   onChangeResend: (value: boolean) => void;
 }) {
-  const [time, setTime] = useState(10);
+  const [time, setTime] = useState(60);
   useEffect(() => {
     const timer = setInterval(() => {
       setTime((prevTime) => {
-        if (prevTime == 0) {
+        if (prevTime < 0) {
           clearInterval(timer);
           return 0;
         }
@@ -20,7 +20,7 @@ export default function Timer({
     const timeout = setTimeout(() => {
       clearInterval(timer);
       onChangeResend(true);
-    }, 10 * 1000);
+    }, 60 * 1000);
 
     return () => {
       clearInterval(timer);
@@ -29,7 +29,7 @@ export default function Timer({
   }, []);
   return (
     <>
-      <div className="">{time}</div>
+      {time>0 && <div className="">{time}</div>}
     </>
   );
 }

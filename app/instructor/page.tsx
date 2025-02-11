@@ -1,12 +1,26 @@
-
+"use client";
 import InstructorDetail from "@/components/instructor/InstructorDetail";
+import useInstructorApi from "@/hooks/useInstructorApi";
+import { useEffect, useState } from "react";
 
 export default function Page() {
+  const { fetchInstructorProfileApi } = useInstructorApi();
+  const [profile, setProfile] = useState();
+  useEffect(() => {
+    async function getProfile() {
+      try {
+        const profile = await fetchInstructorProfileApi();
+        setProfile(profile);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    getProfile();
+  }, []);
 
-  return (
-    <InstructorDetail
-      reviews={200}
-      totalStudents={200}
-    />
-  );
+  if (!profile) {
+    return null;
+  }
+
+  return <InstructorDetail reviews={200} totalStudents={200} user={profile} />;
 }

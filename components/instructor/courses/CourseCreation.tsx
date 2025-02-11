@@ -1,5 +1,6 @@
 "use client";
 import { useRouter } from "next/navigation";
+import DOMPurify from "dompurify";
 import React, { useEffect, useState } from "react";
 import {
   Form,
@@ -11,11 +12,12 @@ import {
   Image,
   Card,
   CardBody,
+  Spinner,
 } from "@nextui-org/react";
 import useCategoryApi from "@/hooks/useCategoryApi";
 import useFilesApi from "@/hooks/useFilesApi";
-import axios from "axios";
-import { v4 as uuidv4 } from 'uuid';
+import axios, { AxiosError } from "axios";
+import { v4 as uuidv4 } from "uuid";
 import useInstructorApi from "@/hooks/useInstructorApi";
 
 interface FormErrors {
@@ -47,10 +49,11 @@ export default function CourseCreation() {
   const [videoPreview, setVideoPreview] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [videoFile, setVideoFile] = useState<File | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const { fetchCategoriesApi } = useCategoryApi();
   const { generatePutSignedUrlApi } = useFilesApi();
-  const {createCourseLandingPage}=useInstructorApi()
+  const { createCourseLandingPage } = useInstructorApi();
 
   useEffect(() => {
     async function getCategories() {
@@ -66,6 +69,13 @@ export default function CourseCreation() {
     getCategories();
   }, []);
 
+  useEffect(() => {
+    return () => {
+      if (imagePreview) URL.revokeObjectURL(imagePreview);
+      if (videoPreview) URL.revokeObjectURL(videoPreview);
+    };
+  }, [imagePreview, videoPreview]);
+
   if (!isClient) return null;
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -76,13 +86,35 @@ export default function CourseCreation() {
       setErrors({ common: "Both image and video files are required" });
       return;
     }
+    if (
+      imageFile.type !== "image/jpeg" &&
+      imageFile.type !== "image/jpg" &&
+      imageFile.type !== "image/png"
+    ) {
+      setErrors({
+        common: "Only JPG, JPEG, and PNG image formats are allowed",
+      });
+      return;
+    }
+    if (videoFile.type !== "video/mp4" && videoFile.type !== "video/webm") {
+      setErrors({ common: "Only MP4 and WebM video formats are allowed" });
+      return;
+    }
+
+    if (videoFile.size > 50000000 || videoFile.size < 10000000) {
+      setErrors({ common: "Video Must be between 10 and 50 mb" });
+      return;
+    }
+
     const formData = Object.fromEntries(new FormData(e.currentTarget));
-    const thumbnailKey = `thumbnails/${Date.now()}_${uuidv4()}_${imageFile.name}`;
+    const thumbnailKey = `thumbnails/${Date.now()}_${uuidv4()}_${
+      imageFile.name
+    }`;
     const videoKey = `videos/${Date.now()}_${uuidv4()}_${videoFile.name}`;
     const thumbnailContentType = imageFile.type;
     const videoContentType = videoFile.type;
     try {
-
+      setIsLoading(true);
       const thumbnailSignedUrl = await generatePutSignedUrlApi(
         thumbnailKey,
         thumbnailContentType,
@@ -93,7 +125,7 @@ export default function CourseCreation() {
         videoContentType,
         true
       );
-      console.log({thumbnailContentType,videoContentType})
+      console.log({ thumbnailContentType, videoContentType });
       // Uploading files to s3
       await axios.put(thumbnailSignedUrl, imageFile, {
         headers: { "Content-Type": thumbnailContentType },
@@ -103,18 +135,38 @@ export default function CourseCreation() {
       });
 
       // Submitting course details to the backend
+      const sanitizedDescription = DOMPurify.sanitize(formData.description);
       const payload = {
         ...formData,
-        image: thumbnailKey,
-        video: videoKey,
+        description: sanitizedDescription,
+        image: {
+          key: thumbnailKey,
+          size: imageFile.size,
+          type: imageFile.type,
+          name: imageFile.name,
+        },
+        video: {
+          key: videoKey,
+          size: videoFile.size,
+          type: videoFile.type,
+          name: videoFile.name,
+        },
       };
 
-      const response=await createCourseLandingPage(payload)
-      console.log("Course created successfully!");
-      router.push(`/courses/${response.courseId}`); // Navigate to courses page after success
+      const response = await createCourseLandingPage(payload);
+      router.push(`/instructor/courses/create/${response.id}`); // Navigate to courses page after success
     } catch (error) {
-      console.error("Error creating course:", error);
-      setErrors({ common: "An error occurred while creating the course." });
+      let commonError;
+      if (error instanceof AxiosError) {
+        commonError = error.response?.data?.errors[0].message;
+      }
+      setErrors({
+        common: commonError
+          ? commonError
+          : "An error occurred while creating the course.",
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -194,7 +246,7 @@ export default function CourseCreation() {
                 }}
               >
                 {categories.map((category) => (
-                  <SelectItem key={category.name} value={category.name}>
+                  <SelectItem key={category.id} value={category.id}>
                     {category.name}
                   </SelectItem>
                 ))}
@@ -327,8 +379,13 @@ export default function CourseCreation() {
               </div>
             </div>
 
-            <Button type="submit" size="lg" className="mt-4 bg-purple-900">
-              Create Course
+            <Button
+              type="submit"
+              size="lg"
+              className="mt-4 bg-purple-900"
+              disabled={isLoading}
+            >
+              {isLoading ? <Spinner /> : "Create Course"}
             </Button>
           </Form>
         </CardBody>

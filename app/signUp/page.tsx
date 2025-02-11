@@ -9,6 +9,15 @@ import { login } from "@/lib/features/auth/authSlice";
 import { useRouter } from "next/navigation";
 import { customAxios } from "@/api/axios";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
+import { toast } from "react-toastify";
+import { Spinner } from "@nextui-org/react";
+
+interface IFormError{
+  name?: string;
+  email?: string;
+  password?: string;
+  confirmPassword?: string;
+}
 
 const SignupPage = () => {
   const [credentials, setCredentials] = useState<SignupCredentials>({
@@ -19,13 +28,8 @@ const SignupPage = () => {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [isClient, setIsClient] = useState(false); // Track client-side mount
-  const [loading, setLoading] = useState(false);
-  const [errors, setErrors] = useState({
-    name: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-  });
+  const [isLoading, setIsLoading] = useState(false);
+  const [errors, setErrors] = useState<IFormError>({});
   const router = useRouter();
 
   const dispatch = useAppDispatch();
@@ -44,10 +48,11 @@ const SignupPage = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    setLoading(true);
+    setIsLoading(true);
+    setErrors({})
     const validationErrors = validateForm(credentials);
     if (Object.values(validationErrors).some((error) => error !== "")) {
-      setLoading(false);
+      setIsLoading(false);
       setErrors(validationErrors);
       return;
     }
@@ -58,13 +63,24 @@ const SignupPage = () => {
       router.push("/signUp/otp");
     } catch (error) {
       console.log(error);
+      const errorMessage= error.response.data.errors[0].message || 'Something went wrong!Try again later.'
+      toast.error(errorMessage, {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: true,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+      });
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
   const handleGoogleSignIn = async () => {
-    setLoading(true);
+    setIsLoading(true);
     window.open(
       `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/google`,
       "_blank",
@@ -75,9 +91,7 @@ const SignupPage = () => {
 
       const data = event.data; // Extract token from the message
       if (data) {
-        dispatch(
-          login(data)
-        );
+        dispatch(login(data));
 
         router.push("/home");
       }
@@ -88,7 +102,7 @@ const SignupPage = () => {
 
     // Attach the event listener
     window.addEventListener("message", receiveMessage);
-    setLoading(false);
+    setIsLoading(false);
   };
 
   return (
@@ -224,10 +238,10 @@ const SignupPage = () => {
             <div>
               <button
                 type="submit"
-                disabled={loading}
+                disabled={isLoading}
                 className="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-700 rounded-lg font-medium transition-colors"
               >
-                Create account
+                {isLoading ? <Spinner /> :"Create account"}
               </button>
             </div>
 
@@ -245,7 +259,7 @@ const SignupPage = () => {
             <button
               type="button"
               onClick={handleGoogleSignIn}
-              disabled={loading}
+              disabled={isLoading}
               className="w-full py-3 px-4 bg-white text-black rounded-lg font-medium flex items-center justify-center gap-2 hover:bg-gray-100 transition-colors"
             >
               <GoogleSvg />

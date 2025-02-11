@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { Loader2, AlertCircle } from "lucide-react";
 import { useAppSelector } from "@/lib/hooks";
 import useAuthApi from "@/hooks/useAuthApi";
+import useUserApi from "@/hooks/useUserApi";
+import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Textarea, useDisclosure } from "@nextui-org/react";
 
 interface InstructorForm {
   headline: string;
@@ -28,6 +30,7 @@ interface FormErrors {
 
 const InstructorRegister = () => {
   const router = useRouter();
+
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
   const [formData, setFormData] = useState<InstructorForm>({
@@ -39,16 +42,41 @@ const InstructorRegister = () => {
     website: "",
     agreement: false,
   });
+  const [rejectReason,setRejectReason]=useState()
+
   const [isClient, setIsClient] = useState(false);
-  const {user}=useAppSelector(state=>state.auth);
-  const {registerInstructor}=useAuthApi()
+
+  const { user } = useAppSelector((state) => state.auth);
+
+  const { registerInstructor } = useAuthApi();
+  const { fetchUserProfileApi } = useUserApi();
+
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
   useEffect(() => {
-    if(user.verified=='pending'){
-      router.push('/home');
-      return
+    async function getProfile() {
+      const userData = await fetchUserProfileApi();
+      setRejectReason(userData.rejectedReason || "");
+      setFormData({
+        headline: userData.headline,
+        biography: userData.biography,
+        facebook: userData.links.facebook,
+        linkedin: userData.links.linkedin,
+        twitter: userData.links.twitter,
+        website: userData.links.website,
+        agreement: true,
+      });
+
+      setIsClient(true);
     }
-    setIsClient(true);
+    if (user.verified == "pending") {
+      router.push("/home");
+      return;
+    } else if (user.verified == "rejected") {
+      getProfile();
+    } else {
+      setIsClient(true);
+    }
   }, []);
 
   if (!isClient) {
@@ -103,8 +131,8 @@ const InstructorRegister = () => {
     }
 
     try {
-      await registerInstructor(formData)
-      window.location.reload()
+      await registerInstructor(formData);
+      window.location.reload();
     } catch (error: any) {
       console.error(error);
       setErrors({
@@ -130,6 +158,35 @@ const InstructorRegister = () => {
 
   return (
     <main className="pt-24 px-4">
+      <Modal isOpen={isOpen} onOpenChange={onOpenChange} placement="top-center">
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="flex flex-col gap-1">
+                Reason for rejecting instructor request
+              </ModalHeader>
+              <ModalBody>
+                <Textarea
+                  name="rejectReason"
+                  label="Reason"
+                  variant="bordered"
+                  value={rejectReason}
+                  disabled
+                />
+              </ModalBody>
+              <ModalFooter>
+                <Button
+                  color="danger"
+                  variant="flat"
+                  onPress={onClose}
+                >
+                  Close
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -148,6 +205,9 @@ const InstructorRegister = () => {
             <p>{errors.general}</p>
           </div>
         )}
+        <button className="bg-red-600 p-1 rounded-lg" onClick={onOpen}>
+          Click to view Rejected Reason
+        </button>
 
         <form onSubmit={handleSubmit} className="space-y-6" noValidate>
           {/* Headline */}

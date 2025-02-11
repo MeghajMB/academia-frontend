@@ -1,5 +1,12 @@
 "use client";
-import { Input, Pagination, Chip, Tooltip } from "@nextui-org/react";
+import {
+  Input,
+  Pagination,
+  Chip,
+  Tooltip,
+  Button,
+  useDisclosure,
+} from "@nextui-org/react";
 import { EditIcon, SearchIcon } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import useAxiosPrivate from "@/hooks/useAxiosPrivate";
@@ -20,6 +27,12 @@ export default function CategoriesTable() {
 
   const [filterValue, setFilterValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  const [selectedCategory, setSelectedCategory] = useState<ICategory | null>(
+    null
+  );
+  const [isEditMode, setIsEditMode] = useState(false);
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
   const axiosPrivate = useAxiosPrivate();
 
@@ -58,6 +71,12 @@ export default function CategoriesTable() {
       console.error("Error blocking/unblocking user:", error);
     }
   }
+
+  const handleEditCategory = (category: ICategory) => {
+    setSelectedCategory(category);
+    setIsEditMode(true);
+    onOpen();
+  };
 
   const onSearchChange = useCallback((value?: string) => {
     if (value) {
@@ -111,7 +130,9 @@ export default function CategoriesTable() {
             onClear={() => setFilterValue("")}
             onValueChange={onSearchChange}
           />
-          <CategoryModal setCategories={setCategories} />
+          <Button color="default" onPress={onOpen}>
+            +Add Category
+          </Button>
         </div>
       </div>
     );
@@ -161,7 +182,10 @@ export default function CategoriesTable() {
         return (
           <div className="relative flex items-center gap-2">
             <Tooltip content="Edit Category">
-              <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
+              <span
+                className="text-lg text-default-400 cursor-pointer active:opacity-50"
+                onClick={() => handleEditCategory(category)}
+              >
                 <EditIcon />
               </span>
             </Tooltip>
@@ -190,6 +214,14 @@ export default function CategoriesTable() {
 
   return (
     <>
+      <CategoryModal
+        setCategories={setCategories}
+        isOpen={isOpen}
+        onOpen={onOpen}
+        onOpenChange={onOpenChange}
+        selectedCategory={selectedCategory}
+        isEditMode={isEditMode}
+      />
       <AdminTable
         bottomContent={bottomContent}
         columns={columns}
