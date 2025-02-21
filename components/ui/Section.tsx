@@ -2,61 +2,24 @@
 import { ChevronRight } from "lucide-react";
 import { useEffect, useState } from "react";
 import CourseCard from "./cards/CourseCard";
+import useCourseApi from "@/hooks/api/useCourseApi";
+import { ICourse } from "@/types/course";
 
-interface ICourse {
-  id: string;
-  title: string;
-  image: string;
-  rating: number;
-  reviews: number;
-  price: number;
-  instructor:string
-}
 
-export default function Section({label}:{label:string}) {
+export default function Section({label,status}:{label:string;status:string}) {
   const [courses, setCourses] = useState<ICourse[]>([]);
+  const {fetchNewCoursesApi}=useCourseApi()
   useEffect(() => {
+    async function fetchCourses(){
+      if(status=='new'){
+        const response=await fetchNewCoursesApi();
+        setCourses(response)
+      }
+    }
+    fetchCourses()
     //Fetch the courses here
-    const a = [
-      {
-        id: "strin",
-        title: "asd",
-        image: "asd",
-        rating: 123,
-        reviews: 123,
-        price: 123,
-        instructor:'asds'
-      },
-      {
-        id: "sting",
-        title: "asd",
-        image: "asd",
-        rating: 123,
-        reviews: 123,
-        price: 123,
-        instructor:'asds'
-      },
-      {
-        id: "tring",
-        title: "asd",
-        image: "asd",
-        rating: 123,
-        reviews: 123,
-        price: 123,
-        instructor:'asds'
-      },
-      {
-        id: "tng",
-        title: "asd",
-        image: "asd",
-        rating: 123,
-        reviews: 123,
-        price: 123,
-        instructor:'asds'
-      },
-    ];
-    setCourses(a);
   }, []);
+
   return (
     <>
       <section className="pt-10 pb-5">

@@ -11,7 +11,7 @@ import {
   Input,
   Textarea,
 } from "@nextui-org/react";
-import useAdminApi from "@/hooks/useAdminApi";
+import useAdminApi from "@/hooks/api/useAdminApi";
 
 // Define the structure of category data
 export interface Category {

@@ -4,7 +4,7 @@ import { Card, CardBody, CardHeader, Badge, Button } from "@nextui-org/react";
 import { Coins } from "lucide-react";
 import ProtectedRoute from "@/hoc/ProtectedRoute";
 import RenderRazorpay from "@/components/Payment/RenderRazorpay";
-import usePaymentApi from "@/hooks/usePaymentApi";
+import usePaymentApi from "@/hooks/api/usePaymentApi";
 
 const coinPackages = [
   { coins: 100, price: 90 },
@@ -15,26 +15,6 @@ const coinPackages = [
   { coins: 10000, price: 8900 },
 ];
 const ShopCoins = () => {
-  const [displayRazorpay, setDisplayRazorpay] = useState(false);
-  const [orderDetails, setOrderDetails] = useState({
-    orderId: null,
-    currency: null,
-    amount: null,
-  });
-  const {createOrderApi}=usePaymentApi();
-
-  async function handlePurchase(coins:number, price:number){
-    const data = await createOrderApi(price,'INR')
-    if (data && data.order_id) {
-      setOrderDetails({
-        orderId: data.order_id,
-        currency: data.currency,
-        amount: data.amount,
-      });
-      setDisplayRazorpay(true);
-    }
-  };
-
   return (
     <ProtectedRoute role="common">
       <div className="container mx-auto px-4 py-8 max-w-6xl">
@@ -65,28 +45,16 @@ const ShopCoins = () => {
                     </Badge>
                   )}
                 </div>
-                <Button
-                  color="primary"
-                  className="w-full font-semibold"
-                  size="lg"
-                  onPress={() => handlePurchase(coins, price)}
-                >
-                  Purchase Now
-                </Button>
+                <RenderRazorpay
+                  keyId={process.env.REACT_APP_RAZORPAY_KEY_ID!}
+                  coins={coins}
+                  price={price}
+                />
               </CardBody>
             </Card>
           ))}
         </div>
       </div>
-      {displayRazorpay && (
-        <RenderRazorpay
-          amount={orderDetails.amount}
-          currency={orderDetails.currency}
-          orderId={orderDetails.orderId}
-          keyId={process.env.REACT_APP_RAZORPAY_KEY_ID}
-          keySecret={process.env.REACT_APP_RAZORPAY_KEY_SECRET}
-        />
-      )}
     </ProtectedRoute>
   );
 };

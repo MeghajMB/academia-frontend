@@ -1,6 +1,6 @@
 "use client";
 import InstructorDetail from "@/components/instructor/InstructorDetail";
-import useInstructorApi from "@/hooks/useInstructorApi";
+import useInstructorApi from "@/hooks/api/useInstructorApi";
 import { useEffect, useState } from "react";
 
 export default function Page() {

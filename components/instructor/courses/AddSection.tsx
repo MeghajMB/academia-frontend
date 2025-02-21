@@ -1,4 +1,4 @@
-import useInstructorApi from "@/hooks/useInstructorApi";
+import useCourseApi from "@/hooks/api/useCourseApi";
 import { Button, Form, Input, Spinner, Textarea } from "@nextui-org/react";
 import { useState } from "react";
 
@@ -6,7 +6,7 @@ export default function AddSection({ setSections, courseId }) {
   const [isActive, setIsActive] = useState(false);
   const [errors, setErrors] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const { createCourseSection } = useInstructorApi();
+  const { createCourseSection } = useCourseApi();
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -17,10 +17,10 @@ export default function AddSection({ setSections, courseId }) {
       description: string;
     };
     try {
-      const response = await createCourseSection(courseId, formData);
-      console.log(response);
+      const createdSection = await createCourseSection(courseId, formData);
+      const updatedSection={...createdSection,lectures:[]}
       setIsActive(false);
-      setSections((prevSections) => [...prevSections, response]);
+      setSections((prevSections) => [...prevSections, updatedSection]);
     } catch (error) {
       console.log(error);
     } finally {

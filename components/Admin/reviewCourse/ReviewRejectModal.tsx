@@ -12,32 +12,24 @@ import {
 } from "@nextui-org/react";
 import useAdminApi from "@/hooks/api/useAdminApi";
 import { toast } from "react-toastify";
-
-interface IUser {
-  id: string;
-  name: string;
-  email: string;
-  verified: "pending" | "rejected" | "notRequested" | "verified";
-  profilePicture: string;
-  isBlocked: boolean;
-}
+import { IReviewRequests } from "@/app/admin/review-courses/page";
 
 interface RejectRequestModalProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
-  activeUserId: string | null;
+  courseId: string | null;
   onOpen: () => void;
-  setUsers: React.Dispatch<React.SetStateAction<IUser[]>>;
+  setReviewRequests: React.Dispatch<React.SetStateAction<IReviewRequests[]>>;
 }
 
-export default function RejectRequestModal({
+export default function ReviewRejectModal({
   isOpen,
   onOpenChange,
-  activeUserId,
+  courseId,
   onOpen,
-  setUsers,
+  setReviewRequests,
 }: RejectRequestModalProps) {
-  const { rejectInstructorRequestApi } = useAdminApi();
+  const { rejectCourseRequestApi } = useAdminApi();
 
   const [rejectReason, setRejectReason] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -52,12 +44,12 @@ export default function RejectRequestModal({
     setIsLoading(true);
 
     try {
-      if (!activeUserId) throw new Error("No active user selected.");
-      await rejectInstructorRequestApi(rejectReason, activeUserId);
+      if (!courseId) throw new Error("No active course selected.");
+      await rejectCourseRequestApi(rejectReason, courseId);
 
-      setUsers((prevUsers) => {
-       return prevUsers.filter((user) => {
-          return user.id != activeUserId;
+      setReviewRequests((prevRequest) => {
+       return prevRequest.filter((request) => {
+          return request.id != courseId;
         });
      
       });

@@ -14,11 +14,11 @@ import {
   CardBody,
   Spinner,
 } from "@nextui-org/react";
-import useCategoryApi from "@/hooks/useCategoryApi";
-import useFilesApi from "@/hooks/useFilesApi";
+import useCategoryApi from "@/hooks/api/useCategoryApi";
+import useFilesApi from "@/hooks/api/useFilesApi";
 import axios, { AxiosError } from "axios";
 import { v4 as uuidv4 } from "uuid";
-import useInstructorApi from "@/hooks/useInstructorApi";
+import useCourseApi from "@/hooks/api/useCourseApi";
 
 interface FormErrors {
   title?: string;
@@ -40,6 +40,14 @@ interface ICategory {
   updatedAt: string;
 }
 
+interface CourseFormData {
+  title: string;
+  subtitle: string;
+  description: string;
+  category: string;
+  price: string;
+}
+
 export default function CourseCreation() {
   const [errors, setErrors] = useState<FormErrors>({});
   const router = useRouter();
@@ -53,7 +61,7 @@ export default function CourseCreation() {
 
   const { fetchCategoriesApi } = useCategoryApi();
   const { generatePutSignedUrlApi } = useFilesApi();
-  const { createCourseLandingPage } = useInstructorApi();
+  const { createCourse } = useCourseApi();
 
   useEffect(() => {
     async function getCategories() {
@@ -106,11 +114,15 @@ export default function CourseCreation() {
       return;
     }
 
-    const formData = Object.fromEntries(new FormData(e.currentTarget));
+    const formData = Object.fromEntries(
+      new FormData(e.currentTarget)
+    ) as unknown as CourseFormData;
     const thumbnailKey = `thumbnails/${Date.now()}_${uuidv4()}_${
       imageFile.name
     }`;
-    const videoKey = `previewVideos/${Date.now()}_${uuidv4()}_${videoFile.name}`;
+    const videoKey = `previewVideos/${Date.now()}_${uuidv4()}_${
+      videoFile.name
+    }`;
     const thumbnailContentType = imageFile.type;
     const videoContentType = videoFile.type;
     try {
@@ -138,23 +150,16 @@ export default function CourseCreation() {
       // Submitting course details to the backend
       const sanitizedDescription = DOMPurify.sanitize(formData.description);
       const payload = {
-        ...formData,
+        title: formData.title,
+        subtitle: formData.subtitle,
+        category: formData.category,
+        price: parseFloat(formData.price),
         description: sanitizedDescription,
-        image: {
-          key: thumbnailKey,
-          size: imageFile.size,
-          type: imageFile.type,
-          name: imageFile.name,
-        },
-        video: {
-          key: videoKey,
-          size: videoFile.size,
-          type: videoFile.type,
-          name: videoFile.name,
-        },
+        imageThumbnail: thumbnailKey,
+        promotionalVideo: videoKey,
       };
 
-      const response = await createCourseLandingPage(payload);
+      const response = await createCourse(payload);
       router.push(`/instructor/courses/create/${response.id}`); // Navigate to courses page after success
     } catch (error) {
       let commonError;
@@ -188,209 +193,207 @@ export default function CourseCreation() {
   };
 
   return (
-    <div className="w-full max-w-3xl mx-auto p-4">
-      <Card className="p-6 bg-gray-950">
-        {errors.common && <p className="text-red-400">{errors.common}</p>}
-        <CardBody>
-          <Form
-            validationBehavior="native"
-            onSubmit={handleSubmit}
-            className="flex flex-col gap-6"
-          >
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Input
-                isRequired
-                errorMessage={errors.title || null}
-                label="Course Title"
-                labelPlacement="outside"
-                name="title"
-                placeholder="Enter the Title"
-                type="text"
-                variant="bordered"
-                classNames={{
-                  label: "font-medium",
-                }}
-                validate={(value) => {
-                  if (value.length < 5)
-                    return "Title must be at least 5 characters long";
-                }}
-              />
-
-              <Input
-                isRequired
-                errorMessage={errors.subtitle || null}
-                label="Course Subtitle"
-                labelPlacement="outside"
-                name="subtitle"
-                placeholder="Enter the Subtitle"
-                type="text"
-                variant="bordered"
-                classNames={{
-                  label: "font-medium",
-                }}
-                validate={(value) => {
-                  if (value.length < 5)
-                    return "Subtitle must be at least 5 characters long";
-                }}
-              />
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Select
-                label="Select a Category"
-                labelPlacement="outside"
-                isRequired
-                name="category"
-                variant="bordered"
-                classNames={{
-                  label: "font-medium",
-                }}
-              >
-                {categories.map((category) => (
-                  <SelectItem key={category.id} value={category.id}>
-                    {category.name}
-                  </SelectItem>
-                ))}
-              </Select>
-
-              <Input
-                label="Price"
-                isRequired
-                labelPlacement="outside"
-                name="price"
-                placeholder="Enter the Price"
-                type="number"
-                variant="bordered"
-                startContent={
-                  <div className="pointer-events-none flex items-center">
-                    <span className="text-default-400 text-small">$</span>
-                  </div>
-                }
-                classNames={{
-                  label: "font-medium",
-                }}
-                validate={(value) => {
-                  if (parseFloat(value) < 0) return "Enter a valid Price";
-                }}
-              />
-            </div>
-
-            <Textarea
+    <Card className="p-6 bg-gradient-to-r from-black to-gray-900">
+      {errors.common && <p className="text-red-400">{errors.common}</p>}
+      <CardBody>
+        <Form
+          validationBehavior="native"
+          onSubmit={handleSubmit}
+          className="flex flex-col gap-6"
+        >
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Input
               isRequired
-              label="Description"
-              placeholder="Enter your description"
+              errorMessage={errors.title || null}
+              label="Course Title"
               labelPlacement="outside"
-              name="description"
+              name="title"
+              placeholder="Enter the Title"
+              type="text"
               variant="bordered"
-              minRows={4}
               classNames={{
                 label: "font-medium",
               }}
               validate={(value) => {
-                if (value.length < 50)
-                  return "Description must be at least 50 characters long";
+                if (value.length < 5)
+                  return "Title must be at least 5 characters long";
               }}
             />
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-4">
-                <p className="font-medium">Course Thumbnail</p>
-                {imagePreview ? (
-                  <div className="flex flex-col justify-center items-center">
-                    <Image
-                      src={imagePreview}
-                      alt="Image Preview"
-                      classNames={{
-                        img: "object-cover w-full h-48 rounded-lg",
-                      }}
-                    />
-                    <div>
-                      <Button
-                        as="label"
-                        htmlFor="image-upload"
-                        variant="flat"
-                        color="primary"
-                        className="bg-white/20"
-                      >
-                        Change Image
-                      </Button>
-                    </div>
-                  </div>
-                ) : (
-                  <Button
-                    as="label"
-                    htmlFor="image-upload"
-                    variant="flat"
-                    color="primary"
-                    className="w-full h-48"
-                  >
-                    Select Thumbnail Image
-                  </Button>
-                )}
-                <Input
-                  id="image-upload"
-                  name="image"
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={handleImageChange}
-                />
-              </div>
+            <Input
+              isRequired
+              errorMessage={errors.subtitle || null}
+              label="Course Subtitle"
+              labelPlacement="outside"
+              name="subtitle"
+              placeholder="Enter the Subtitle"
+              type="text"
+              variant="bordered"
+              classNames={{
+                label: "font-medium",
+              }}
+              validate={(value) => {
+                if (value.length < 5)
+                  return "Subtitle must be at least 5 characters long";
+              }}
+            />
+          </div>
 
-              <div className="space-y-4">
-                <p className="font-medium">Course Preview Video</p>
-                {videoPreview ? (
-                  <div className="flex flex-col justify-center items-center">
-                    <video
-                      src={videoPreview}
-                      controls
-                      className="w-full h-48 rounded-lg object-cover"
-                    />
-                    <div className="">
-                      <Button
-                        as="label"
-                        htmlFor="video-upload"
-                        variant="flat"
-                        color="primary"
-                        className="bg-white/20"
-                      >
-                        Change Video
-                      </Button>
-                    </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Select
+              label="Select a Category"
+              labelPlacement="outside"
+              isRequired
+              name="category"
+              variant="bordered"
+              classNames={{
+                label: "font-medium",
+              }}
+            >
+              {categories.map((category) => (
+                <SelectItem key={category.id} value={category.id}>
+                  {category.name}
+                </SelectItem>
+              ))}
+            </Select>
+
+            <Input
+              label="Price"
+              isRequired
+              labelPlacement="outside"
+              name="price"
+              placeholder="Enter the Price"
+              type="number"
+              variant="bordered"
+              startContent={
+                <div className="pointer-events-none flex items-center">
+                  <span className="text-default-400 text-small">$</span>
+                </div>
+              }
+              classNames={{
+                label: "font-medium",
+              }}
+              validate={(value) => {
+                if (parseFloat(value) < 0) return "Enter a valid Price";
+              }}
+            />
+          </div>
+
+          <Textarea
+            isRequired
+            label="Description"
+            placeholder="Enter your description"
+            labelPlacement="outside"
+            name="description"
+            variant="bordered"
+            minRows={4}
+            classNames={{
+              label: "font-medium",
+            }}
+            validate={(value) => {
+              if (value.length < 50)
+                return "Description must be at least 50 characters long";
+            }}
+          />
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-4">
+              <p className="font-medium">Course Thumbnail</p>
+              {imagePreview ? (
+                <div className="flex flex-col justify-center items-center">
+                  <Image
+                    src={imagePreview}
+                    alt="Image Preview"
+                    classNames={{
+                      img: "object-cover w-full h-48 rounded-lg",
+                    }}
+                  />
+                  <div>
+                    <Button
+                      as="label"
+                      htmlFor="image-upload"
+                      variant="flat"
+                      color="primary"
+                      className="bg-white/20"
+                    >
+                      Change Image
+                    </Button>
                   </div>
-                ) : (
-                  <Button
-                    as="label"
-                    htmlFor="video-upload"
-                    variant="flat"
-                    color="primary"
-                    className="w-full h-48"
-                  >
-                    Select Preview Video
-                  </Button>
-                )}
-                <Input
-                  id="video-upload"
-                  type="file"
-                  name="video"
-                  accept="video/*"
-                  className="hidden"
-                  onChange={handleVideoChange}
-                />
-              </div>
+                </div>
+              ) : (
+                <Button
+                  as="label"
+                  htmlFor="image-upload"
+                  variant="flat"
+                  color="primary"
+                  className="w-full h-48"
+                >
+                  Select Thumbnail Image
+                </Button>
+              )}
+              <Input
+                id="image-upload"
+                name="image"
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleImageChange}
+              />
             </div>
 
-            <Button
-              type="submit"
-              size="lg"
-              className="mt-4 bg-purple-900"
-              disabled={isLoading}
-            >
-              {isLoading ? <Spinner /> : "Create Course"}
-            </Button>
-          </Form>
-        </CardBody>
-      </Card>
-    </div>
+            <div className="space-y-4">
+              <p className="font-medium">Course Preview Video</p>
+              {videoPreview ? (
+                <div className="flex flex-col justify-center items-center">
+                  <video
+                    src={videoPreview}
+                    controls
+                    className="w-full h-48 rounded-lg object-cover"
+                  />
+                  <div className="">
+                    <Button
+                      as="label"
+                      htmlFor="video-upload"
+                      variant="flat"
+                      color="primary"
+                      className="bg-white/20"
+                    >
+                      Change Video
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <Button
+                  as="label"
+                  htmlFor="video-upload"
+                  variant="flat"
+                  color="primary"
+                  className="w-full h-48"
+                >
+                  Select Preview Video
+                </Button>
+              )}
+              <Input
+                id="video-upload"
+                type="file"
+                name="video"
+                accept="video/*"
+                className="hidden"
+                onChange={handleVideoChange}
+              />
+            </div>
+          </div>
+
+          <Button
+            type="submit"
+            size="lg"
+            className="mt-4 bg-purple-900"
+            disabled={isLoading}
+          >
+            {isLoading ? <Spinner /> : "Create Course"}
+          </Button>
+        </Form>
+      </CardBody>
+    </Card>
   );
 }

@@ -17,7 +17,8 @@ import {
 } from "@nextui-org/table";
 import { EyeIcon, SearchIcon } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import useAdminApi from "@/hooks/useAdminApi";
+import useAdminApi from "@/hooks/api/useAdminApi";
+import { debounce } from "lodash";
 
 interface IUser {
   id: string;
@@ -40,13 +41,12 @@ export default function UsersTable({
   const [isLoading, setIsLoading] = useState(false);
   const [loadingId, setLoadingId] = useState<string | null>(null);
 
-  const {fetchUsersApi,blockUserApi} = useAdminApi()
+  const { fetchUsersApi, blockUserApi } = useAdminApi();
 
-  const fetchPaginatedUsers = async (page: number) => {
+  const fetchPaginatedUsers = debounce(async (page: number) => {
     setIsLoading(true);
     try {
-     
-      const response = await fetchUsersApi(role,page)
+      const response = await fetchUsersApi(role, page, filterValue);
       setUsers(response.users);
       setTotalPages(response.pagination.totalPages);
     } catch (error) {
@@ -54,21 +54,20 @@ export default function UsersTable({
     } finally {
       setIsLoading(false);
     }
-  };
+  }, 500);
 
   useEffect(() => {
     fetchPaginatedUsers(currentPage);
-  }, [currentPage]);
+    return () => fetchPaginatedUsers.cancel();
+  }, [currentPage, filterValue]);
 
   async function handleBlockUser(id: string) {
     setLoadingId(id); // Set the loading state for the user being blocked/unblocked
     try {
-      await blockUserApi(id)
+      await blockUserApi(id);
       setUsers((prevUsers) =>
         prevUsers.map((user) =>
-          user.id == id
-            ? { ...user, isBlocked: !user.isBlocked }
-            : user
+          user.id == id ? { ...user, isBlocked: !user.isBlocked } : user
         )
       );
     } catch (error) {
@@ -79,6 +78,7 @@ export default function UsersTable({
   }
   const onSearchChange = useCallback((value?: string) => {
     if (value) {
+      console.log(value);
       setFilterValue(value);
       setCurrentPage(1);
     } else {
@@ -109,7 +109,7 @@ export default function UsersTable({
         />
       </div>
     );
-  }, [currentPage,totalPages]);
+  }, [currentPage, totalPages]);
 
   const topContent = useMemo(() => {
     return (

@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import Timer from "../Timer";
-import useAuthApi from "@/hooks/useAuthApi";
+import useAuthApi from "@/hooks/api/useAuthApi";
 import { toast } from "react-toastify";
 
 const OTPVerification: React.FC = () => {

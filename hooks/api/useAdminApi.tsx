@@ -1,5 +1,5 @@
 import createAdminApi from "@/services/adminApi";
-import useAxiosPrivate from "./useAxiosPrivate";
+import useAxiosPrivate from "../useAxiosPrivate";
 
 export default function useAdminApi() {
   const axiosPrivate = useAxiosPrivate();

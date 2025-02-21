@@ -17,7 +17,7 @@ import {
 } from "@nextui-org/table";
 import { EyeIcon, SearchIcon } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import useAdminApi from "@/hooks/useAdminApi";
+import useAdminApi from "@/hooks/api/useAdminApi";
 import AdminTable from "../../Table";
 import GenericModal from "@/components/ui/GenericModal";
 import RejectRequestModal from "./RejectRequestModal";

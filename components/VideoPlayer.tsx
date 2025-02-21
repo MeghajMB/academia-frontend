@@ -1,51 +1,28 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import VideoJS from "@/components/VideoJS";
-import { Spinner } from "@nextui-org/react";
+import videojs from "video.js";
 
-export default function VideoPlayer({
-  lecture,
-  fetchFn,
-}: {
-  lecture: {
-    content: string;
-    sectionId: string;
-    courseId: string;
-    lectureId: string;
-  };
-  fetchFn: (
-    courseId: string,
-    sectionId: string,
-    lectureId: string
-  ) => Promise<{url:string}>;
-}) {
+export default function VideoPlayer({ videoLink }: { videoLink: string }) {
   const playerRef = React.useRef(null);
-  const [videoLink, setVideoLink] = useState<null | string>(null);
-  const [isLoading,setIsLoading]=useState(true)
-
-  useEffect(() => {
-    async function fetchLectureUrl(){
-
-      const {url} =await fetchFn(lecture.courseId,lecture.sectionId,lecture.lectureId);
-      setVideoLink(url);
-      setIsLoading(false)
-    }
-    fetchLectureUrl()
-  }, []);
-  if(isLoading){
-    return null
-  }
 
   const videoJsOptions = {
     autoplay: true,
     controls: true,
     responsive: true,
     fluid: true,
+    preload:'auto',
     sources: [
       {
         src: videoLink,
         type: "application/x-mpegURL", // HLS format
+        withCredentials: true
       },
     ],
+    html5: {
+      nativeAudioTracks: true,
+      nativeVideoTracks: true,
+      nativeTextTracks: true
+    }
   };
 
   const handlePlayerReady = (player) => {

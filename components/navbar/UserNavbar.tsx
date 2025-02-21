@@ -50,7 +50,6 @@ const UserNavbar: React.FC = () => {
     ["/home/courses", "Courses"],
     ["/home/services", "Services"],
     ["/home/my-learning", "My Learning"],
-    ["/home/cart", "Cart"],
     ["/home/shop", "Shop"],
     ["/home/profile", "Profile"],
   ];

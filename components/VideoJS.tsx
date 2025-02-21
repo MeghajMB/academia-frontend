@@ -1,6 +1,7 @@
 import React from "react";
 import videojs from "video.js";
 import "video.js/dist/video-js.css";
+import "videojs-hls-quality-selector";
 
 export const VideoJS = (props) => {
   const videoRef = React.useRef(null);
@@ -20,6 +21,11 @@ export const VideoJS = (props) => {
         videojs.log("player is ready");
         onReady && onReady(player);
       }));
+
+            // Initialize the quality selector plugin
+            player.hlsQualitySelector({
+              displayCurrentQuality: true,
+            });
 
       // You could update an existing player in the `else` block here
       // on prop change, for example:

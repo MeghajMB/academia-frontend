@@ -1,5 +1,5 @@
 import createCourseApi from "@/services/courseApi";
-import useAxiosPrivate from "./useAxiosPrivate";
+import useAxiosPrivate from "../useAxiosPrivate";
 
 export default function useCourseApi() {
   const axiosPrivate = useAxiosPrivate();

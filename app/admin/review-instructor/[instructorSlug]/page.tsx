@@ -4,7 +4,7 @@ import FacebookSvg from "@/components/icons/FacebookSvg";
 import LinkedinSvg from "@/components/icons/LinkedinSvg";
 import TwitterSvg from "@/components/icons/TwitterSvg";
 import InstructorHeaderSection from "@/components/instructor/InstructorHeaderSection";
-import useUserApi from "@/hooks/useUserApi";
+import useUserApi from "@/hooks/api/useUserApi";
 import { Calendar, Globe, GraduationCap } from "lucide-react";
 import moment from "moment";
 import { useParams } from "next/navigation";

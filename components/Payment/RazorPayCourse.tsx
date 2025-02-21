@@ -1,7 +1,9 @@
 "use client";
 import usePaymentApi from "@/hooks/api/usePaymentApi";
 import { Button } from "@nextui-org/react";
+import { useRouter } from "next/navigation";
 import { useRef } from "react";
+import { toast } from "react-toastify";
 
 // Function to load script and append in the DOM tree.
 const loadScript = (src: string) =>
@@ -19,14 +21,23 @@ const loadScript = (src: string) =>
     document.body.appendChild(script);
   });
 
-const RenderRazorpay = ({ keyId,coins,price }: { keyId: string,coins:number,price:number }) => {
+const RazorpayCourse = ({
+  courseId,
+  type,
+}: {
+  courseId: string;
+  type: string;
+}) => {
   const paymentId = useRef<string | null>(null);
   const paymentMethod = useRef<string | null>(null);
-  const { createOrderApi } = usePaymentApi();
+  const { createOrderApi, paymentSuccessApi } = usePaymentApi();
+  const router = useRouter();
 
   // Function to load Razorpay checkout modal
   const displayRazorpay = async (options: any) => {
-    const res = await loadScript("https://checkout.razorpay.com/v1/checkout.js");
+    const res = await loadScript(
+      "https://checkout.razorpay.com/v1/checkout.js"
+    );
 
     if (!res) {
       console.log("Razorpay SDK failed to load. Are you online?");
@@ -43,52 +54,67 @@ const RenderRazorpay = ({ keyId,coins,price }: { keyId: string,coins:number,pric
 
     // Capture payment ID in case of failure
     rzp1.on("payment.failed", (response) => {
+      toast.error("Payment Failed! Try again later", {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: true,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+      });
       paymentId.current = response.error.metadata.payment_id;
     });
 
     rzp1.open();
   };
 
-  // Handling payment status updates
-  const handlePayment = async (status: string) => {
-    if (status === "Cancelled") {
-      console.log("Payment is cancelled");
-    }
-  };
-
   // Function to initiate a purchase
-  async function handlePurchase(coins: number, price: number) {
+  async function handlePurchase() {
     try {
-      const data = await createOrderApi(price, "INR");
+      const data = await createOrderApi(courseId, type);
 
       if (data && data.order_id) {
         // Set options dynamically
         const options = {
-          key: keyId,
+          key: process.env.REACT_APP_RAZORPAY_KEY_ID,
           amount: data.amount,
           currency: data.currency,
           name: "Academia",
           description: "Online Payment",
           order_id: data.order_id,
-          handler: (response: any) => {
-            console.log("Payment Successful:", response);
+          handler: async (response: {
+            razorpay_order_id: string;
+            razorpay_payment_id: string;
+            razorpay_signature: string;
+          }) => {
+            const paymentDetails = {
+              itemId: courseId,
+              paymentType: type,
+              amount: data.amount,
+            };
+            const responseData = await paymentSuccessApi(
+              response,
+              paymentDetails
+            );
+            toast.success("Course successfully purchased", {
+              position: "top-right",
+              autoClose: 5000,
+              hideProgressBar: true,
+              closeOnClick: false,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              theme: "dark",
+            });
+            router.push("/home"); // show the success page
           },
           modal: {
             confirm_close: true,
             ondismiss: async (reason: any) => {
-              const { reason: paymentReason, field, step, code } =
-                reason?.error || {};
-
-              if (!reason) {
-                console.log("Payment cancelled");
-                handlePayment("Cancelled");
-              } else if (reason === "timeout") {
-                console.log("Payment timed out");
-                handlePayment("Timeout");
-              } else {
-                console.log("Payment failed");
-                handlePayment("Failed");
-              }
+              
+              console.log("Razorpay closed")
             },
           },
           retry: { enabled: false },
@@ -105,14 +131,14 @@ const RenderRazorpay = ({ keyId,coins,price }: { keyId: string,coins:number,pric
 
   return (
     <Button
-      color="primary"
+      color="default"
       className="w-full font-semibold"
       size="lg"
-      onPress={() => handlePurchase(coins, price)} // Example values (coins, price)
+      onPress={() => handlePurchase()} // Example values (coins, price)
     >
       Purchase Now
     </Button>
   );
 };
 
-export default RenderRazorpay;
+export default RazorpayCourse;

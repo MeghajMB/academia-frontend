@@ -1,7 +1,7 @@
 "use client";
 
 import Timer from "@/components/Timer";
-import useAuthApi from "@/hooks/useAuthApi";
+import useAuthApi from "@/hooks/api/useAuthApi";
 import { Button, Input, InputOtp } from "@nextui-org/react";
 import React, { useState } from "react";
 import { toast } from "react-toastify";

@@ -1,22 +1,10 @@
-import useCourseApi from "@/hooks/useCourseApi";
-import useFilesApi from "@/hooks/useFilesApi";
+import useCourseApi from "@/hooks/api/useCourseApi";
+import useFilesApi from "@/hooks/api/useFilesApi";
 import { useAppSelector } from "@/lib/hooks";
 import { Button, Form, Input, Spinner } from "@nextui-org/react";
 import axios from "axios";
 import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
-
-interface ILecture {
-  id: string;
-  title: string;
-  content: string;
-}
-
-interface ISection {
-  id: string;
-  title: string;
-  lectures: ILecture[];
-}
 
 interface AddLectureProps {
   setSections: React.Dispatch<React.SetStateAction<ISection[]>>;
@@ -34,13 +22,25 @@ export default function AddLecture({
   const [errors, setErrors] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [videoFile, setVideoFile] = useState<File | null>(null);
+  const [videoDuration, setVideoDuration] = useState<number | null>(null);
   const { addLecture } = useCourseApi()
   const {generatePutSignedUrlApi}=useFilesApi()
   const {id}=useAppSelector(state=>state.auth.user)
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setVideoFile(e.target.files[0]);
+      const file = e.target.files[0];
+      setVideoFile(file);
+  
+      const video = document.createElement("video");
+      video.preload = "metadata";
+      
+      video.onloadedmetadata = () => {
+        window.URL.revokeObjectURL(video.src);
+        setVideoDuration(video.duration);
+      };
+  
+      video.src = URL.createObjectURL(file);
     }
   };
 
@@ -51,7 +51,7 @@ export default function AddLecture({
     const formData = new FormData(e.currentTarget);
     const title = formData.get("title") as string;
 
-    if (!title || !videoFile) {
+    if (!title || !videoFile || !videoDuration) {
       setErrors("Title and video file are required.");
       setIsLoading(false);
       return;
@@ -71,7 +71,8 @@ export default function AddLecture({
 
       const lectureData = {
         title,
-        content: videoKey,
+        videoUrl: videoKey,
+        duration:videoDuration
       };
 
       const response = await addLecture(courseId,sectionId,lectureData);

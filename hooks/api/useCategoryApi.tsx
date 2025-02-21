@@ -1,5 +1,5 @@
 import createCategoryApi from "@/services/categoryApi";
-import useAxiosPrivate from "./useAxiosPrivate";
+import useAxiosPrivate from "../useAxiosPrivate";
 
 export default function useCategoryApi() {
   const axiosPrivate = useAxiosPrivate();

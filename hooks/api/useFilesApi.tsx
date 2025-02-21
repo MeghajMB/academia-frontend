@@ -1,5 +1,5 @@
 import createFileApi from "@/services/fileApi";
-import useAxiosPrivate from "./useAxiosPrivate";
+import useAxiosPrivate from "../useAxiosPrivate";
 
 export default function useFilesApi() {
   const axiosPrivate = useAxiosPrivate();

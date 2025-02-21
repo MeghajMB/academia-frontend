@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { logout } from "@/lib/features/auth/authSlice";
-import useAuthApi from "@/hooks/useAuthApi";
+import useAuthApi from "@/hooks/api/useAuthApi";
 
 export default function AdminNavbar() {
   const [isCollapsed, setIsCollapsed] = useState(false);

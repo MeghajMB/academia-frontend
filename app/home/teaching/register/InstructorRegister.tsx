@@ -4,9 +4,18 @@ import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { Loader2, AlertCircle } from "lucide-react";
 import { useAppSelector } from "@/lib/hooks";
-import useAuthApi from "@/hooks/useAuthApi";
-import useUserApi from "@/hooks/useUserApi";
-import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Textarea, useDisclosure } from "@nextui-org/react";
+import useAuthApi from "@/hooks/api/useAuthApi";
+import useUserApi from "@/hooks/api/useUserApi";
+import {
+  Button,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  Textarea,
+  useDisclosure,
+} from "@nextui-org/react";
 
 interface InstructorForm {
   headline: string;
@@ -42,7 +51,7 @@ const InstructorRegister = () => {
     website: "",
     agreement: false,
   });
-  const [rejectReason,setRejectReason]=useState()
+  const [rejectReason, setRejectReason] = useState();
 
   const [isClient, setIsClient] = useState(false);
 
@@ -55,7 +64,7 @@ const InstructorRegister = () => {
 
   useEffect(() => {
     async function getProfile() {
-      const userData = await fetchUserProfileApi();
+      const userData = await fetchUserProfileApi(user.id!);
       setRejectReason(userData.rejectedReason || "");
       setFormData({
         headline: userData.headline,
@@ -175,11 +184,7 @@ const InstructorRegister = () => {
                 />
               </ModalBody>
               <ModalFooter>
-                <Button
-                  color="danger"
-                  variant="flat"
-                  onPress={onClose}
-                >
+                <Button color="danger" variant="flat" onPress={onClose}>
                   Close
                 </Button>
               </ModalFooter>
@@ -205,9 +210,12 @@ const InstructorRegister = () => {
             <p>{errors.general}</p>
           </div>
         )}
-        <button className="bg-red-600 p-1 rounded-lg" onClick={onOpen}>
-          Click to view Rejected Reason
-        </button>
+
+        {rejectReason && (
+          <button className="bg-red-600 p-1 rounded-lg" onClick={onOpen}>
+            Click to view Rejected Reason
+          </button>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-6" noValidate>
           {/* Headline */}

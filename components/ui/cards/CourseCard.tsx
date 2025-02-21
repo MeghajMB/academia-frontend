@@ -1,48 +1,39 @@
 "use client";
 
-import {
-  Card,
-  CardFooter,
-  CardBody,
-  CardHeader,
-  Image,
-} from "@nextui-org/react";
+import { ICourse } from "@/types/course";
+import { Card, CardBody, CardHeader, Image } from "@nextui-org/react";
 import { Star } from "lucide-react";
-
-interface ICourse {
-  id: string;
-  title: string;
-  image: string;
-  rating: number;
-  reviews: number;
-  price: number;
-  instructor: string;
-}
+import Link from "next/link";
 
 export default function CourseCard({ course }: { course: ICourse }) {
   return (
-    <Card className="">
-      <div>
-        <Image
-          alt="Card background"
-          className="object-cover rounded-xl"
-          src="https://nextui.org/images/hero-card-complete.jpeg"
-        />
-      </div>
-
-      <CardHeader className="pb-0 pt-2 px-4 flex-col items-start">
-        <p className="text-large uppercase font-bold">{course.title}</p>
-        <small className="text-[#8680ff]">{course.instructor}</small>
-      </CardHeader>
-      <CardBody className="overflow-visible py-2 pl-4">
-        <div className="flex">
-          <span className="text-sm">{course.rating}</span>
-          <Star className="w-4 text-blue-500" />
-          <Star className="w-4 text-blue-500" />
-          <Star className="w-4 text-blue-500" />
+    <Link href={`/course/${course.id}`} className="block">
+      <Card className="cursor-pointer max-w-[340px] w-full transition-transform duration-300 hover:scale-[1.02] h-96">
+        <div className="w-full overflow-hidden rounded-xl">
+          <Image
+            alt="Course thumbnail"
+            className="w-full object-cover aspect-video rounded-xl"
+            src={course.imageThumbnail}
+            width={340}
+            height={190}
+          />
         </div>
-        <p className="text-yellow-300">${course.price}</p>
-      </CardBody>
-    </Card>
+
+        <CardHeader className="pb-0 pt-3 px-4 flex flex-col items-start">
+          <h3 className="text-lg font-semibold line-clamp-2">{course.title}</h3>
+          <small className="text-primary">{course.category.name}</small>
+        </CardHeader>
+
+        <CardBody className="py-2 px-4 flex flex-col gap-2">
+          <div className="flex items-center gap-1 text-sm">
+            <span>4.5</span>
+            <Star className="w-4 text-yellow-500" />
+            <Star className="w-4 text-yellow-500" />
+            <Star className="w-4 text-yellow-500" />
+          </div>
+          <p className="text-lg font-medium text-yellow-400">${course.price}</p>
+        </CardBody>
+      </Card>
+    </Link>
   );
 }

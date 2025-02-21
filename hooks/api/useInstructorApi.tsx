@@ -1,5 +1,5 @@
 import createInstructorApi from "@/services/instructorApi";
-import useAxiosPrivate from "./useAxiosPrivate";
+import useAxiosPrivate from "../useAxiosPrivate";
 
 export default function useInstructorApi() {
   const axiosPrivate = useAxiosPrivate();
