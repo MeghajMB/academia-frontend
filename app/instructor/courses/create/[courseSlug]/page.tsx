@@ -13,7 +13,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { Button, Form, Input } from "@nextui-org/react";
+import { Form, Input } from "@nextui-org/react";
 import axios from "axios";
 import { Grip } from "lucide-react";
 import Link from "next/link";
@@ -22,16 +22,9 @@ import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
-interface ICourseDetails {
-  status: string;
-}
-
 export default function Page() {
   const [curriculum, setCurriculum] = useState<ISection[]>([]);
   const [activeLecture, setActiveLecture] = useState<ILecture | null>(null);
-  const [courseDetails, setCourseDetails] = useState<ICourseDetails>({
-    status: "draft",
-  });
   const [isClient, setIsClient] = useState(false);
   const router = useRouter();
 
@@ -64,28 +57,6 @@ export default function Page() {
     return <LoadingPage />;
   }
 
-  async function handleSendSubmitReviewRequest() {
-    try {
-      if (typeof courseSlug == "string") {
-        const response = await submitCourseForReview(courseSlug);
-        console.log(response);
-        toast.success("Request send successfully!", {
-          position: "top-center",
-          autoClose: 5000,
-          hideProgressBar: true,
-          closeOnClick: false,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "dark",
-        });
-        router.push("/instructor/courses");
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
   const handleDragStart = (event: any) => {
     const [type, id] = event.active.id.split("-");
     if (type === "lecture") {
@@ -115,7 +86,6 @@ export default function Page() {
       const overSectionIndex = over.data.current.sectionIndex;
 
       if (activeType === "lecture" && overType === "lecture") {
-        
         if (
           activeSectionIndex !== undefined &&
           overSectionIndex !== undefined
@@ -144,7 +114,7 @@ export default function Page() {
 
           setCurriculum(updatedSections);
 
-          await changeOrderOfLectureApi(activeId,overId);
+          await changeOrderOfLectureApi(activeId, overId);
         }
       }
     } catch (error) {
@@ -160,17 +130,6 @@ export default function Page() {
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
       >
-        {(courseDetails!.status == "draft" ||
-          courseDetails!.status == "rejected") &&
-          curriculum.length > 0 && (
-            <Button color="success" onPress={handleSendSubmitReviewRequest}>
-              Submit for review
-            </Button>
-          )}
-        {courseDetails!.status == "rejected" && (
-          <Button color="danger">Rejected Reason</Button>
-        )}
-
         {curriculum.length > 0 && (
           <Link
             href={`${courseSlug}/preview`}

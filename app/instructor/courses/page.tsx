@@ -92,34 +92,34 @@ const CoursesPage = () => {
 
       {/* Course Categories */}
       <div className="space-y-10">
-        <CourseSection
+        <PendingCourseList
           title="Listed Courses"
           description="Courses that have been listed."
           courses={courses.filter((course) => course.status === "listed")}
           handleListCourse={handleListCourse}
         />
-        <CourseSection
+        <PendingCourseList
           title="Active Courses"
           description="Courses that have been approved."
           courses={courses.filter((course) => course.status === "accepted")}
           handleListCourse={handleListCourse}
         />
 
-        <CourseSection
+        <PendingCourseList
           title="Pending Courses"
           description="Courses waiting for admin approval."
           courses={courses.filter((course) => course.status === "pending")}
           handleListCourse={handleListCourse}
         />
 
-        <CourseSection
+        <PendingCourseList
           title="Incomplete Courses"
           description="Courses that are drafted."
           courses={courses.filter((course) => course.status === "draft")}
           handleListCourse={handleListCourse}
         />
 
-        <CourseSection
+        <PendingCourseList
           title="Rejected Courses"
           description="Courses that have been rejected."
           courses={courses.filter((course) => course.status === "rejected")}
@@ -132,7 +132,7 @@ const CoursesPage = () => {
 
 export default CoursesPage;
 
-const CourseSection = ({
+const PendingCourseList = ({
   title,
   description,
   courses,
@@ -143,68 +143,57 @@ const CourseSection = ({
   courses: ICourse[];
   handleListCourse: (courseId: string) => void;
 }) => {
-  return (
-    <div>
-      <h2 className="text-3xl font-bold text-white">{title}</h2>
-      <p className="mt-2 text-gray-400">{description}</p>
-      <PendingCourseList
-        courses={courses}
-        handleListCourse={handleListCourse}
-      />
-    </div>
-  );
-};
-
-const PendingCourseList = ({
-  courses,
-  handleListCourse,
-}: {
-  courses: ICourse[];
-  handleListCourse: (courseId: string) => void;
-}) => {
   if (!courses || courses.length === 0) {
     return (
-      <p className="mt-4 text-gray-400 italic">
-        No courses found in this category.
-      </p>
+      <>
+        <h2 className="text-3xl font-bold text-white">{title}</h2>
+        <p className="mt-2 text-gray-400">{description}</p>{" "}
+        <p className="mt-4 text-gray-400 italic">
+          No courses found in this category.
+        </p>
+      </>
     );
   }
 
   return (
-    <div className="grid md:grid-cols-3 gap-6 mt-6">
-      {courses.map((course) => (
-        <div
-          key={course.id}
-          className="bg-gray-900 rounded-xl p-5 shadow-lg border border-gray-800 hover:border-purple-500 transition-all"
-        >
-          <h3 className="text-xl font-semibold text-white">{course.title}</h3>
-          <p className="text-gray-400 text-sm mt-1">
-            {course.description?.slice(0, 100)}...
-          </p>
-          <div className="mt-4 flex justify-between items-center">
-            {course.status === "accepted" ? (
-              <Button
-                color="success"
-                className="h-7"
-                onPress={() => handleListCourse(course.id)}
-                aria-label="List the course"
+    <div>
+      <h2 className="text-3xl font-bold text-white">{title}</h2>
+      <p className="mt-2 text-gray-400">{description}</p>
+      <div className="grid md:grid-cols-3 gap-6 mt-6">
+        {courses.map((course) => (
+          <div
+            key={course.id}
+            className="bg-gray-900 rounded-xl p-5 shadow-lg border border-gray-800 hover:border-purple-500 transition-all"
+          >
+            <h3 className="text-xl font-semibold text-white">{course.title}</h3>
+            <p className="text-gray-400 text-sm mt-1">
+              {course.description?.slice(0, 100)}...
+            </p>
+            <div className="mt-4 flex justify-between items-center">
+              {course.status === "accepted" ? (
+                <Button
+                  color="success"
+                  className="h-7"
+                  onPress={() => handleListCourse(course.id)}
+                  aria-label="List the course"
+                >
+                  List the Course
+                </Button>
+              ) : (
+                <span className="text-sm px-3 py-1 rounded-full text-white bg-purple-600">
+                  {course.status}
+                </span>
+              )}
+              <Link
+                href={`courses/create/${course.id}`}
+                className="text-purple-400 hover:underline text-sm"
               >
-                List the Course
-              </Button>
-            ) : (
-              <span className="text-sm px-3 py-1 rounded-full text-white bg-purple-600">
-                {course.status}
-              </span>
-            )}
-            <Link
-              href={`courses/create/${course.id}`}
-              className="text-purple-400 hover:underline text-sm"
-            >
-              View Details
-            </Link>
+                View Details
+              </Link>
+            </div>
           </div>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   );
 };

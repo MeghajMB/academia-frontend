@@ -14,6 +14,21 @@ const createAdminApi = (axiosInstance: AxiosInstance) => ({
     return response.data;
   },
 
+  fetchCoursesApi: async (page: number,search?:string) => {
+    const response = await axiosInstance.get("/api/admin/get-courses", {
+      params: {
+        page,
+        search
+      },
+    });
+    return response.data;
+  },
+
+  blockCourseApi: async (courseId: string) => {
+    const response = await axiosInstance.put(`/api/admin/block-course/${courseId}`);
+    return response.data;
+  },
+
   blockUserApi: async (userId: string) => {
     const response = await axiosInstance.put(`/api/admin/block-user/${userId}`);
     return response.data;
@@ -100,6 +115,7 @@ const createAdminApi = (axiosInstance: AxiosInstance) => ({
     );
     return response.data;
   },
+
   approveCourseRequestApi: async (courseId: string) => {
     const response = await axiosInstance.put(
       `/api/admin/course-review-requests/approve`,
