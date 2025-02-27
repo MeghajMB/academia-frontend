@@ -12,7 +12,6 @@ export default function Home() {
             <h2>Carousel</h2>
           </section>
           <Section label={"Top Rated Courses"} status='top-rated'/>
-          <Section label={"Featured Instructors"} status='instructor'/>
           <Section label={"New Courses"} status='new' />
         </main>
       </ProtectedRoute>

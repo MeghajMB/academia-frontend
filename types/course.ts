@@ -5,6 +5,8 @@ export interface ILecture {
   order: number;
   duration: number;
   status: string;
+  sectionId: string;
+  progress: "completed" | "not completed" | "locked";
 }
 
 export interface ISection {
@@ -21,7 +23,7 @@ export interface ICourse {
   price: number;
   subtitle: string;
   description: string;
-  category: { description: string,name:string };
+  category: { description: string; name: string };
   totalDuration: number;
   totalLectures: number;
   totalSections: number;
@@ -34,7 +36,7 @@ export interface ICourse {
   updatedAt: Date;
 }
 
-export interface ICourseDetails{
+export interface ICourseDetails {
   courseId: string;
   instructorId: string;
   instructorName: string;
@@ -47,7 +49,7 @@ export interface ICourseDetails{
   price: number;
   subtitle: string;
   description: string;
-  enrollmentStatus:"enrolled" | "not enrolled";
-  canReview:boolean
-  hasReviewed:boolean;
+  enrollmentStatus: "enrolled" | "not enrolled";
+  canReview: boolean;
+  hasReviewed: boolean;
 }

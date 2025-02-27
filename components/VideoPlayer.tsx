@@ -2,7 +2,7 @@ import React from "react";
 import VideoJS from "@/components/VideoJS";
 import videojs from "video.js";
 
-export default function VideoPlayer({ videoLink }: { videoLink: string }) {
+export default function VideoPlayer({ videoLink,onEnded }: { videoLink: string,onEnded?:()=>void }) {
   const playerRef = React.useRef(null);
 
   const videoJsOptions = {
@@ -35,6 +35,13 @@ export default function VideoPlayer({ videoLink }: { videoLink: string }) {
     player.on("dispose", () => {
       videojs.log("player will dispose");
     });
+
+    player.on("ended", () => {
+      if(onEnded){
+        onEnded()
+      }
+    });
+
   };
 
   return <VideoJS options={videoJsOptions} onReady={handlePlayerReady} />;

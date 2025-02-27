@@ -6,9 +6,11 @@ import React, { useEffect, useState } from "react";
 function CourseLectureView({
   activeLecture,
   courseId,
+  onEnded,
 }: {
   activeLecture: ILecture;
   courseId: string;
+  onEnded?:()=>void,
 }) {
   const { getLectureUrlApi } = useCourseApi();
   const [videoUrl, setVideoUrl] = useState("");
@@ -31,7 +33,7 @@ function CourseLectureView({
     <div>
       {/* Video Player */}
       <div className="w-full rounded-lg overflow-hidden mb-4">
-        <VideoPlayer videoLink={videoUrl} />
+        <VideoPlayer videoLink={videoUrl} onEnded={onEnded} />
       </div>
 
       <h1 className="text-3xl font-bold">{activeLecture.title}</h1>
