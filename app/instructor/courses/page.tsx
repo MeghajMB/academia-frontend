@@ -185,7 +185,7 @@ const PendingCourseList = ({
                 </span>
               )}
               <Link
-                href={`courses/create/${course.id}`}
+                href={`courses/${course.id}`}
                 className="text-purple-400 hover:underline text-sm"
               >
                 View Details

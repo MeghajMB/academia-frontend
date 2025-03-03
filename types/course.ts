@@ -13,6 +13,7 @@ export interface ISection {
   id: string;
   title: string;
   order: number;
+  description:string;
   lectures: ILecture[];
 }
 

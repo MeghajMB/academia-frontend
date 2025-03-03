@@ -80,7 +80,7 @@ export default function InstructorLayout({
             )}
           </AnimatePresence>
 
-          <div className="pl-20">{children}</div>
+          <div className="pl-5 sm:pl-20">{children}</div>
         </main>
       </ProtectedRoute>
     </>

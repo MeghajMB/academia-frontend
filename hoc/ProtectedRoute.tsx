@@ -33,6 +33,7 @@ export default function ProtectedRoute({
     }
     setIsLoading(false)
   }, [user.role, role, router]);
+  
   if (isLoading) {
     return null;
   }

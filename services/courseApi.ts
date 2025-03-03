@@ -2,14 +2,34 @@ import { ICourse, ICourseDetails } from "@/types/course";
 import { AxiosInstance } from "axios";
 
 const createCourseApi = (axiosInstance: AxiosInstance) => ({
-  
   fetchEnrolledCoursesApi: async () => {
+    const response = await axiosInstance.get(`/api/course/enrolled-courses`);
+    return response.data;
+  },
+
+  fetchCourseCreationDetailsApi: async (courseId: string) => {
     const response = await axiosInstance.get(
-      `/api/course/enrolled-courses`
+      `/api/course/create-course/${courseId}`
     );
     return response.data;
   },
   
+  editCourseCreationDetailsApi: async (courseId:string,courseDetails: {
+    category: string;
+    imageThumbnail: string | null;
+    description: string;
+    price: number;
+    subtitle: string;
+    title: string;
+    promotionalVideo: string | null;
+  }) => {
+    const response = await axiosInstance.put(
+      `/api/course/edit-course/${courseId}`,
+      courseDetails
+    );
+    return response.data;
+  },
+
   fetchCurriculum: async (
     courseId: string,
     status: "instructor" | "student" | "admin"
@@ -20,10 +40,7 @@ const createCourseApi = (axiosInstance: AxiosInstance) => ({
     return response.data;
   },
 
-  markLectureCompleted: async (
-    courseId: string,
-    lectureId: string
-  ) => {
+  markLectureCompleted: async (courseId: string, lectureId: string) => {
     const response = await axiosInstance.post("/api/course/progress", {
       courseId,
       lectureId,
@@ -76,7 +93,24 @@ const createCourseApi = (axiosInstance: AxiosInstance) => ({
 
   deleteLecture: async (lectureId: string) => {
     const response = await axiosInstance.delete(
-      `/api/course/delete/${lectureId}`
+      `/api/course/delete-lecture/${lectureId}`
+    );
+    return response.data;
+  },
+  editSectionApi: async (
+    sectionId: string,
+    sectionData: { title: string; description:string }
+  ) => {
+    const response = await axiosInstance.put(`/api/course/edit-section`, {
+      sectionId,
+      sectionData,
+    });
+    return response.data;
+  },
+
+  deleteSectionApi: async (sectionId: string) => {
+    const response = await axiosInstance.delete(
+      `/api/course/delete-section/${sectionId}`
     );
     return response.data;
   },
@@ -153,7 +187,6 @@ const createCourseApi = (axiosInstance: AxiosInstance) => ({
     const response = await axiosInstance.patch(`/api/course/${courseId}/list`);
     return response.data;
   },
-
 });
 
 export default createCourseApi;
