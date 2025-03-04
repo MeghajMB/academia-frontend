@@ -1,7 +1,34 @@
-import { ICourse, ICourseDetails, ISection } from "@/types/course";
+import { ICourse, ICourseDetails } from "@/types/course";
 import { AxiosInstance } from "axios";
 
 const createCourseApi = (axiosInstance: AxiosInstance) => ({
+  fetchEnrolledCoursesApi: async () => {
+    const response = await axiosInstance.get(`/api/course/enrolled-courses`);
+    return response.data;
+  },
+
+  fetchCourseCreationDetailsApi: async (courseId: string) => {
+    const response = await axiosInstance.get(
+      `/api/course/create-course/${courseId}`
+    );
+    return response.data;
+  },
+  
+  editCourseCreationDetailsApi: async (courseId:string,courseDetails: {
+    category: string;
+    imageThumbnail: string | null;
+    description: string;
+    price: number;
+    subtitle: string;
+    title: string;
+    promotionalVideo: string | null;
+  }) => {
+    const response = await axiosInstance.put(
+      `/api/course/edit-course/${courseId}`,
+      courseDetails
+    );
+    return response.data;
+  },
 
   fetchCurriculum: async (
     courseId: string,
@@ -10,6 +37,14 @@ const createCourseApi = (axiosInstance: AxiosInstance) => ({
     const response = await axiosInstance.get(
       `/api/course/curriculum/${courseId}?status=${status}`
     );
+    return response.data;
+  },
+
+  markLectureCompleted: async (courseId: string, lectureId: string) => {
+    const response = await axiosInstance.post("/api/course/progress", {
+      courseId,
+      lectureId,
+    });
     return response.data;
   },
 
@@ -44,8 +79,9 @@ const createCourseApi = (axiosInstance: AxiosInstance) => ({
     });
     return response.data;
   },
+
   editlecture: async (
-    lectureId:string,
+    lectureId: string,
     lectureData: { title: string; videoUrl: string; duration: number }
   ) => {
     const response = await axiosInstance.put(`/api/course/edit-lecture`, {
@@ -54,8 +90,28 @@ const createCourseApi = (axiosInstance: AxiosInstance) => ({
     });
     return response.data;
   },
+
   deleteLecture: async (lectureId: string) => {
-    const response = await axiosInstance.delete(`/api/course/delete/${lectureId}`);
+    const response = await axiosInstance.delete(
+      `/api/course/delete-lecture/${lectureId}`
+    );
+    return response.data;
+  },
+  editSectionApi: async (
+    sectionId: string,
+    sectionData: { title: string; description:string }
+  ) => {
+    const response = await axiosInstance.put(`/api/course/edit-section`, {
+      sectionId,
+      sectionData,
+    });
+    return response.data;
+  },
+
+  deleteSectionApi: async (sectionId: string) => {
+    const response = await axiosInstance.delete(
+      `/api/course/delete-section/${sectionId}`
+    );
     return response.data;
   },
 
@@ -80,7 +136,10 @@ const createCourseApi = (axiosInstance: AxiosInstance) => ({
     return response.data;
   },
 
-  changeOrderOfLectureApi: async (draggedLectureId:string,targetLectureId:string): Promise<{message:string}> => {
+  changeOrderOfLectureApi: async (
+    draggedLectureId: string,
+    targetLectureId: string
+  ): Promise<{ message: string }> => {
     const response = await axiosInstance.put(
       `/api/course/lectures/update-order`,
       {

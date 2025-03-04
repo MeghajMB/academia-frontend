@@ -7,8 +7,13 @@ const createReviewApi = (axiosInstance: AxiosInstance) => ({
     return response.data;
   },
 
+  fetchCourseReviewStatiticsApi: async (courseId: string) => {
+    const response = await axiosInstance.get(`/api/review/course/statitics/${courseId}`);
+    return response.data;
+  },
+
   // Submit a new review
-  submitReviewApi: async (courseId: string, rating: number, comment: string) => {
+  addReviewApi: async (courseId: string, rating: number, comment?: string) => {
     const response = await axiosInstance.post("/api/review/add-review", {
       courseId,
       rating,

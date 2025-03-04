@@ -4,7 +4,6 @@ import { useAppSelector } from "@/lib/hooks";
 import { Button, Form, Input, Spinner } from "@nextui-org/react";
 import axios from "axios";
 import { useState } from "react";
-import { v4 as uuidv4 } from "uuid";
 
 interface AddLectureProps {
   setSections: React.Dispatch<React.SetStateAction<ISection[]>>;
@@ -17,29 +16,28 @@ export default function AddLecture({
   courseId,
   sectionId,
 }: AddLectureProps) {
-  
   const [isActive, setIsActive] = useState(false);
   const [errors, setErrors] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [videoDuration, setVideoDuration] = useState<number | null>(null);
-  const { addLecture } = useCourseApi()
-  const {generatePutSignedUrlApi}=useFilesApi()
-  const {id}=useAppSelector(state=>state.auth.user)
+  const { addLecture } = useCourseApi();
+  const { generatePutSignedUrlApi } = useFilesApi();
+  const { id } = useAppSelector((state) => state.auth.user);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       setVideoFile(file);
-  
+
       const video = document.createElement("video");
       video.preload = "metadata";
-      
+
       video.onloadedmetadata = () => {
         window.URL.revokeObjectURL(video.src);
         setVideoDuration(video.duration);
       };
-  
+
       video.src = URL.createObjectURL(file);
     }
   };
@@ -61,8 +59,13 @@ export default function AddLecture({
       //generate the signed url
       const videoKey = `${id}-${courseId}-${sectionId}-${Date.now()}`;
       const videoContentType = videoFile.type;
-      
-      const videoSignedUrl = await generatePutSignedUrlApi(videoKey,videoContentType,false,true);
+
+      const videoSignedUrl = await generatePutSignedUrlApi(
+        videoKey,
+        videoContentType,
+        false,
+        true
+      );
 
       //store the video into s3
       await axios.put(videoSignedUrl, videoFile, {
@@ -72,10 +75,10 @@ export default function AddLecture({
       const lectureData = {
         title,
         videoUrl: videoKey,
-        duration:videoDuration
+        duration: videoDuration,
       };
 
-      const response = await addLecture(courseId,sectionId,lectureData);
+      const response = await addLecture(courseId, sectionId, lectureData);
 
       setSections((prevSections) =>
         prevSections.map((section) =>

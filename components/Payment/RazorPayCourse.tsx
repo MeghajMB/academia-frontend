@@ -108,7 +108,10 @@ const RazorpayCourse = ({
               progress: undefined,
               theme: "dark",
             });
-            router.push("/home"); // show the success page
+            if(type=='course'){
+               router.push("/home/my-learning"); // show the success page
+            }
+           
           },
           modal: {
             confirm_close: true,

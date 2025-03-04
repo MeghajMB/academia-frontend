@@ -4,7 +4,7 @@ import React from "react";
 
 export default function page() {
   return (
-    <ProtectedRoute role="common">
+    <ProtectedRoute role={["instructor","student"]}>
       <ProfilePage />
     </ProtectedRoute>
   );

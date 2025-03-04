@@ -8,7 +8,7 @@ export default function page() {
         Enter Course Details
       </h2>
       <div className="w-full max-w-3xl mx-auto p-4">
-      <CourseCreation />
+      <CourseCreation isEditMode={false} />
       </div>
     </>
   );
