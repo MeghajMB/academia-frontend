@@ -6,6 +6,7 @@ import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { customAxios } from "@/api/axios";
 import { login } from "@/lib/features/auth/authSlice";
 import { AxiosError } from "axios";
+import LoadingPage from "@/components/LoadingPage";
 
 interface UserCredentials {
   email: string;
@@ -32,7 +33,7 @@ const AdminLogin = () => {
   const router = useRouter();
 
   useEffect(() => {
-    setIsClient(true);
+    
     if (user.role) {
       if (user.role !== "admin") {
         router.push("/");
@@ -46,10 +47,10 @@ const AdminLogin = () => {
     } else {
       setPersist(localPersist === "true");
     }
+    setIsClient(true);
   }, []);
   if (!isClient) {
-    // Prevent rendering client-side code during SSR
-    return null;
+    return <LoadingPage />;
   }
 
   function handleChangePersist() {

@@ -27,7 +27,7 @@ export default function InstructorLayout({
   const [open, setOpen] = useState(false);
   return (
     <>
-      <ProtectedRoute role="instructor">
+      <ProtectedRoute role={["instructor"]}>
         <main className="pt-24">
           <button
             className="fixed top-24 left-4 z-50 p-2 hover:bg-white/10 rounded-lg transition-colors"

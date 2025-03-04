@@ -4,9 +4,6 @@ import React, { useEffect, useState } from "react";
 import {
   Award,
   BookOpen,
-  BarChart2,
-  Calendar,
-  CheckCircle2,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import LoadingPage from "@/app/loading";

@@ -2,7 +2,7 @@ import InstructorIntroductionPage from "@/components/pages/InstructorIntroductio
 import ProtectedRoute from "@/hoc/ProtectedRoute";
 export default function Page() {
   return (
-    <ProtectedRoute role="student">
+    <ProtectedRoute role={["student"]}>
       <InstructorIntroductionPage />
     </ProtectedRoute>
   );

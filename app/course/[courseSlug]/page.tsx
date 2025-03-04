@@ -39,7 +39,6 @@ export default function Page() {
       try {
         if (courseSlug && typeof courseSlug == "string") {
           const courseDetails = await fetchDetailsOfListedCourseApi(courseSlug);
-          console.log(courseDetails);
           setCourseDetails(courseDetails);
           setIsClient(true);
         }
@@ -65,14 +64,20 @@ export default function Page() {
   return (
     <>
       <main className="pt-24 px-7">
-        <div className="grid md:grid-cols-2 gap-x-5 gap-y-10 md:gap-y-3">
-          <CourseCard course={courseDetails!} />
-          <CourseDetails course={courseDetails!} />
-          <CourseTabs
-            courseId={courseSlug! as string}
-            canReview={courseDetails.canReview}
-            hasReviewed={courseDetails.hasReviewed}
-          />
+        <div className="lg:grid lg:grid-cols-7 lg:grid-rows-1 lg:gap-x-8 lg:gap-y-10 xl:gap-x-16">
+          <div className="lg:col-span-4 lg:row-end-1">
+            <CourseCard course={courseDetails!} />
+          </div>
+          <div className="mx-auto mt-14 max-w-[50rem] sm:mt-16 lg:col-span-3 lg:row-span-2 lg:row-end-2 lg:mt-0 lg:max-w-none">
+            <CourseDetails course={courseDetails!} />
+          </div>
+          <div className="mx-auto mt-16 w-full max-w-[50rem] lg:col-span-4 lg:mt-0 lg:max-w-none">
+            <CourseTabs
+              courseId={courseSlug! as string}
+              canReview={courseDetails.canReview}
+              hasReviewed={courseDetails.hasReviewed}
+            />
+          </div>
         </div>
       </main>
     </>
@@ -115,13 +120,18 @@ const CourseDetails = ({ course }: { course: ICourseDetails }) => {
         <div className="flex flex-col gap-3">
           <h2 className="text-2xl font-bold">{course.title}</h2>
           <p className="mt-4 text-gray-300">{course.subtitle}</p>
-          <Link
-            href={`/home/instructor/${course.instructorId}`}
-            className="text-gray-400"
-          >
-            Created By:{" "}
-            <span className="text-blue-500">{course.instructorName}</span>
-          </Link>
+          <div>
+            <span className="text-gray-50">
+              Created By:
+            </span>
+            <Link
+              href={`/home/instructor/${course.instructorId}`}
+              className="font-semibold text-muted-foreground underline underline-offset-2 text-purple-500"
+            >
+              {course.instructorName}
+            </Link>
+          </div>
+
           <p>Last updated :19/10/2024</p>
           <p className="mt-4 text-3xl font-bold">₹{course.price}</p>
           <div className="mt-4 flex gap-4">

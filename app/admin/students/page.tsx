@@ -5,7 +5,7 @@ import ProtectedRoute from "@/hoc/ProtectedRoute";
 export default function Page() {
   return (
     <>
-      <ProtectedRoute role="admin">
+      <ProtectedRoute role={["admin"]}>
         <main className="overflow-x-auto p-20 flex-1">
           <UsersTable role="student" />
         </main>

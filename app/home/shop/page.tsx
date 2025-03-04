@@ -16,7 +16,7 @@ const coinPackages = [
 ];
 const ShopCoins = () => {
   return (
-    <ProtectedRoute role="common">
+    <ProtectedRoute role={["instructor","student"]}>
       <div className="container mx-auto px-4 py-8 max-w-6xl">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold mb-2">Purchase Coins</h1>
