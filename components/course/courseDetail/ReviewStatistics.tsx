@@ -1,6 +1,6 @@
 import useReviewApi from "@/hooks/api/useReviewApi";
 import { ReviewStats } from "@/types/review";
-import { Card, CardBody, Progress, Spinner } from "@nextui-org/react";
+import { Card, CardBody, Progress, Spinner } from "@heroui/react";
 import { Star } from "lucide-react";
 import { useEffect, useState } from "react";
 

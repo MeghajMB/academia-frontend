@@ -4,7 +4,7 @@ import { Plus } from "lucide-react";
 import Link from "next/link";
 import useCourseApi from "@/hooks/api/useCourseApi";
 import { useAppSelector } from "@/lib/hooks";
-import { Button } from "@nextui-org/react";
+import { Button } from "@heroui/react";
 import { toast } from "react-toastify";
 import { ICourse } from "@/types/course";
 

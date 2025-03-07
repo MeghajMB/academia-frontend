@@ -1,5 +1,5 @@
 import useCourseApi from "@/hooks/api/useCourseApi";
-import { Button, Form, Input, Spinner, Textarea } from "@nextui-org/react";
+import { Button, Form, Input, Spinner, Textarea } from "@heroui/react";
 import { useState } from "react";
 
 export default function AddSection({ setSections, courseId }) {

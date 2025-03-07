@@ -1,5 +1,5 @@
 import { ILecture, ISection } from "@/types/course";
-import { Accordion, AccordionItem, Checkbox } from "@nextui-org/react";
+import { Accordion, AccordionItem, Checkbox } from "@heroui/react";
 import { Clock1, Lock, Play } from "lucide-react";
 
 const CourseContent = ({

@@ -10,7 +10,7 @@ import { useRouter } from "next/navigation";
 import { customAxios } from "@/api/axios";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { toast } from "react-toastify";
-import { Spinner } from "@nextui-org/react";
+import { Spinner } from "@heroui/react";
 
 interface IFormError{
   name?: string;

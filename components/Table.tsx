@@ -7,7 +7,7 @@ import {
   TableColumn,
   TableRow,
   TableCell,
-} from "@nextui-org/react";
+} from "@heroui/react";
 
 interface AdminTableProps<T extends { id: string | number }> {
   bottomContent?: React.ReactNode;

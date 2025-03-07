@@ -1,7 +1,7 @@
 import useCourseApi from "@/hooks/api/useCourseApi";
 import useFilesApi from "@/hooks/api/useFilesApi";
 import { useAppSelector } from "@/lib/hooks";
-import { Button, Form, Input, Spinner } from "@nextui-org/react";
+import { Button, Form, Input, Spinner } from "@heroui/react";
 import axios from "axios";
 import { useState } from "react";
 

@@ -3,7 +3,7 @@ import useCourseApi from "@/hooks/api/useCourseApi";
 import useFilesApi from "@/hooks/api/useFilesApi";
 import { ILecture } from "@/types/course";
 import { useSortable } from "@dnd-kit/sortable";
-import { Form, Input, Button, Chip, Tooltip } from "@nextui-org/react";
+import { Form, Input, Button, Chip, Tooltip } from "@heroui/react";
 import axios from "axios";
 import {
   Grip,

@@ -9,7 +9,7 @@ import {
 import CourseLectureCard from "./CourseLectureCard";
 import AddLecture from "./AddLecture";
 import { useState } from "react";
-import { Button, Input, Textarea, Form } from "@nextui-org/react";
+import { Button, Input, Textarea, Form } from "@heroui/react";
 import { Edit2, Save, X, ChevronDown, ChevronUp, Trash2 } from "lucide-react";
 import useCourseApi from "@/hooks/api/useCourseApi";
 import DeleteConfirmationModal from "@/components/ui/modals/DeleteconfirmationModal";

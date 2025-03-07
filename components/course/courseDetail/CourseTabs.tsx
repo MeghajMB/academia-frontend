@@ -1,6 +1,6 @@
 "use client";
 import useReviewApi from "@/hooks/api/useReviewApi";
-import { Accordion, AccordionItem, Tab, Tabs } from "@nextui-org/react";
+import { Accordion, AccordionItem, Tab, Tabs } from "@heroui/react";
 import React, { useEffect, useState } from "react";
 import CourseReviews from "./CourseReviews";
 import { Review } from "@/types/review";

@@ -15,7 +15,7 @@ import {
   ModalHeader,
   Textarea,
   useDisclosure,
-} from "@nextui-org/react";
+} from "@heroui/react";
 
 interface InstructorForm {
   headline: string;

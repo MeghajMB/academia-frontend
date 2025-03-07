@@ -15,7 +15,7 @@ import ProtectedRoute from "@/hoc/ProtectedRoute";
 
 const menuItems = [
   { title: "Courses", icon: BookOpen, path: "/instructor/courses" },
-  { title: "Services", icon: Calendar, path: "/instructor/services" },
+  { title: "Gigs", icon: Calendar, path: "/instructor/gigs" },
   { title: "Messages", icon: MessageCircle, path: "/instructor/messages" },
 ];
 

@@ -1,4 +1,4 @@
-import { Avatar, Button, Card, CardBody } from "@nextui-org/react";
+import { Avatar, Button, Card, CardBody } from "@heroui/react";
 import { Edit2, Star, Trash2 } from "lucide-react";
 import React, { useState } from "react";
 import { ReviewForm } from "./ReviewForm";
