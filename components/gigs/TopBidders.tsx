@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import {
   Avatar,
   Card,
@@ -10,38 +9,15 @@ import {
   Chip,
 } from "@heroui/react";
 import { Trophy, Coins } from "lucide-react";
-import { socket } from "@/lib/socket";
-
-interface Bid {
-  userId: string;
-  username: string;
-  amount: number;
-  profilePicture: string;
-}
+import ProfilePicture from "@/public/images/blankUserProfile.jpeg";
+import useTopBidders from "@/hooks/socket/useSocketTopBidders";
 
 interface Props {
   gigId: string;
 }
 
 const TopBidders = ({ gigId }: Props) => {
-  const [topBidders, setTopBidders] = useState<Bid[]>([]);
-  console.log(topBidders)
-  useEffect(() => {
-    if (!gigId) return;
-
-    // Join the bidding room
-    socket.emit("joinBiddingRoom", gigId);
-
-    // Listen for updates
-    socket.on("updateBids", (bidders: Bid[]) => {
-      setTopBidders(bidders);
-    });
-
-    return () => {
-      socket.emit("leaveBiddingRoom", gigId);
-      socket.off("updateBids");
-    };
-  }, [gigId]);
+  const topBidders = useTopBidders(gigId);
 
   return (
     <Card className="bg-content2 shadow-md">
@@ -77,13 +53,11 @@ const TopBidders = ({ gigId }: Props) => {
                     variant="flat"
                     size="sm"
                   >
-                    #{index!=9 && '0'}{index + 1}
+                    #{index != 9 && "0"}
+                    {index + 1}
                   </Chip>
                   <Avatar
-                    src={
-                      bid.profilePicture ||
-                      "/placeholder.svg?height=32&width=32"
-                    }
+                    src={bid.profilePicture || ProfilePicture.src}
                     size="sm"
                     className="hidden sm:flex"
                   />

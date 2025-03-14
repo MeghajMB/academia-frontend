@@ -29,7 +29,7 @@ interface GigFormData {
   description: string;
   sessionDuration: number;
   minBid: number;
-  serviceDate: string;
+  sessionDate: string;
   maxParticipants: number;
 }
 
@@ -51,7 +51,7 @@ function CreateGigModal({
       description: "",
       sessionDuration: 60,
       minBid: 10,
-      serviceDate: moment().format("YYYY-MM-DDTHH:mm"),
+      sessionDate: moment().format("YYYY-MM-DDTHH:mm"),
       maxParticipants: 1,
     },
   });
@@ -155,12 +155,12 @@ function CreateGigModal({
                   label="Service Date"
                   defaultValue={moment().format("YYYY-MM-DDTHH:mm")}
                   variant="bordered"
-                  {...register("serviceDate", {
+                  {...register("sessionDate", {
                     required: "Service date is required",
                   })}
                 />
-                {errors.serviceDate && (
-                  <p className="text-red-500">{errors.serviceDate.message}</p>
+                {errors.sessionDate && (
+                  <p className="text-red-500">{errors.sessionDate.message}</p>
                 )}
               </div>
 

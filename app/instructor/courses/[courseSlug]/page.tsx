@@ -3,7 +3,6 @@ import LoadingPage from "@/app/loading";
 import CourseCreation from "@/components/instructor/courses/CourseCreation";
 import PageNotFound from "@/components/PageNotFound";
 import useCourseApi from "@/hooks/api/useCourseApi";
-import { Button } from "@heroui/react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
@@ -87,9 +86,6 @@ export default function Page() {
           >
             Submit For Review
           </button>
-        )}
-        {courseDetails.rejectedReason && (
-          <Button className="bg-red-500">Rejected Reason</Button>
         )}
       </div>
       <h2 className="text-3xl font-bold text-white text-center">

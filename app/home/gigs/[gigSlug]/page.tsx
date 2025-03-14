@@ -20,7 +20,7 @@ import {
 } from "@heroui/react";
 import { Calendar, Clock, Coins, Info, Award } from "lucide-react";
 import PageNotFound from "@/components/PageNotFound";
-import TopBidders from "@/components/services/TopBidders";
+import TopBidders from "@/components/gigs/TopBidders";
 import useGigApi from "@/hooks/api/useGigApi";
 import CountDownTimer from "@/components/CountDownTimer";
 
@@ -35,7 +35,7 @@ interface IGigDetails {
   currentBidder: string | null;
   status: "active" | "expired";
   biddingExpiresAt: Date;
-  serviceDate: Date;
+  sessionDate: Date;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -75,7 +75,7 @@ function Page() {
 
   async function handleSubmitBid() {
     setError("");
-
+    if (!gigDetails) return;
     if (!bid || Number(bid) <= 0) {
       setError("Please enter a valid bid amount");
       return;
@@ -178,7 +178,7 @@ function Page() {
                     <div>
                       <p className="text-sm text-default-500">Service Date</p>
                       <p className="font-semibold">
-                        {new Date(gigDetails.serviceDate).toLocaleDateString()}
+                        {new Date(gigDetails.sessionDate).toLocaleDateString()}
                       </p>
                     </div>
                   </CardBody>

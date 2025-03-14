@@ -3,9 +3,10 @@ import LoadingPage from "@/app/loading";
 import AddSection from "@/components/instructor/courses/AddSection";
 import CourseLectureCard from "@/components/instructor/courses/CourseLectureCard";
 import CourseSection from "@/components/instructor/courses/CourseSection";
+import NoContentAvailable from "@/components/ui/NoContentAvailable";
 import useCourseApi from "@/hooks/api/useCourseApi";
 import { ILecture, ISection } from "@/types/course";
-import { closestCorners, DndContext, DragOverlay } from "@dnd-kit/core";
+import { closestCorners, DndContext, DragOverlay, DragStartEvent } from "@dnd-kit/core";
 import {
   SortableContext,
   verticalListSortingStrategy,
@@ -47,8 +48,9 @@ export default function Page() {
     return <LoadingPage />;
   }
 
-  const handleDragStart = (event: any) => {
-    const [type, id] = event.active.id.split("-");
+  const handleDragStart = (event: DragStartEvent) => {
+    const idString = String(event.active.id);
+    const [type, id] = idString.split("-");
     if (type === "lecture") {
       const lecture = curriculum
         .flatMap((section) => section.lectures)
@@ -154,6 +156,12 @@ export default function Page() {
               );
             })}
           </SortableContext>
+          {curriculum.length == 0 && (
+            <NoContentAvailable
+              title="No Added Content"
+              content="Add Course Content"
+            />
+          )}
           <AddSection setSections={setCurriculum} courseId={courseSlug} />
         </div>
 

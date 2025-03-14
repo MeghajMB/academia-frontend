@@ -16,6 +16,7 @@ import useGigApi from "@/hooks/api/useGigApi";
 import CountDownTimer from "@/components/CountDownTimer";
 import Link from "next/link";
 import { Calendar, Clock, Coins } from "lucide-react";
+import NoContentAvailable from "@/components/ui/NoContentAvailable";
 
 interface IGigDetails {
   id: string;
@@ -26,7 +27,7 @@ interface IGigDetails {
   sessionDuration: string;
   minBid: number;
   biddingExpiresAt: string;
-  serviceDate: string;
+  sessionDate: string;
 }
 
 const GigListing = () => {
@@ -59,7 +60,7 @@ const GigListing = () => {
             className="bg-content1 border border-content2 hover:shadow-lg transition-shadow duration-300"
             isPressable
             as={Link}
-            href={`services/${gig.id}`}
+            href={`gigs/${gig.id}`}
           >
             <CardHeader className="flex gap-3 p-4">
               <Avatar
@@ -101,7 +102,7 @@ const GigListing = () => {
                   <Calendar className="w-4 h-4 text-success" />
                   <span className="text-sm">
                     <span className="font-semibold">Service Date:</span>{" "}
-                    {new Date(gig.serviceDate).toLocaleDateString()}
+                    {new Date(gig.sessionDate).toLocaleDateString()}
                   </span>
                 </div>
               </div>
@@ -123,14 +124,10 @@ const GigListing = () => {
       </div>
 
       {gigs.length === 0 && (
-        <div className="flex flex-col items-center justify-center p-12 border border-dashed rounded-xl border-default-700">
-          <p className="text-xl text-default-900">
-            No gigs available at the moment
-          </p>
-          <p className="text-sm text-default-700">
-            Check back later for new opportunities
-          </p>
-        </div>
+        <NoContentAvailable
+          title="No gigs available at the moment"
+          content="Check back later for new opportunities"
+        />
       )}
     </div>
   );

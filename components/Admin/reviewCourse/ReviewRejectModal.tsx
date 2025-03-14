@@ -111,6 +111,7 @@ export default function ReviewRejectModal({
                 value={rejectReason}
                 onChange={(e) => setRejectReason(e.target.value)}
                 errorMessage={error}
+                isInvalid={!!error}
               />
             </ModalBody>
             <ModalFooter>

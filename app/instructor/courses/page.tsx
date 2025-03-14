@@ -1,35 +1,40 @@
 "use client";
-import React, { useEffect, useState } from "react";
+
+import { useEffect, useState } from "react";
 import { Plus } from "lucide-react";
 import Link from "next/link";
 import useCourseApi from "@/hooks/api/useCourseApi";
 import { useAppSelector } from "@/lib/hooks";
-import { Button } from "@heroui/react";
 import { toast } from "react-toastify";
-import { ICourse } from "@/types/course";
+import type { ICourse } from "@/types/course";
+import {
+  Button,
+  Card,
+  CardBody,
+  CardFooter,
+  Chip,
+  Divider,
+  Spinner,
+} from "@heroui/react";
+import NoContentAvailable from "@/components/ui/NoContentAvailable";
 
 const CoursesPage = () => {
   const { fetchCoursesOfInstructorWithStatus, listCourseApi } = useCourseApi();
   const { id } = useAppSelector((state) => state.auth.user);
   const [courses, setCourses] = useState<ICourse[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     async function fetchAllCourses() {
       try {
-        const response = await fetchCoursesOfInstructorWithStatus(id!, "all"); // Fetch all courses
+        setIsLoading(true);
+        const response = await fetchCoursesOfInstructorWithStatus(id!, "all");
         setCourses(response);
       } catch (error) {
         console.error(error);
-        toast.error("Failed to fetch courses. Please try again later.", {
-          position: "top-right",
-          autoClose: 5000,
-          hideProgressBar: true,
-          closeOnClick: false,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "dark",
-        });
+        toast.error("Failed to fetch courses. Please try again later.");
+      } finally {
+        setIsLoading(false);
       }
     }
     fetchAllCourses();
@@ -46,154 +51,219 @@ const CoursesPage = () => {
         )
       );
 
-      toast.success("Course listed successfully!", {
-        position: "top-right",
-        autoClose: 5000,
-        hideProgressBar: true,
-        closeOnClick: false,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "dark",
-      });
+      toast.success("Course listed successfully!");
     } catch (error) {
       console.log(error);
-      toast.error("Something happened. Try again later!", {
-        position: "top-right",
-        autoClose: 5000,
-        hideProgressBar: true,
-        closeOnClick: false,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "dark",
-      });
+      toast.error("Something happened. Try again later!");
     }
   };
+
+  // Define course categories
+  const courseCategories = [
+    {
+      id: "listed",
+      title: "Listed Courses",
+      description:
+        "Courses that have been listed and are available to students.",
+      courses: courses.filter((course) => course.status === "listed"),
+    },
+    {
+      id: "accepted",
+      title: "Active Courses",
+      description:
+        "Courses that have been approved and are ready to be listed.",
+      courses: courses.filter((course) => course.status === "accepted"),
+    },
+    {
+      id: "pending",
+      title: "Pending Courses",
+      description: "Courses waiting for admin approval.",
+      courses: courses.filter((course) => course.status === "pending"),
+    },
+    {
+      id: "draft",
+      title: "Incomplete Courses",
+      description: "Courses that are still in draft mode.",
+      courses: courses.filter((course) => course.status === "draft"),
+    },
+    {
+      id: "rejected",
+      title: "Rejected Courses",
+      description: "Courses that have been rejected by admins.",
+      courses: courses.filter((course) => course.status === "rejected"),
+    },
+  ];
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Header */}
-      <div className="flex justify-between items-center mb-8">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
         <div>
-          <h1 className="text-4xl font-extrabold text-white">My Courses</h1>
-          <p className="mt-2 text-gray-400 text-lg">
+          <h1 className="text-3xl md:text-4xl font-bold text-foreground">
+            My Courses
+          </h1>
+          <p className="mt-2 text-muted-foreground text-base md:text-lg">
             Manage your courses and track their performance
           </p>
         </div>
-        <Link
+        <Button
+          as={Link}
           href="/instructor/courses/create"
-          className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white px-5 py-3 rounded-lg transition-colors font-medium shadow-md"
+          color="primary"
+          startContent={<Plus size={20} />}
+          className="font-medium"
+          size="lg"
         >
-          <Plus size={22} />
-          <span>Create New Course</span>
-        </Link>
+          Create New Course
+        </Button>
       </div>
-
+      {courses.length == 0 && (
+        <NoContentAvailable
+          title="Create Courses"
+          content="Add courses to view them"
+        />
+      )}
       {/* Course Categories */}
-      <div className="space-y-10">
-        <PendingCourseList
-          title="Listed Courses"
-          description="Courses that have been listed."
-          courses={courses.filter((course) => course.status === "listed")}
-          handleListCourse={handleListCourse}
-        />
-        <PendingCourseList
-          title="Active Courses"
-          description="Courses that have been approved."
-          courses={courses.filter((course) => course.status === "accepted")}
-          handleListCourse={handleListCourse}
-        />
-
-        <PendingCourseList
-          title="Pending Courses"
-          description="Courses waiting for admin approval."
-          courses={courses.filter((course) => course.status === "pending")}
-          handleListCourse={handleListCourse}
-        />
-
-        <PendingCourseList
-          title="Incomplete Courses"
-          description="Courses that are drafted."
-          courses={courses.filter((course) => course.status === "draft")}
-          handleListCourse={handleListCourse}
-        />
-
-        <PendingCourseList
-          title="Rejected Courses"
-          description="Courses that have been rejected."
-          courses={courses.filter((course) => course.status === "rejected")}
-          handleListCourse={handleListCourse}
-        />
-      </div>
+      {isLoading ? (
+        <div className="flex justify-center items-center h-64">
+          <Spinner size="lg" color="secondary" />
+        </div>
+      ) : (
+        <div className="space-y-12">
+          {courseCategories.map((category) => (
+            <CourseCategory
+              key={category.id}
+              title={category.title}
+              description={category.description}
+              courses={category.courses}
+              handleListCourse={handleListCourse}
+              showListButton={category.id === "accepted"}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 };
 
 export default CoursesPage;
 
-const PendingCourseList = ({
+const CourseCategory = ({
   title,
   description,
   courses,
   handleListCourse,
+  showListButton = false,
 }: {
   title: string;
   description: string;
   courses: ICourse[];
   handleListCourse: (courseId: string) => void;
+  showListButton?: boolean;
 }) => {
   if (!courses || courses.length === 0) {
-    return (
-      <>
-        <h2 className="text-3xl font-bold text-white">{title}</h2>
-        <p className="mt-2 text-gray-400">{description}</p>{" "}
-        <p className="mt-4 text-gray-400 italic">
-          No courses found in this category.
-        </p>
-      </>
-    );
+    return null; // Don't show empty categories
   }
 
   return (
     <div>
-      <h2 className="text-3xl font-bold text-white">{title}</h2>
-      <p className="mt-2 text-gray-400">{description}</p>
-      <div className="grid md:grid-cols-3 gap-6 mt-6">
+      <h2 className="text-2xl md:text-3xl font-bold text-foreground">
+        {title}
+      </h2>
+      <p className="mt-2 text-muted-foreground">{description}</p>
+      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
         {courses.map((course) => (
-          <div
+          <CourseCard
             key={course.id}
-            className="bg-gray-900 rounded-xl p-5 shadow-lg border border-gray-800 hover:border-purple-500 transition-all"
-          >
-            <h3 className="text-xl font-semibold text-white">{course.title}</h3>
-            <p className="text-gray-400 text-sm mt-1">
-              {course.description?.slice(0, 100)}...
-            </p>
-            <div className="mt-4 flex justify-between items-center">
-              {course.status === "accepted" ? (
-                <Button
-                  color="success"
-                  className="h-7"
-                  onPress={() => handleListCourse(course.id)}
-                  aria-label="List the course"
-                >
-                  List the Course
-                </Button>
-              ) : (
-                <span className="text-sm px-3 py-1 rounded-full text-white bg-purple-600">
-                  {course.status}
-                </span>
-              )}
-              <Link
-                href={`courses/${course.id}`}
-                className="text-purple-400 hover:underline text-sm"
-              >
-                View Details
-              </Link>
-            </div>
-          </div>
+            course={course}
+            handleListCourse={handleListCourse}
+            showListButton={showListButton}
+          />
         ))}
       </div>
     </div>
+  );
+};
+
+const CourseCard = ({
+  course,
+  handleListCourse,
+  showListButton,
+}: {
+  course: ICourse;
+  handleListCourse: (courseId: string) => void;
+  showListButton: boolean;
+}) => {
+  // Status chip color mapping
+  const statusColorMap: Record<
+    string,
+    {
+      color:
+        | "success"
+        | "primary"
+        | "warning"
+        | "default"
+        | "danger"
+        | "secondary";
+      label: string;
+    }
+  > = {
+    listed: { color: "success", label: "Listed" },
+    accepted: { color: "primary", label: "Approved" },
+    pending: { color: "warning", label: "Pending" },
+    draft: { color: "default", label: "Draft" },
+    rejected: { color: "danger", label: "Rejected" },
+  };
+
+  const statusInfo = statusColorMap[course.status] || {
+    color: "default",
+    label: course.status,
+  };
+
+  return (
+    <Card className="bg-content1 border-none shadow-md hover:shadow-lg transition-shadow">
+      <CardBody className="p-5">
+        <h3 className="text-xl font-semibold text-foreground line-clamp-1">
+          {course.title}
+        </h3>
+        <p className="text-muted-foreground text-sm mt-2 line-clamp-3">
+          {course.description || "No description available"}
+        </p>
+      </CardBody>
+      <Divider />
+      <CardFooter className="flex justify-between items-center p-5">
+        <Chip
+          color={statusInfo.color}
+          variant="flat"
+          size="sm"
+          className={`${course.status === "rejected" && "font-semibold"}`}
+        >
+          {statusInfo.label}
+        </Chip>
+        <div className="flex gap-2">
+          {showListButton && (
+            <Button
+              color="success"
+              size="sm"
+              variant="flat"
+              onPress={() => handleListCourse(course.id)}
+              className="font-medium"
+            >
+              List Course
+            </Button>
+          )}
+          <Button
+            as={Link}
+            href={`/instructor/courses/${course.id}`}
+            color="secondary"
+            variant="light"
+            size="sm"
+            className="font-medium"
+          >
+            View Details
+          </Button>
+        </div>
+      </CardFooter>
+    </Card>
   );
 };

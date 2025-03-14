@@ -24,7 +24,7 @@ function CourseLectureView({
       }
     }
     fetchUrl();
-  }, []);
+  }, [activeLecture.id,courseId]);
   if(!videoUrl){
     return null
   }

@@ -49,7 +49,7 @@ export function GigCard({ gig }: GigCardProps) {
           <div className="flex items-center gap-2">
             <CalendarIcon size={16} className="text-gray-500" />
             <span className="text-sm">
-            {moment(gig.serviceDate).format("MMM D, YYYY, h:mm A")}
+            {moment(gig.sessionDate).format("MMM D, YYYY, h:mm A")}
             </span>
           </div>
           <div className="flex items-center gap-2">
