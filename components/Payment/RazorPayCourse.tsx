@@ -1,6 +1,6 @@
 "use client";
 import usePaymentApi from "@/hooks/api/usePaymentApi";
-import { Button } from "@nextui-org/react";
+import { Button } from "@heroui/react";
 import { useRouter } from "next/navigation";
 import { useRef } from "react";
 import { toast } from "react-toastify";

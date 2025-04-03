@@ -1,9 +1,8 @@
 "use client";
-import useReviewApi from "@/hooks/api/useReviewApi";
-import { Accordion, AccordionItem, Tab, Tabs } from "@nextui-org/react";
-import React, { useEffect, useState } from "react";
+import { Accordion, AccordionItem, Tab, Tabs } from "@heroui/react";
+import React from "react";
 import CourseReviews from "./CourseReviews";
-import { Review } from "@/types/review";
+import { IReview } from "@/types/review";
 
 function CourseTabs({
   canReview,
@@ -14,33 +13,8 @@ function CourseTabs({
   courseId: string;
   hasReviewed: boolean;
 }) {
-  const [reviews, setReviews] = useState<Review[]>([]);
-  const { fetchCourseReviewsApi, addReviewApi } = useReviewApi();
 
-  useEffect(() => {
-    fetchReviews();
-  }, []);
-
-  const fetchReviews = async () => {
-    try {
-      const res = await fetchCourseReviewsApi(courseId);
-      setReviews(res);
-    } catch (error) {
-      console.error("Error fetching reviews:", error);
-    }
-  };
-
-  const handleAddReview = async (review: Partial<Review>) => {
-    try {
-      console.log(review);
-
-      await addReviewApi(courseId, Number(review.rating), review.comment);
-      //fetchReviews(); // Refresh reviews
-    } catch (error) {
-      console.error("Error submitting review:", error);
-    }
-  };
-  function handleEditReview(review: Partial<Review>) {
+  function handleEditReview(review: Partial<IReview>) {
     console.log(review);
   }
   function handleDeleteReview(reviewId: string) {
@@ -66,9 +40,7 @@ function CourseTabs({
         <Tab key="reviews" title="Reviews">
           <div className="space-y-6 p-4">
             <CourseReviews
-              reviews={reviews}
               currentUserId="Current User" // In real app, get from auth
-              onAddReview={handleAddReview}
               onEditReview={handleEditReview}
               onDeleteReview={handleDeleteReview}
               canReview={canReview}

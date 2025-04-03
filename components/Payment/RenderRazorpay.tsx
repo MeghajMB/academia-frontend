@@ -1,6 +1,6 @@
 "use client";
 import usePaymentApi from "@/hooks/api/usePaymentApi";
-import { Button } from "@nextui-org/react";
+import { Button } from "@heroui/react";
 import { useRef } from "react";
 
 // Function to load script and append in the DOM tree.

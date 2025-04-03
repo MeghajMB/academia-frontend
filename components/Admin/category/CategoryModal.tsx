@@ -10,7 +10,7 @@ import {
   Button,
   Input,
   Textarea,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import useAdminApi from "@/hooks/api/useAdminApi";
 
 // Define the structure of category data

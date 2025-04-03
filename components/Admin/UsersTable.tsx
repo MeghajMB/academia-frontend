@@ -6,7 +6,7 @@ import {
   User,
   Chip,
   Tooltip,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import {
   Table,
   TableHeader,
@@ -14,7 +14,7 @@ import {
   TableColumn,
   TableRow,
   TableCell,
-} from "@nextui-org/table";
+} from "@heroui/table";
 import { EyeIcon, SearchIcon } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import useAdminApi from "@/hooks/api/useAdminApi";

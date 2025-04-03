@@ -6,7 +6,7 @@ import {
   Tooltip,
   Button,
   useDisclosure,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import { EditIcon, SearchIcon } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import useAxiosPrivate from "@/hooks/useAxiosPrivate";

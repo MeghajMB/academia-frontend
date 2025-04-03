@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import { Card, CardBody, CardHeader, Badge, Button } from "@nextui-org/react";
+import { Card, CardBody, CardHeader, Badge, Button } from "@heroui/react";
 import { Coins } from "lucide-react";
 import ProtectedRoute from "@/hoc/ProtectedRoute";
 import RenderRazorpay from "@/components/Payment/RenderRazorpay";

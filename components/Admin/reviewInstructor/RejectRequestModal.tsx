@@ -9,7 +9,7 @@ import {
   ModalFooter,
   Button,
   Textarea,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import useAdminApi from "@/hooks/api/useAdminApi";
 import { toast } from "react-toastify";
 

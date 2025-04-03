@@ -8,7 +8,7 @@ import LoadingPage from "@/app/loading";
 import useCourseApi from "@/hooks/api/useCourseApi";
 import { toast } from "react-toastify";
 import { ICourseDetails } from "@/types/course";
-import { Tab, Tabs } from "@nextui-org/react";
+import { Tab, Tabs } from "@heroui/react";
 import RazorpayCourse from "@/components/Payment/RazorPayCourse";
 import CourseTabs from "@/components/course/courseDetail/CourseTabs";
 

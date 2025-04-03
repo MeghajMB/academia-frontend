@@ -12,7 +12,7 @@ import {
   Card,
   CardBody,
   Spinner,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import useCategoryApi from "@/hooks/api/useCategoryApi";
 import useFilesApi from "@/hooks/api/useFilesApi";
 import axios, { AxiosError } from "axios";
@@ -408,7 +408,7 @@ export default function CourseCreation({
               }}
             >
               {categories.map((category) => (
-                <SelectItem key={category.id} value={category.id}>
+                <SelectItem key={category.id}>
                   {category.name}
                 </SelectItem>
               ))}

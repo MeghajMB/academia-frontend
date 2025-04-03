@@ -9,7 +9,7 @@ import {
   ModalFooter,
   Button,
   Textarea,
-} from "@nextui-org/react";
+} from "@heroui/react";
 import useAdminApi from "@/hooks/api/useAdminApi";
 import { toast } from "react-toastify";
 import { IReviewRequests } from "@/app/admin/review-courses/page";
@@ -111,6 +111,7 @@ export default function ReviewRejectModal({
                 value={rejectReason}
                 onChange={(e) => setRejectReason(e.target.value)}
                 errorMessage={error}
+                isInvalid={!!error}
               />
             </ModalBody>
             <ModalFooter>

@@ -1,4 +1,4 @@
-export interface Review {
+export interface IReview {
     id: string
     studentId: {
       name: string
@@ -9,7 +9,7 @@ export interface Review {
     createdAt: string
   }
   
-  export interface ReviewStats {
+  export interface IReviewStats {
     averageRating: number;
     totalReviews: number;
     ratingBreakdown: Record<string, number>;

@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { Button, Card, CardBody, CardFooter, CardHeader, Textarea } from "@nextui-org/react"
+import { Button, Card, CardBody, CardFooter, CardHeader, Textarea } from "@heroui/react"
 import { Star } from "lucide-react"
 import { useState } from "react"
 import { Review } from "@/types/review"

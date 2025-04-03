@@ -1,15 +1,14 @@
-import { Avatar, Button, Card, CardBody } from "@nextui-org/react";
+import { Avatar, Button, Card, CardBody } from "@heroui/react";
 import { Edit2, Star, Trash2 } from "lucide-react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ReviewForm } from "./ReviewForm";
 import { ReviewStatistics } from "./ReviewStatistics";
-import { Review } from "@/types/review";
+import { IReview, IReviewStats } from "@/types/review";
+import useReviewApi from "@/hooks/api/useReviewApi";
 
 interface CourseReviewsProps {
-  reviews: Review[];
   currentUserId?: string;
-  onAddReview: (review: Partial<Review>) => void;
-  onEditReview: (review: Partial<Review>) => void;
+  onEditReview: (review: Partial<IReview>) => void;
   onDeleteReview: (reviewId: string) => void;
   canReview: boolean;
   hasReviewed: boolean;
@@ -17,30 +16,56 @@ interface CourseReviewsProps {
 }
 
 function CourseReviews({
-  reviews,
   currentUserId,
-  onAddReview,
   onEditReview,
   onDeleteReview,
   canReview,
   courseId,
   hasReviewed,
 }: CourseReviewsProps) {
+  const [reviews, setReviews] = useState<IReview[]>([]);
+  const [reviewStats, setReviewStats] = useState<IReviewStats>({
+    averageRating: 0,
+    totalReviews: 0,
+    ratingBreakdown: {
+      "1star": 0,
+      "2star": 0,
+      "3star": 0,
+      "4star": 0,
+      "5star": 0,
+    },
+  });
   const [editingReviewId, setEditingReviewId] = useState<string | null>(null);
   const [isAddingReview, setIsAddingReview] = useState(false);
+  const { fetchCourseReviewsApi, addReviewApi } = useReviewApi();
+  useEffect(() => {
+    fetchReviews();
+  }, []);
 
-  const handleAddReview = (review: Partial<Review>) => {
-    onAddReview(review);
+  const fetchReviews = async () => {
+    try {
+      const res = await fetchCourseReviewsApi(courseId);
+      setReviews(res.reviews);
+      setReviewStats(res.reviewStats);
+      console.log(res);
+    } catch (error) {
+      console.error("Error fetching reviews:", error);
+    }
+  };
+
+  const handleAddReview = async (review: Partial<IReview>) => {
+    await addReviewApi(courseId, Number(review.rating), review.comment);
     setIsAddingReview(false);
   };
 
-  const handleEditReview = (review: Partial<Review>) => {
+  const handleEditReview = (review: Partial<IReview>) => {
     onEditReview(review);
     setEditingReviewId(null);
   };
+
   return (
     <div className="space-y-6">
-      <ReviewStatistics courseId={courseId} />
+      <ReviewStatistics reviewStats={reviewStats} />
 
       {!isAddingReview && canReview && !hasReviewed && (
         <Button

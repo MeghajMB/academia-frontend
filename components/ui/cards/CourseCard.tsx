@@ -1,7 +1,7 @@
 "use client";
 
 import { ICourse } from "@/types/course";
-import { Card, CardBody, CardFooter, CardHeader, Chip, Image } from "@nextui-org/react";
+import { Card, CardBody, CardFooter, CardHeader, Chip, Image } from "@heroui/react";
 import { BookOpen, Clock, Star } from "lucide-react";
 import Link from "next/link";
 

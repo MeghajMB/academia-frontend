@@ -11,7 +11,7 @@ import {
   Chip,
   Tooltip,
   ChipProps,
-} from "@nextui-org/react";
+} from "@heroui/react";
 
 export type IconSvgProps = SVGProps<SVGSVGElement> & {
   size?: number;
