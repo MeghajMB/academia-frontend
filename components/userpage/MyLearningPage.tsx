@@ -1,14 +1,12 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import {
-  Award,
-  BookOpen,
-} from "lucide-react";
+import { Award, BookOpen } from "lucide-react";
 import { motion } from "framer-motion";
 import LoadingPage from "@/app/loading";
 import MyLearningCard from "../ui/cards/MyLearningCard";
 import useCourseApi from "@/hooks/api/useCourseApi";
+import NoContentAvailable from "../common/NoContentAvailable";
 
 export interface IEnrolledCourses {
   id: string;
@@ -20,7 +18,6 @@ export interface IEnrolledCourses {
 }
 
 export default function LearningPage() {
-  
   const [isClient, setIsClient] = useState(false);
   const [courses, setCourses] = useState<IEnrolledCourses[]>([]);
   const [completedCourses, setCompletedCourses] = useState<IEnrolledCourses[]>(
@@ -32,9 +29,12 @@ export default function LearningPage() {
   useEffect(() => {
     async function fetchCourses() {
       try {
-        const coursesData = await fetchEnrolledCoursesApi() as IEnrolledCourses[];
+        const coursesData =
+          (await fetchEnrolledCoursesApi()) as IEnrolledCourses[];
         //const activecourses=coursesData.filter((course)=>!course.completedAt)
-        const completedCourses=coursesData.filter((course)=>course.completedAt)
+        const completedCourses = coursesData.filter(
+          (course) => course.completedAt
+        );
         setCourses(coursesData);
         setCompletedCourses(completedCourses);
       } catch (error) {
@@ -50,7 +50,7 @@ export default function LearningPage() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white pt-24 px-4 sm:px-6 lg:px-8">
+    <div className=" bg-black text-white pt-10 px-4 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto py-8">
         {/* Stats Overview */}
         <motion.div
@@ -92,26 +92,32 @@ export default function LearningPage() {
         </motion.div>
 
         {/* In Progress Courses */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="mb-12"
-        >
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold">In Progress</h2>
-          </div>
+        {courses.length != 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="mb-12"
+          >
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold">In Progress</h2>
+            </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {courses.length==0 && <p>No Courses Purchased,</p>}
-            {courses.map((course) => (
-              <MyLearningCard key={course.id} course={course} />
-            ))}
-          </div>
-        </motion.div>
-
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {courses.map((course) => (
+                <MyLearningCard key={course.id} course={course} />
+              ))}
+            </div>
+          </motion.div>
+        )}
+        {courses.length == 0 && (
+          <NoContentAvailable
+            title="No Courses Purchased"
+            content="Purchase courses to view them."
+          />
+        )}
         {/* Completed Courses */}
-{/*         <motion.div
+        {/*         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
@@ -165,7 +171,6 @@ export default function LearningPage() {
             ))}
           </div>
         </motion.div> */}
-
       </div>
     </div>
   );

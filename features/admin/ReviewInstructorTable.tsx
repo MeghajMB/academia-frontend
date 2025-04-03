@@ -7,19 +7,10 @@ import {
   Tooltip,
   useDisclosure,
 } from "@heroui/react";
-import {
-  Table,
-  TableHeader,
-  TableBody,
-  TableColumn,
-  TableRow,
-  TableCell,
-} from "@heroui/table";
 import { EyeIcon, SearchIcon } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import useAdminApi from "@/hooks/api/useAdminApi";
 import AdminTable from "../../Table";
-import GenericModal from "@/components/ui/GenericModal";
 import RejectRequestModal from "./RejectRequestModal";
 import { toast } from "react-toastify";
 import Link from "next/link";
@@ -68,7 +59,7 @@ export default function ReviewInstructorTable() {
     try {
       const response = await approveInstructorRequestApi(userId);
       setUsers((prevUsers) => {
-       return prevUsers.filter((user) => {
+        return prevUsers.filter((user) => {
           return user.id != userId;
         });
       });

@@ -16,7 +16,7 @@ import {
   Divider,
   Spinner,
 } from "@heroui/react";
-import NoContentAvailable from "@/components/ui/NoContentAvailable";
+import NoContentAvailable from "@/components/common/NoContentAvailable";
 
 const CoursesPage = () => {
   const { fetchCoursesOfInstructorWithStatus, listCourseApi } = useCourseApi();

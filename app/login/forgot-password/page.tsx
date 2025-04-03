@@ -1,6 +1,6 @@
 "use client";
 
-import Timer from "@/components/Timer";
+import Timer from "@/components/common/Timer";
 import useAuthApi from "@/hooks/api/useAuthApi";
 import { Button, Input, InputOtp } from "@heroui/react";
 import React, { useState } from "react";
@@ -16,12 +16,10 @@ export default function Page() {
   const [error, setError] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [token, setToken] = useState<null | string>(null);
 
-  const {
-    forgotPasswordApi,
-    verifyResetPasswordApi,
-    resetPasswordApi,
-  } = useAuthApi();
+  const { forgotPasswordApi, verifyResetPasswordApi, resetPasswordApi } =
+    useAuthApi();
 
   const handleEmailSubmit = async () => {
     if (!email) {
@@ -57,6 +55,7 @@ export default function Page() {
       setError("");
 
       const response = await verifyResetPasswordApi(email, otpValue);
+      setToken(response.resetToken);
       setShowPasswordFields(true);
       console.log("OTP verified successfully");
     } catch (err: any) {
@@ -88,7 +87,7 @@ export default function Page() {
       setLoading(true);
       setError("");
 
-      await resetPasswordApi(email, otpValue, newPassword);
+      await resetPasswordApi({email:email, password:newPassword,token:token});
       // Handle successful password reset (e.g., redirect to login)
 
       toast.success("Password reset successfully!", {

@@ -1,4 +1,4 @@
-import VideoPlayer from "@/components/VideoPlayer";
+import VideoPlayer from "@/components/common/VideoPlayer";
 import useCourseApi from "@/hooks/api/useCourseApi";
 import { ILecture } from "@/types/course";
 import React, { useEffect, useState } from "react";

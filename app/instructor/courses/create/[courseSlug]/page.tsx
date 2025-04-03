@@ -1,9 +1,9 @@
 "use client";
 import LoadingPage from "@/app/loading";
-import AddSection from "@/components/instructor/courses/AddSection";
-import CourseLectureCard from "@/components/instructor/courses/CourseLectureCard";
-import CourseSection from "@/components/instructor/courses/CourseSection";
-import NoContentAvailable from "@/components/ui/NoContentAvailable";
+import AddSection from "@/features/instructor/course/AddSection";
+import CourseLectureCard from "@/features/instructor/course/CourseLectureCard";
+import CourseSection from "@/features/instructor/course/CourseSection";
+import NoContentAvailable from "@/components/common/NoContentAvailable";
 import useCourseApi from "@/hooks/api/useCourseApi";
 import { ILecture, ISection } from "@/types/course";
 import { closestCorners, DndContext, DragOverlay, DragStartEvent } from "@dnd-kit/core";

@@ -1,0 +1,82 @@
+"use client";
+import React, { useEffect, useState } from "react";
+import useMediaSoup from "@/hooks/useMediaSoup";
+import JoinRoom from "@/features/videoCall/JoinRoom";
+import ConferenceRoom from "@/features/videoCall/ConferenceRoom";
+import { useParams } from "next/navigation";
+import DisconnectRoom from "@/features/videoCall/DisconnectRoom";
+import { Button } from "@heroui/react";
+const gigId = "123";
+export default function MediasoupPage() {
+  const [hasjoinedRoom, setHasJoinedRoom] = useState<boolean>(false);
+  const [hasDisconnected, sethasDisconnected] = useState<boolean>(false);
+  const [loading, setIsLoading] = useState(true);
+  const { gigSlug } = useParams();
+  const {
+    handleJoinRoom,
+    remoteStreams,
+    startMedia,
+    videoRef,
+    screenRef,
+    isAudioMuted,
+    isVideoPaused,
+    toggleAudio,
+    toggleVideo,
+    handleDisconnect,
+    toggleScreenShare,
+    isScreenSharing,
+  } = useMediaSoup();
+  /*   useEffect(() => {
+    async function joinTheSession() {
+      try {
+        const response = await handleJoinRoom({
+          gigId,
+          accessToken: gigSlug! as string,
+        });
+      } catch (error) {
+        console.log("cant join room");
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    joinTheSession();
+  }, [gigSlug]); */
+  return (
+    <>
+      <Button
+        onClick={() =>
+          handleJoinRoom({
+            gigId,
+            accessToken: gigSlug! as string,
+          })
+        }
+      >
+        Join the room
+      </Button>
+      {!hasjoinedRoom && (
+        <JoinRoom
+          startMedia={startMedia}
+          setHasJoinedRoom={setHasJoinedRoom}
+          userDetails={{ name: "your name" }}
+        />
+      )}
+
+      {hasjoinedRoom && !hasDisconnected && (
+        <ConferenceRoom
+          isAudioMuted={isAudioMuted}
+          isVideoPaused={isVideoPaused}
+          toggleAudio={toggleAudio}
+          toggleVideo={toggleVideo}
+          handleDisconnect={handleDisconnect}
+          toggleScreenShare={toggleScreenShare}
+          isScreenSharing={isScreenSharing}
+          videoRef={videoRef}
+          screenRef={screenRef}
+          remoteStreams={remoteStreams}
+          setHasDisconnected={sethasDisconnected}
+        />
+      )}
+      {hasDisconnected && <DisconnectRoom />}
+    </>
+  );
+}

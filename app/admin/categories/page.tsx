@@ -1,4 +1,4 @@
-import CategoriesTable from "@/components/Admin/category/CategoriesTable";
+import CategoriesTable from "@/features/admin/CategoriesTable";
 import ProtectedRoute from "@/hoc/ProtectedRoute";
 import React from "react";
 

@@ -434,13 +434,7 @@ function useMediaSoup() {
             if (index !== -1) {
               newStreams[userId][index].paused = paused;
             }
-            const stream = newStreams[userId][index].stream;
-            const track = stream.getVideoTracks()[0];
-            console.log(
-              `Producer ${producerId}: paused=${paused}, track enabled=${track.enabled}, stream active=${stream.active}`
-            );
           }
-          console.log(newStreams);
           return newStreams;
         });
       }

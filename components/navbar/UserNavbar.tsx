@@ -211,10 +211,11 @@ const UserNavbar: React.FC = () => {
                   })}
                   <DropdownItem
                     key="view-all"
-                    href="/home/notification"
                     color="secondary"
                   >
-                    View All Notifications
+                    <Link href="/home/notification">
+                      View All Notifications
+                    </Link>
                   </DropdownItem>
                 </>
               </DropdownMenu>

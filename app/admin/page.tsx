@@ -6,7 +6,7 @@ import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { customAxios } from "@/api/axios";
 import { login } from "@/lib/features/auth/authSlice";
 import { AxiosError } from "axios";
-import LoadingPage from "@/components/LoadingPage";
+import LoadingPage from "@/components/common/LoadingPage";
 
 interface UserCredentials {
   email: string;

@@ -1,5 +1,5 @@
 import React from "react";
-import UsersTable from "@/components/Admin/UsersTable";
+import UsersTable from "@/features/admin/UsersTable";
 import ProtectedRoute from "@/hoc/ProtectedRoute";
 
 export default function Page() {

@@ -3,7 +3,7 @@ import { RootState } from "@/lib/store";
 import { ReactNode, useEffect, useState } from "react";
 import { useAppSelector } from "@/lib/hooks";
 import LoadingPage from "@/app/loading";
-import PageNotFound from "@/components/PageNotFound";
+import PageNotFound from "@/components/common/PageNotFound";
 
 interface ProtectedRouteProps {
   role: string[];

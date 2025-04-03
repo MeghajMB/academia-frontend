@@ -10,7 +10,7 @@ import {
 } from "@heroui/react";
 import { CalendarIcon, ClockIcon, DollarSignIcon } from "lucide-react";
 import { IGig } from "@/types/gig";
-import CountDownTimer from "@/components/CountDownTimer";
+import CountDownTimer from "@/components/common/CountDownTimer";
 import moment from "moment";
 
 interface GigCardProps {

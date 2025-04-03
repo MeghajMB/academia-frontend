@@ -1,5 +1,5 @@
 import React from "react";
-import VideoJS from "@/components/VideoJS";
+import VideoJS from "@/components/common/VideoJS";
 import videojs from "video.js";
 
 export default function VideoPlayer({ videoLink,onEnded }: { videoLink: string,onEnded?:()=>void }) {

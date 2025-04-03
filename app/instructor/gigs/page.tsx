@@ -8,7 +8,7 @@ import { Button } from "@heroui/react";
 import { PlusIcon } from "lucide-react";
 import { GigCard } from "@/components/ui/cards/GigCard";
 import { IGig } from "@/types/gig";
-import CreateGigModal from "@/components/ui/modals/CreateGigModal";
+import CreateGigModal from "@/features/gig/CreateGigModal";
 
 function GigPage() {
   const { getActiveGigOfInstructorApi, createGigApi } = useGigApi();

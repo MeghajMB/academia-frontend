@@ -9,8 +9,8 @@ import useCourseApi from "@/hooks/api/useCourseApi";
 import { toast } from "react-toastify";
 import { ICourseDetails } from "@/types/course";
 import { Tab, Tabs } from "@heroui/react";
-import RazorpayCourse from "@/components/Payment/RazorPayCourse";
-import CourseTabs from "@/components/course/courseDetail/CourseTabs";
+import RazorpayCourse from "@/features/payment/RazorPayCourse";
+import CourseTabs from "@/features/course/courseDetail/CourseTabs";
 
 export default function Page() {
   const [courseDetails, setCourseDetails] = useState<ICourseDetails>({

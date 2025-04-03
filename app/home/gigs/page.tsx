@@ -13,10 +13,10 @@ import {
   Divider,
 } from "@heroui/react";
 import useGigApi from "@/hooks/api/useGigApi";
-import CountDownTimer from "@/components/CountDownTimer";
+import CountDownTimer from "@/components/common/CountDownTimer";
 import Link from "next/link";
 import { Calendar, Clock, Coins } from "lucide-react";
-import NoContentAvailable from "@/components/ui/NoContentAvailable";
+import NoContentAvailable from "@/components/common/NoContentAvailable";
 
 interface IGigDetails {
   id: string;

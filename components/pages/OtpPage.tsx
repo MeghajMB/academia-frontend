@@ -2,8 +2,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
-import axios from "axios";
-import Timer from "../Timer";
+import Timer from "../common/Timer";
 import useAuthApi from "@/hooks/api/useAuthApi";
 import { toast } from "react-toastify";
 
@@ -13,15 +12,14 @@ const OTPVerification: React.FC = () => {
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
-  const [resend,setResend]=useState(false)
+  const [resend, setResend] = useState(false);
   const [isClient, setIsClient] = useState(false);
   const email = useRef("");
-  const {verifyOtpApi,resendOtpApi}=useAuthApi()
-
+  const { verifyOtpApi, resendOtpApi } = useAuthApi();
 
   // Initialize refs array
   useEffect(() => {
-    console.log("Hello")
+    console.log("Hello");
     inputRefs.current = inputRefs.current.slice(0, 6);
     setIsClient(true);
     const userEmail = sessionStorage.getItem("userEmail");
@@ -82,28 +80,30 @@ const OTPVerification: React.FC = () => {
 
     try {
       // Replace this with your actual OTP verification API call
-      const response = await verifyOtpApi(otpString,email.current)
-      if (response) {
+      const response = await verifyOtpApi({
+        otp: otpString,
+        email: email.current,
+      });
+      if (response.status == "success") {
         sessionStorage.removeItem("userEmail");
         router.push("/login");
       } else {
-        setError("Invalid OTP. Please try again.");
+        setError(response.message);
+        return;
       }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
-      if (axios.isAxiosError(err)) {
-        const { errors } = err.response?.data;
-        setError(errors[0].message);
-      }
+      setError("unknown error");
     } finally {
       setLoading(false);
     }
   };
-  async function handleResendOtp(){
+  async function handleResendOtp() {
     try {
       // Replace this with your actual OTP verification API call
-      const response = await resendOtpApi(email.current)
-      if (response) {
-        toast('New Otp Send!', {
+      const response = await resendOtpApi(email.current);
+      if (response.status=='success') {
+        toast("New Otp Send!", {
           position: "top-right",
           autoClose: 5000,
           hideProgressBar: true,
@@ -112,16 +112,12 @@ const OTPVerification: React.FC = () => {
           draggable: true,
           progress: undefined,
           theme: "dark",
-          });
-
+        });
       } else {
-        setError("Cannot Set Otp. Login Again.");
+        setError(response.message);
       }
     } catch (err) {
-      if (axios.isAxiosError(err)) {
-        const { errors } = err.response?.data;
-        setError(errors[0].message);
-      }
+      console.log(err)
     } finally {
       setLoading(false);
     }
@@ -179,16 +175,18 @@ const OTPVerification: React.FC = () => {
             {loading ? "Verifying..." : "Verify OTP"}
           </button>
 
-          {resend && <p className="text-center text-sm text-gray-400">
-            Didn&apos;t receive the code?
-            <button
-              type="button"
-              className="text-indigo-400 hover:text-indigo-300"
-              onClick={handleResendOtp}
-            >
-              Resend
-            </button>
-          </p>}
+          {resend && (
+            <p className="text-center text-sm text-gray-400">
+              Didn&apos;t receive the code?
+              <button
+                type="button"
+                className="text-indigo-400 hover:text-indigo-300"
+                onClick={handleResendOtp}
+              >
+                Resend
+              </button>
+            </p>
+          )}
         </form>
       </motion.div>
     </main>

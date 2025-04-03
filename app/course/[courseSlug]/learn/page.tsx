@@ -1,8 +1,8 @@
 "use client";
-import CourseContent from "@/components/course/courseView/CourseContent";
-import CourseLectureView from "@/components/course/courseView/CourseLectureView";
-import LoadingPage from "@/components/LoadingPage";
-import PageNotFound from "@/components/PageNotFound";
+import CourseContent from "@/features/course/courseView/CourseContent";
+import CourseLectureView from "@/features/course/courseView/CourseLectureView";
+import LoadingPage from "@/components/common/LoadingPage";
+import PageNotFound from "@/components/common/PageNotFound";
 import useCourseApi from "@/hooks/api/useCourseApi";
 import { ILecture, ISection } from "@/types/course";
 import { useParams } from "next/navigation";

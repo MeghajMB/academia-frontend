@@ -1,4 +1,4 @@
-import createPaymentApi from "@/services/paymentApi";
+import createPaymentApi from "@/services/queries/implementations/paymentApi";
 import useAxiosPrivate from "../useAxiosPrivate";
 
 export default function usePaymentApi() {

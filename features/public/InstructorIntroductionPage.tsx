@@ -7,8 +7,7 @@ export default function InstructorIntroductionPage() {
   const { user } = useAppSelector((state) => state.auth);
   return (
     <>
-
-      <main className="pt-24">
+      <main className="pt-10">
         <section className="hero bg-[#0f0f0f] text-white py-16">
           <div className="container mx-auto text-center">
             <h1 className="text-3xl font-bold">
@@ -19,13 +18,21 @@ export default function InstructorIntroductionPage() {
               rewards!
             </p>
             {user.verified == "pending" ? (
-              <p className=" p-10 text-purple-700">Request Has Been Send.<br/>Will Notify when accepted.</p>
+              <p className=" p-10 text-purple-700">
+                Request Has Been Send.
+                <br />
+                Will Notify when accepted.
+              </p>
             ) : (
               <Link
                 href="/home/teaching/register"
-                className={`mt-8 inline-block text-white py-3 px-6 rounded-lg ${ user.verified == 'rejected'? 'bg-red-500' : 'bg-blue-700'}`}
+                className={`mt-8 inline-block text-white py-3 px-6 rounded-lg ${
+                  user.verified == "rejected" ? "bg-red-500" : "bg-blue-700"
+                }`}
               >
-                {user.verified =='rejected' ? "Request Rejected" : "Get Started"}
+                {user.verified == "rejected"
+                  ? "Request Rejected"
+                  : "Get Started"}
               </Link>
             )}
           </div>
@@ -88,7 +95,6 @@ export default function InstructorIntroductionPage() {
           </div>
         </section>
       </main>
-
     </>
   );
 }

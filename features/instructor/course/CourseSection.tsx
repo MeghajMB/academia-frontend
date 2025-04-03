@@ -7,7 +7,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import CourseLectureCard from "./CourseLectureCard";
-import AddLecture from "./AddLecture";
+import AddLecture from "../../../components/instructor/courses/AddLecture";
 import { useState } from "react";
 import { Button, Input, Textarea, Form } from "@heroui/react";
 import { Edit2, Save, X, ChevronDown, ChevronUp, Trash2 } from "lucide-react";

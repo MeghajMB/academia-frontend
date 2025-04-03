@@ -3,7 +3,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import axios from "axios";
-import Timer from "@/components/Timer";
+import Timer from "@/components/common/Timer";
 import useAuthApi from "@/hooks/api/useAuthApi";
 import { toast } from "react-toastify";
 
@@ -13,15 +13,14 @@ const Page: React.FC = () => {
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
-  const [resend,setResend]=useState(false)
+  const [resend, setResend] = useState(false);
   const [isClient, setIsClient] = useState(false);
   const email = useRef("");
-  const {verifyOtpApi,resendOtpApi}=useAuthApi()
-
+  const { verifyOtpApi, resendOtpApi } = useAuthApi();
 
   // Initialize refs array
   useEffect(() => {
-    console.log("Hello")
+    console.log("Hello");
     inputRefs.current = inputRefs.current.slice(0, 6);
     setIsClient(true);
     const userEmail = sessionStorage.getItem("userEmail");
@@ -82,7 +81,7 @@ const Page: React.FC = () => {
 
     try {
       // Replace this with your actual OTP verification API call
-      const response = await verifyOtpApi(otpString,email.current)
+      const response = await verifyOtpApi({otp:otpString, email:email.current});
       if (response) {
         sessionStorage.removeItem("userEmail");
         router.push("/login");
@@ -98,12 +97,12 @@ const Page: React.FC = () => {
       setLoading(false);
     }
   };
-  async function handleResendOtp(){
+  async function handleResendOtp() {
     try {
       // Replace this with your actual OTP verification API call
-      const response = await resendOtpApi(email.current)
-      if (response) {
-        toast('New Otp Send!', {
+      const response = await resendOtpApi(email.current);
+      if (response.status == "success") {
+        toast("New Otp Send!", {
           position: "top-right",
           autoClose: 5000,
           hideProgressBar: true,
@@ -112,16 +111,12 @@ const Page: React.FC = () => {
           draggable: true,
           progress: undefined,
           theme: "dark",
-          });
-
+        });
       } else {
-        setError("Cannot Set Otp. Login Again.");
+        setError(response.message);
       }
     } catch (err) {
-      if (axios.isAxiosError(err)) {
-        const { errors } = err.response?.data;
-        setError(errors[0].message);
-      }
+      console.log(err);
     } finally {
       setLoading(false);
     }
@@ -179,16 +174,18 @@ const Page: React.FC = () => {
             {loading ? "Verifying..." : "Verify OTP"}
           </button>
 
-          {resend && <p className="text-center text-sm text-gray-400">
-            Didn&apos;t receive the code?
-            <button
-              type="button"
-              className="text-indigo-400 hover:text-indigo-300"
-              onClick={handleResendOtp}
-            >
-              Resend
-            </button>
-          </p>}
+          {resend && (
+            <p className="text-center text-sm text-gray-400">
+              Didn&apos;t receive the code?
+              <button
+                type="button"
+                className="text-indigo-400 hover:text-indigo-300"
+                onClick={handleResendOtp}
+              >
+                Resend
+              </button>
+            </p>
+          )}
         </form>
       </motion.div>
     </main>

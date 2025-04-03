@@ -9,12 +9,12 @@ import {
 import { EyeIcon, SearchIcon } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import AdminTable from "@/components/Table";
+import AdminTable from "@/components/common/Table";
 import ProtectedRoute from "@/hoc/ProtectedRoute";
 import useAdminApi from "@/hooks/api/useAdminApi";
 import { toast } from "react-toastify";
 import Link from "next/link";
-import ReviewRejectModal from "@/components/Admin/reviewCourse/ReviewRejectModal";
+import ReviewRejectModal from "@/features/admin/ReviewRejectModal";
 
 export interface IReviewRequests {
   id: string;

@@ -19,7 +19,7 @@ export interface IGig {
   currentBidder: string | null;
   status: "active" | "expired";
   biddingExpiresAt: string;
-  serviceDate: string;
+  sessionDate: string;
   createdAt: string;
   updatedAt: string;
 }

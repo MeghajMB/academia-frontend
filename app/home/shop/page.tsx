@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { Card, CardBody, CardHeader, Badge, Button } from "@heroui/react";
 import { Coins } from "lucide-react";
 import ProtectedRoute from "@/hoc/ProtectedRoute";
-import RenderRazorpay from "@/components/Payment/RenderRazorpay";
+import RenderRazorpay from "@/features/payment/RenderRazorpay";
 import usePaymentApi from "@/hooks/api/usePaymentApi";
 
 const coinPackages = [

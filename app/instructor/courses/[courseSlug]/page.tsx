@@ -1,7 +1,7 @@
 "use client";
 import LoadingPage from "@/app/loading";
-import CourseCreation from "@/components/instructor/courses/CourseCreation";
-import PageNotFound from "@/components/PageNotFound";
+import CourseCreation from "@/features/instructor/course/CourseCreation";
+import PageNotFound from "@/components/common/PageNotFound";
 import useCourseApi from "@/hooks/api/useCourseApi";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";

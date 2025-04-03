@@ -9,7 +9,7 @@ import {
 import { EyeIcon, SearchIcon } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import AdminTable from "@/components/Table";
+import AdminTable from "@/components/common/Table";
 import useAdminApi from "@/hooks/api/useAdminApi";
 import Link from "next/link";
 import { debounce } from "lodash";

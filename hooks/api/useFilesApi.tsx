@@ -1,4 +1,4 @@
-import createFileApi from "@/services/fileApi";
+import createFileApi from "@/services/queries/implementations/fileApi";
 import useAxiosPrivate from "../useAxiosPrivate";
 
 export default function useFilesApi() {

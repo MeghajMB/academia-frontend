@@ -19,10 +19,10 @@ import {
   Progress,
 } from "@heroui/react";
 import { Calendar, Clock, Coins, Info, Award } from "lucide-react";
-import PageNotFound from "@/components/PageNotFound";
-import TopBidders from "@/components/gigs/TopBidders";
+import PageNotFound from "@/components/common/PageNotFound";
+import TopBidders from "@/features/gig/TopBidders";
 import useGigApi from "@/hooks/api/useGigApi";
-import CountDownTimer from "@/components/CountDownTimer";
+import CountDownTimer from "@/components/common/CountDownTimer";
 
 interface IGigDetails {
   id: string;

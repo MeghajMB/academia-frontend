@@ -10,12 +10,13 @@ function useNotification(userId: string | null) {
     const socket = getSocket();
     socket.emit("registerUser", userId);
     socket.on("notifications", (data) => {
-      console.log(data)
+      console.log(data);
       setNotifications(data.notifications);
       setNotificationCount(data.count);
     });
     return () => {
       socket.emit("unRegisterUser", userId);
+      socket.off("notifications");
     };
   }, [userId]);
   return { notifications, notificationCount };

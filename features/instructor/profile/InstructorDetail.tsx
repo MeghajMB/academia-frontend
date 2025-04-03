@@ -2,11 +2,12 @@
 
 import React from "react";
 import { Globe, GraduationCap, Calendar } from "lucide-react";
-import InstructorHeaderSection from "./InstructorHeaderSection";
-import TwitterSvg from "../icons/TwitterSvg";
-import FacebookSvg from "../icons/FacebookSvg";
-import LinkedinSvg from "../icons/LinkedinSvg";
+
+import TwitterSvg from "../../../components/icons/TwitterSvg";
+import FacebookSvg from "../../../components/icons/FacebookSvg";
+import LinkedinSvg from "../../../components/icons/LinkedinSvg";
 import moment from "moment";
+import InstructorHeaderSection from "./InstructorHeaderSection";
 
 interface IInstructorDetail {
   name: string;

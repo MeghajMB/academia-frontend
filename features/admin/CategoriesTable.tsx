@@ -17,8 +17,8 @@ interface ICategory {
   description: string;
   isBlocked: boolean;
 }
-import CategoryModal from "@/components/Admin/category/CategoryModal";
-import AdminTable from "../../Table";
+import CategoryModal from "@/features/admin/CategoryModal";
+import AdminTable from "../../components/common/Table";
 
 export default function CategoriesTable() {
   const [categories, setCategories] = useState<ICategory[]>([]);

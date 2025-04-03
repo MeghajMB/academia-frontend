@@ -7,7 +7,7 @@ export default function Home() {
   return (
     <>
       <ProtectedRoute role={["instructor","student"]}>
-        <main className="pt-24 mx-10">
+        <main className="pt-10 mx-10">
           <Carousel />
           {/* <Section label={"Top Rated Courses"} status="top-rated" /> */}
           <Section label={"New Courses"} status="new" />
