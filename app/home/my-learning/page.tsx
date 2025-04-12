@@ -1,5 +1,5 @@
 import ProtectedRoute from "@/hoc/ProtectedRoute";
-import LearningPage from "@/components/userpage/MyLearningPage";
+import LearningPage from "@/features/course/components/MyLearningPage";
 import React from "react";
 
 export default function page() {

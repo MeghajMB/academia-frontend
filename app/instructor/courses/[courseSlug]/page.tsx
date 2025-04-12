@@ -1,6 +1,6 @@
 "use client";
 import LoadingPage from "@/app/loading";
-import CourseCreation from "@/features/instructor/course/CourseCreation";
+import CourseCreation from "@/features/course/components/instructor/CourseCreation";
 import PageNotFound from "@/components/common/PageNotFound";
 import useCourseApi from "@/hooks/api/useCourseApi";
 import Link from "next/link";
@@ -25,20 +25,22 @@ export default function Page() {
   const { courseSlug } = useParams();
   const [courseDetails, setCourseDetails] = useState<ICourseDetails>();
   const [error, setError] = useState("");
-  const router=useRouter()
+  const router = useRouter();
   const { fetchCourseCreationDetailsApi, submitCourseForReview } =
     useCourseApi();
   useEffect(() => {
     async function fetchData() {
       try {
         if (typeof courseSlug == "string") {
-          const course = (await fetchCourseCreationDetailsApi(
-            courseSlug
-          )) as ICourseDetails;
-          setCourseDetails(course);
+          const response = await fetchCourseCreationDetailsApi(courseSlug);
+          if (response.status == "error") {
+            setError(response.message);
+            return;
+          }
+          setCourseDetails(response.data);
         }
       } catch (error) {
-        console.log(error)
+        console.log(error);
         setError("something Happened");
       }
     }
@@ -64,7 +66,7 @@ export default function Page() {
         progress: undefined,
         theme: "dark",
       });
-      router.push('/instructor/courses')
+      router.push("/instructor/courses");
     } catch (error) {
       console.log(error);
     }

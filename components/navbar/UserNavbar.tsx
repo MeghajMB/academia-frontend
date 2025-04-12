@@ -34,9 +34,12 @@ import {
   Home,
   Briefcase,
   ChevronDown,
+  Glasses,
 } from "lucide-react";
 import ProfilePicture from "@/public/images/blankUserProfile.jpeg";
 import useNotification from "@/hooks/socket/useSocketNotification";
+import Image from "next/image";
+import AcademiaLogo from '@/public/images/academia-logo.png'
 const UserNavbar: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
   const [loading, setLoading] = useState(false);
@@ -67,9 +70,9 @@ const UserNavbar: React.FC = () => {
 
   let instructorRoute;
   if (user?.role === "student") {
-    instructorRoute = { path: "/home/teaching", label: "Become an Instructor" };
+    instructorRoute = { path: "/home/teaching", label: "Become an Instructor",icon:<Glasses />  };
   } else {
-    instructorRoute = { path: "/instructor", label: "Instructor" };
+    instructorRoute = { path: "/instructor", label: "Instructor",icon:<Glasses /> };
   }
 
   const navigationItems = [
@@ -85,6 +88,11 @@ const UserNavbar: React.FC = () => {
       path: "/home/my-learning",
       label: "My Learning",
       icon: <BookOpen size={18} />,
+    },
+    {
+      path: "/home/my-gigs",
+      label: "My Gigs",
+      icon: <Briefcase size={18} />,
     },
     { path: "/home/shop", label: "Shop", icon: <ShoppingCart size={18} /> },
   ];
@@ -126,7 +134,7 @@ const UserNavbar: React.FC = () => {
             }}
             className="flex items-center cursor-pointer"
           >
-            <div className="w-8 h-8 bg-primary rounded"></div>
+            <div className="w-8 h-8 bg-primary rounded relative"><Image src={AcademiaLogo.src} alt="logo" fill/></div>
             <span className="text-xl font-bold ml-2">Academia</span>
           </motion.div>
         </NavbarBrand>

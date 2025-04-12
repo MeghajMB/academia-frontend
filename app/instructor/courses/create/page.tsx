@@ -1,4 +1,4 @@
-import CourseCreation from "@/features/instructor/course/CourseCreation";
+import CourseCreation from "@/features/course/components/instructor/CourseCreation";
 import React from "react";
 
 export default function page() {

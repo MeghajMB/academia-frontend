@@ -17,9 +17,8 @@ export interface IGig {
   minBid: number;
   currentBid: number;
   currentBidder: string | null;
-  status: "active" | "expired";
+  status: "active" | "expired" | "completed" | "no-bids" | "missed";
   biddingExpiresAt: string;
   sessionDate: string;
   createdAt: string;
-  updatedAt: string;
 }

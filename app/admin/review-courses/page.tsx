@@ -1,11 +1,5 @@
 "use client";
-import {
-  Input,
-  Pagination,
-  Chip,
-  Tooltip,
-  useDisclosure,
-} from "@heroui/react";
+import { Input, Pagination, Chip, Tooltip, useDisclosure } from "@heroui/react";
 import { EyeIcon, SearchIcon } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
@@ -14,7 +8,7 @@ import ProtectedRoute from "@/hoc/ProtectedRoute";
 import useAdminApi from "@/hooks/api/useAdminApi";
 import { toast } from "react-toastify";
 import Link from "next/link";
-import ReviewRejectModal from "@/features/admin/ReviewRejectModal";
+import ReviewRejectModal from "@/features/course/components/admin/ReviewRejectModal";
 
 export interface IReviewRequests {
   id: string;
@@ -34,18 +28,18 @@ export default function Page() {
   const [filterValue, setFilterValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const {
-    fetchCoursesForReview,
-    approveCourseRequestApi,
-  } = useAdminApi();
+  const { fetchCoursesForReviewApi, approveCourseRequestApi } = useAdminApi();
 
   const fetchAllCoursesForReview = useCallback(async (page: number) => {
     setIsLoading(true);
     try {
-      const response = await fetchCoursesForReview(page);
-      console.log(response);
-      setReviewRequests(response.reviewRequests);
-      setTotalPages(response.pagination.totalPages);
+      const response = await fetchCoursesForReviewApi(page);
+      if(response.status=='error'){
+        console.log(response.message)
+        return
+      }
+      setReviewRequests(response.data.requests);
+      setTotalPages(response.data.pagination.totalPages);
     } catch (error) {
       console.error("Error fetching requests:", error);
     } finally {
@@ -59,12 +53,16 @@ export default function Page() {
 
   async function handleApproveRequest(courseId: string) {
     try {
-      await approveCourseRequestApi(courseId);
+      const response = await approveCourseRequestApi(courseId);
       setReviewRequests((prevRequests) => {
         return prevRequests.filter((request) => {
           return request.id != courseId;
         });
       });
+      if (response.status == "error") {
+        console.log(response.message);
+        return;
+      }
       toast("Request Approved!", {
         position: "top-right",
         autoClose: 5000,

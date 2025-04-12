@@ -1,12 +1,18 @@
 "use client";
 import LoadingPage from "@/app/loading";
-import AddSection from "@/features/instructor/course/AddSection";
-import CourseLectureCard from "@/features/instructor/course/CourseLectureCard";
-import CourseSection from "@/features/instructor/course/CourseSection";
+import AddSection from "@/features/course/components/instructor/AddSection";
+import CourseLectureCard from "@/features/course/components/instructor/CourseLectureCard";
+import CourseSection from "@/features/course/components/instructor/CourseSection";
 import NoContentAvailable from "@/components/common/NoContentAvailable";
 import useCourseApi from "@/hooks/api/useCourseApi";
 import { ILecture, ISection } from "@/types/course";
-import { closestCorners, DndContext, DragOverlay, DragStartEvent } from "@dnd-kit/core";
+import {
+  closestCorners,
+  DndContext,
+  DragEndEvent,
+  DragOverlay,
+  DragStartEvent,
+} from "@dnd-kit/core";
 import {
   SortableContext,
   verticalListSortingStrategy,
@@ -15,11 +21,14 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
+import { ErrorState } from "@/components/common/ErrorState";
+import { toast } from "react-toastify";
 
 export default function Page() {
   const [curriculum, setCurriculum] = useState<ISection[]>([]);
   const [activeLecture, setActiveLecture] = useState<ILecture | null>(null);
   const [isClient, setIsClient] = useState(false);
+  const [error, setError] = useState(false);
   const router = useRouter();
 
   const { courseSlug } = useParams();
@@ -30,14 +39,19 @@ export default function Page() {
     async function fetchData() {
       try {
         if (typeof courseSlug === "string") {
-          const data = await fetchCurriculum(courseSlug, "instructor");
-
-          setCurriculum(data);
+          const response = await fetchCurriculum(courseSlug, "instructor");
+          if (response.status == "error") {
+            console.log(response.message);
+            setError(true);
+            return;
+          }
+          setCurriculum(response.data);
           setIsClient(true);
         } else {
           router.push("/instructor/courses");
         }
       } catch (error) {
+        setError(true);
         console.log(error);
       }
     }
@@ -46,6 +60,9 @@ export default function Page() {
 
   if (!isClient) {
     return <LoadingPage />;
+  }
+  if (error) {
+    return <ErrorState />;
   }
 
   const handleDragStart = (event: DragStartEvent) => {
@@ -59,7 +76,7 @@ export default function Page() {
     }
   };
 
-  const handleDragEnd = async (event: any) => {
+  const handleDragEnd = async (event: DragEndEvent) => {
     try {
       const { active, over } = event;
 
@@ -69,11 +86,13 @@ export default function Page() {
       }
 
       // take the id of the dragged item
-      const [activeType, activeId] = active.id.split("-");
+      const [activeType, activeId] = active.id.toString().split("-");
       // take the id of the area of dropped item
-      const [overType, overId] = over.id.split("-");
+      const [overType, overId] = over.id.toString().split("-");
 
       //section indexes of dopped and dragged
+      if (!active.data.current) return;
+      if (!over.data.current) return;
       const activeSectionIndex = active.data.current.sectionIndex;
       const overSectionIndex = over.data.current.sectionIndex;
 
@@ -109,6 +128,16 @@ export default function Page() {
         }
       }
     } catch (error) {
+      toast.error("Failed to change order.Reload page.", {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: true,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+      });
       console.log(error);
     }
     setActiveLecture(null);
@@ -158,11 +187,14 @@ export default function Page() {
           </SortableContext>
           {curriculum.length == 0 && (
             <NoContentAvailable
-              title="No Added Content"
-              content="Add Course Content"
+              title="No content added"
+              content="Add sections to get started"
             />
           )}
-          <AddSection setSections={setCurriculum} courseId={courseSlug} />
+          <AddSection
+            setSections={setCurriculum}
+            courseId={courseSlug as string}
+          />
         </div>
 
         <DragOverlay>

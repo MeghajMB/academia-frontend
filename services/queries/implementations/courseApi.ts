@@ -1,153 +1,307 @@
-import { ICourse, ICourseDetails } from "@/types/course";
+import { handleApiError } from "@/util/handle-api-error";
+import {
+  AddLectureResponseDTO,
+  AddLectureResponseSchema,
+  AddSectionResponseDTO,
+  AddSectionResponseSchema,
+  ChangeOrderOfLectureResponseDTO,
+  ChangeOrderOfLectureResponseSchema,
+  CreateCourseResponseDTO,
+  CreateCourseResponseSchema,
+  DeleteLectureResponseDTO,
+  DeleteLectureResponseSchema,
+  DeleteSectionResponseDTO,
+  DeleteSectionResponseSchema,
+  EditCourseCreationDetailsResponseDTO,
+  EditCourseCreationDetailsResponseSchema,
+  EditLectureResponseDTO,
+  EditLectureResponseSchema,
+  EditSectionResponseDTO,
+  EditSectionResponseSchema,
+  ErrorResponseDTO,
+  GenerateLectureUrlResponseDTO,
+  GenerateLectureUrlResponseSchema,
+  GetCourseCreationDetailsResponseDTO,
+  GetCourseCreationDetailsResponseSchema,
+  GetCourseDetailsResponseDTO,
+  GetCourseDetailsResponseSchema,
+  GetCoursesOfInstructorResponseDTO,
+  GetCoursesOfInstructorResponseSchema,
+  GetCoursesResponseDTO,
+  GetCoursesResponseSchema,
+  GetCurriculumResponseDTO,
+  GetCurriculumResponseSchema,
+  GetEnrolledCoursesOfUserResponseDTO,
+  GetEnrolledCoursesOfUserResponseSchema,
+  GetNewCoursesResponseDTO,
+  GetNewCoursesResponseSchema,
+  ListCourseResponseDTO,
+  ListCourseResponseSchema,
+  MarkLectureAsCompletedResponseDTO,
+  MarkLectureAsCompletedResponseSchema,
+  SubmitCourseForReviewResponseDTO,
+  SubmitCourseForReviewResponseSchema,
+} from "@/shared/index";
 import { AxiosInstance } from "axios";
 
 const createCourseApi = (axiosInstance: AxiosInstance) => ({
-  fetchEnrolledCoursesApi: async () => {
-    const response = await axiosInstance.get(`/api/course/enrolled-courses`);
-    return response.data;
+  fetchEnrolledCoursesApi: async (): Promise<
+    GetEnrolledCoursesOfUserResponseDTO | ErrorResponseDTO
+  > => {
+    try {
+      const response = await axiosInstance.get(`/api/course/enrolled-courses`);
+      const result = GetEnrolledCoursesOfUserResponseSchema.parse(
+        response.data
+      );
+      return result;
+    } catch (error) {
+      return handleApiError(error);
+    }
   },
 
-  fetchCourseCreationDetailsApi: async (courseId: string) => {
-    const response = await axiosInstance.get(
-      `/api/course/create-course/${courseId}`
-    );
-    return response.data;
+  fetchCourseCreationDetailsApi: async (
+    courseId: string
+  ): Promise<GetCourseCreationDetailsResponseDTO | ErrorResponseDTO> => {
+    try {
+      const response = await axiosInstance.get(
+        `/api/course/create-course/${courseId}`
+      );
+      const result = GetCourseCreationDetailsResponseSchema.parse(
+        response.data
+      );
+      return result;
+    } catch (error) {
+      return handleApiError(error);
+    }
   },
-  
-  editCourseCreationDetailsApi: async (courseId:string,courseDetails: {
-    category: string;
-    imageThumbnail: string | null;
-    description: string;
-    price: number;
-    subtitle: string;
-    title: string;
-    promotionalVideo: string | null;
-  }) => {
-    const response = await axiosInstance.put(
-      `/api/course/edit-course/${courseId}`,
-      courseDetails
-    );
-    return response.data;
+
+  editCourseCreationDetailsApi: async (
+    courseId: string,
+    courseDetails: {
+      category: string;
+      imageThumbnail: string | null;
+      description: string;
+      price: number;
+      subtitle: string;
+      title: string;
+      promotionalVideo: string | null;
+    }
+  ): Promise<EditCourseCreationDetailsResponseDTO | ErrorResponseDTO> => {
+    try {
+      const response = await axiosInstance.put(
+        `/api/course/edit-course/${courseId}`,
+        courseDetails
+      );
+      const result = EditCourseCreationDetailsResponseSchema.parse(
+        response.data
+      );
+      return result;
+    } catch (error) {
+      return handleApiError(error);
+    }
   },
 
   fetchCurriculum: async (
     courseId: string,
     status: "instructor" | "student" | "admin"
-  ) => {
-    const response = await axiosInstance.get(
-      `/api/course/curriculum/${courseId}?status=${status}`
-    );
-    return response.data;
+  ): Promise<GetCurriculumResponseDTO | ErrorResponseDTO> => {
+    try {
+      const response = await axiosInstance.get(
+        `/api/course/curriculum/${courseId}?status=${status}`
+      );
+      const result = GetCurriculumResponseSchema.parse(response.data);
+      return result;
+    } catch (error) {
+      return handleApiError(error);
+    }
   },
 
-  markLectureCompleted: async (courseId: string, lectureId: string) => {
-    const response = await axiosInstance.post("/api/course/progress", {
-      courseId,
-      lectureId,
-    });
-    return response.data;
+  markLectureCompleted: async (
+    courseId: string,
+    lectureId: string
+  ): Promise<MarkLectureAsCompletedResponseDTO | ErrorResponseDTO> => {
+    try {
+      const response = await axiosInstance.post("/api/course/progress", {
+        courseId,
+        lectureId,
+      });
+      const result = MarkLectureAsCompletedResponseSchema.parse(response.data);
+      return result;
+    } catch (error) {
+      return handleApiError(error);
+    }
   },
 
   fetchDetailsOfListedCourseApi: async (
     courseId: string
-  ): Promise<ICourseDetails> => {
-    const response = await axiosInstance.get(
-      `/api/course/course-details/${courseId}`
-    );
-    return response.data;
+  ): Promise<GetCourseDetailsResponseDTO | ErrorResponseDTO> => {
+    try {
+      const response = await axiosInstance.get(
+        `/api/course/course-details/${courseId}`
+      );
+      const result = GetCourseDetailsResponseSchema.parse(response.data);
+      return result;
+    } catch (error) {
+      return handleApiError(error);
+    }
   },
-  //
-  fetchTopRatedCoursesApi: async () => {
-    const response = await axiosInstance.get(`/api/course/top-rated`);
-    return response.data;
+
+  fetchNewCoursesApi: async (): Promise<
+    GetNewCoursesResponseDTO | ErrorResponseDTO
+  > => {
+    try {
+      const response = await axiosInstance.get(`/api/course/new`);
+      const result = GetNewCoursesResponseSchema.parse(response.data);
+      return result;
+    } catch (error) {
+      return handleApiError(error);
+    }
   },
-  //
-  fetchNewCoursesApi: async () => {
-    const response = await axiosInstance.get(`/api/course/new`);
-    return response.data;
+  fetchCoursesApi: async ({
+    sort,
+    category,
+    page,
+    search,
+  }: {
+    sort?: string;
+    category?: string;
+    page: number;
+    search?: string;
+  }): Promise<GetCoursesResponseDTO | ErrorResponseDTO> => {
+    try {
+      const response = await axiosInstance.get(`/api/course/all`,{params:{sort,category,page,search}});
+      const result = GetCoursesResponseSchema.parse(response.data);
+      return result;
+    } catch (error) {
+      return handleApiError(error);
+    }
   },
 
   addLecture: async (
     courseId: string,
     sectionId: string,
     lectureData: { title: string; videoUrl: string; duration: number }
-  ) => {
-    const response = await axiosInstance.post(`/api/course/add-lecture`, {
-      courseId,
-      sectionId,
-      lectureData,
-    });
-    return response.data;
+  ): Promise<AddLectureResponseDTO | ErrorResponseDTO> => {
+    try {
+      const response = await axiosInstance.post(`/api/course/add-lecture`, {
+        courseId,
+        sectionId,
+        lectureData,
+      });
+      const result = AddLectureResponseSchema.parse(response.data);
+      return result;
+    } catch (error) {
+      return handleApiError(error);
+    }
   },
 
   editlecture: async (
     lectureId: string,
     lectureData: { title: string; videoUrl: string; duration: number }
-  ) => {
-    const response = await axiosInstance.put(`/api/course/edit-lecture`, {
-      lectureId,
-      lectureData,
-    });
-    return response.data;
+  ): Promise<EditLectureResponseDTO | ErrorResponseDTO> => {
+    try {
+      const response = await axiosInstance.put(`/api/course/edit-lecture`, {
+        lectureId,
+        lectureData,
+      });
+      const result = EditLectureResponseSchema.parse(response.data);
+      return result;
+    } catch (error) {
+      return handleApiError(error);
+    }
   },
 
-  deleteLecture: async (lectureId: string) => {
-    const response = await axiosInstance.delete(
-      `/api/course/delete-lecture/${lectureId}`
-    );
-    return response.data;
+  deleteLecture: async (
+    lectureId: string
+  ): Promise<DeleteLectureResponseDTO | ErrorResponseDTO> => {
+    try {
+      const response = await axiosInstance.delete(
+        `/api/course/delete-lecture/${lectureId}`
+      );
+      const result = DeleteLectureResponseSchema.parse(response.data);
+      return result;
+    } catch (error) {
+      return handleApiError(error);
+    }
   },
   editSectionApi: async (
     sectionId: string,
-    sectionData: { title: string; description:string }
-  ) => {
-    const response = await axiosInstance.put(`/api/course/edit-section`, {
-      sectionId,
-      sectionData,
-    });
-    return response.data;
+    sectionData: { title: string; description: string }
+  ): Promise<EditSectionResponseDTO | ErrorResponseDTO> => {
+    try {
+      const response = await axiosInstance.put(`/api/course/edit-section`, {
+        sectionId,
+        sectionData,
+      });
+      const result = EditSectionResponseSchema.parse(response.data);
+      return result;
+    } catch (error) {
+      return handleApiError(error);
+    }
   },
 
-  deleteSectionApi: async (sectionId: string) => {
-    const response = await axiosInstance.delete(
-      `/api/course/delete-section/${sectionId}`
-    );
-    return response.data;
+  deleteSectionApi: async (
+    sectionId: string
+  ): Promise<DeleteSectionResponseDTO | ErrorResponseDTO> => {
+    try {
+      const response = await axiosInstance.delete(
+        `/api/course/delete-section/${sectionId}`
+      );
+      const result = DeleteSectionResponseSchema.parse(response.data);
+      return result;
+    } catch (error) {
+      return handleApiError(error);
+    }
   },
 
   createCourseSection: async (
     courseId: string,
     section: { title: string; description: string }
-  ) => {
-    const response = await axiosInstance.post(`/api/course/create-section`, {
-      section,
-      courseId,
-    });
-    return response.data;
+  ): Promise<AddSectionResponseDTO | ErrorResponseDTO> => {
+    try {
+      const response = await axiosInstance.post(`/api/course/create-section`, {
+        section,
+        courseId,
+      });
+      const result = AddSectionResponseSchema.parse(response.data);
+      return result;
+    } catch (error) {
+      return handleApiError(error);
+    }
   },
 
   getLectureUrlApi: async (
     courseId: string,
     lectureId: string
-  ): Promise<{ url: string }> => {
-    const response = await axiosInstance.get(
-      `/api/course/get-lecture-url/${courseId}/${lectureId}`
-    );
-    return response.data;
+  ): Promise<GenerateLectureUrlResponseDTO | ErrorResponseDTO> => {
+    try {
+      const response = await axiosInstance.get(
+        `/api/course/get-lecture-url/${courseId}/${lectureId}`
+      );
+      const result = GenerateLectureUrlResponseSchema.parse(response.data);
+      return result;
+    } catch (error) {
+      return handleApiError(error);
+    }
   },
 
   changeOrderOfLectureApi: async (
     draggedLectureId: string,
     targetLectureId: string
-  ): Promise<{ message: string }> => {
-    const response = await axiosInstance.put(
-      `/api/course/lectures/update-order`,
-      {
-        draggedLectureId,
-        targetLectureId,
-      }
-    );
-    return response.data;
+  ): Promise<ChangeOrderOfLectureResponseDTO | ErrorResponseDTO> => {
+    try {
+      const response = await axiosInstance.put(
+        `/api/course/lectures/update-order`,
+        {
+          draggedLectureId,
+          targetLectureId,
+        }
+      );
+      const result = ChangeOrderOfLectureResponseSchema.parse(response.data);
+      return result;
+    } catch (error) {
+      return handleApiError(error);
+    }
   },
 
   createCourse: async (courseDetails: {
@@ -158,34 +312,60 @@ const createCourseApi = (axiosInstance: AxiosInstance) => ({
     subtitle: string;
     title: string;
     promotionalVideo: string;
-  }) => {
-    const response = await axiosInstance.post(
-      "/api/course/create-course",
-      courseDetails
-    );
-    return response.data;
+  }): Promise<CreateCourseResponseDTO | ErrorResponseDTO> => {
+    try {
+      const response = await axiosInstance.post(
+        "/api/course/create-course",
+        courseDetails
+      );
+      const result = CreateCourseResponseSchema.parse(response.data);
+      return result;
+    } catch (error) {
+      return handleApiError(error);
+    }
   },
 
-  submitCourseForReview: async (courseId: string): Promise<{ url: string }> => {
-    const response = await axiosInstance.patch(
-      `/api/course/${courseId}/submit-review`
-    );
-    return response.data;
+  submitCourseForReview: async (
+    courseId: string
+  ): Promise<SubmitCourseForReviewResponseDTO | ErrorResponseDTO> => {
+    try {
+      const response = await axiosInstance.patch(
+        `/api/course/${courseId}/submit-review`
+      );
+      const result = SubmitCourseForReviewResponseSchema.parse(response.data);
+      return result;
+    } catch (error) {
+      return handleApiError(error);
+    }
   },
 
   fetchCoursesOfInstructorWithStatus: async (
     instructorId: string,
     status: string
-  ): Promise<ICourse[]> => {
-    const response = await axiosInstance.get(
-      `/api/course/get/${instructorId}?status=${status}`
-    );
-    return response.data;
+  ): Promise<GetCoursesOfInstructorResponseDTO | ErrorResponseDTO> => {
+    try {
+      const response = await axiosInstance.get(
+        `/api/course/get/${instructorId}?status=${status}`
+      );
+      const result = GetCoursesOfInstructorResponseSchema.parse(response.data);
+      return result;
+    } catch (error) {
+      return handleApiError(error);
+    }
   },
 
-  listCourseApi: async (courseId: string): Promise<unknown> => {
-    const response = await axiosInstance.patch(`/api/course/${courseId}/list`);
-    return response.data;
+  listCourseApi: async (
+    courseId: string
+  ): Promise<ListCourseResponseDTO | ErrorResponseDTO> => {
+    try {
+      const response = await axiosInstance.patch(
+        `/api/course/${courseId}/list`
+      );
+      const result = ListCourseResponseSchema.parse(response.data);
+      return result;
+    } catch (error) {
+      return handleApiError(error);
+    }
   },
 });
 

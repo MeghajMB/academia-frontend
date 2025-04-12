@@ -1,18 +1,16 @@
 "use client";
 
 import useGigApi from "@/hooks/api/useGigApi";
-import { useAppSelector } from "@/lib/hooks";
 import type React from "react";
 import { useEffect, useState } from "react";
 import { Button } from "@heroui/react";
 import { PlusIcon } from "lucide-react";
-import { GigCard } from "@/components/ui/cards/GigCard";
+import { GigCard } from "@/features/gig/components/GigCard";
 import { IGig } from "@/types/gig";
-import CreateGigModal from "@/features/gig/CreateGigModal";
+import CreateGigModal from "@/features/gig/components/CreateGigModal";
 
 function GigPage() {
-  const { getActiveGigOfInstructorApi, createGigApi } = useGigApi();
-  const { id } = useAppSelector((state) => state.auth.user);
+  const { getGigsOfInstructorApi, createGigApi } = useGigApi();
   const [gigs, setGigs] = useState<IGig[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -20,16 +18,20 @@ function GigPage() {
   useEffect(() => {
     async function fetchData() {
       try {
-        if (!id) {
-          setIsLoading(false);
+        setIsLoading(true);
+        const response = await getGigsOfInstructorApi({
+          page: 1,
+          status: "active",
+        });
+        if (response.status == "error") {
+          console.error("Error fetching gigs:", response.message);
           return;
         }
-        setIsLoading(true);
-        const response = await getActiveGigOfInstructorApi(id);
-        setGigs(response);
+        setGigs(response.data);
         setIsLoading(false);
       } catch (error) {
         console.error("Error fetching gigs:", error);
+      } finally {
         setIsLoading(false);
       }
     }
@@ -37,9 +39,17 @@ function GigPage() {
   }, []);
 
   const handleCreateGig = async (data) => {
-    if (!id) return;
-    const response = await createGigApi(data);
-    setGigs((prevGigs) => [...prevGigs, response]);
+    try {
+      const response = await createGigApi(data);
+      if (response.status == "error") {
+        console.log(response.message);
+        return;
+      }
+      setGigs((prevGigs) => [...prevGigs, response.data]);
+    } catch (error) {
+      console.log(error);
+    } finally {
+    }
   };
 
   return (

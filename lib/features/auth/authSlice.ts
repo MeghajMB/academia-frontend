@@ -1,4 +1,3 @@
-// src/redux/slices/counterSlice.ts
 import { disconnectSocket } from "@/lib/socket";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 

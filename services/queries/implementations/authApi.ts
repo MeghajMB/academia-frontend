@@ -1,173 +1,134 @@
 // src/services/queries/authApi.ts
-import axios, { AxiosInstance, AxiosError } from "axios";
 import {
-  VerifyOtpData,
-  RegisterInstructorData,
-  ResendOtpData,
-  ForgotPasswordData,
-  VerifyResetPasswordData,
-  ResetPasswordData,
-  LogoutData,
-  InstructorData,
+  ErrorResponseDTO,
+  ForgotPasswordResponseDTO,
+  ForgotPasswordResponseSchema,
+  RegisterInstructorResponseDTO,
+  RegisterInstructorResponseSchema,
+  ResendOtpResponseDTO,
+  ResendOtpResponseSchema,
+  ResetPasswordResponseDTO,
+  ResetPasswordResponseSchema,
+  SignInResponseDTO,
+  SignInResponseSchema,
+  SignOutResponseDTO,
+  SignOutResponseSchema,
+  VerifyOtpResponseDTO,
+  VerifyOtpResponseSchema,
+  VerifyResetOtpResponseDTO,
+  VerifyResetOtpResponseSchema,
+} from "@/shared/index";
+import axios, { AxiosInstance } from "axios";
+import {
+  InstructorPayload,
   ResetPasswordPayload,
-  VerifyOtpParams,
-} from "../types/auth.types"; // Adjust path as needed
-import { ApiSuccessResponse, ApiErrorResponse, ApiResponse } from "@/types/api";
+  VerifyOtpPayload,
+} from "../types/auth.types";
+import { handleApiError } from "@/util/handle-api-error";
 
 const createAuthApi = (axiosInstance: AxiosInstance) => ({
-  verifyOtpApi: async ({
-    email,
-    otp,
-  }: VerifyOtpParams): Promise<ApiResponse<VerifyOtpData>> => {
+
+  signInApi: async (
+    payload: {email:string,password:string}
+  ): Promise<SignInResponseDTO | ErrorResponseDTO> => {
     try {
-      const response = await axiosInstance.post("/api/auth/verify-otp", {
-        email,
-        otp,
-      });
-      return response.data as ApiSuccessResponse<VerifyOtpData>;
+      const response = await axiosInstance.post("/api/auth/signin", payload);
+      const result = SignInResponseSchema.parse(response.data);
+      return result;
     } catch (error) {
-      if (error instanceof AxiosError && error.response) {
-        return error.response.data as ApiErrorResponse;
-      }
-      return {
-        status: "error",
-        code: 0,
-        message:
-          error instanceof Error ? error.message : "Unknown error occurred",
-      };
+      return handleApiError(error);
+    }
+  },
+  verifyOtpApi: async (
+    data: VerifyOtpPayload
+  ): Promise<VerifyOtpResponseDTO | ErrorResponseDTO> => {
+    try {
+      const response = await axiosInstance.post("/api/auth/verify-otp", data);
+      const result = VerifyOtpResponseSchema.parse(response.data);
+      return result;
+    } catch (error) {
+      return handleApiError(error);
     }
   },
 
   registerInstructorApi: async (
-    instructorData: InstructorData
-  ): Promise<ApiResponse<RegisterInstructorData>> => {
+    instructorData: InstructorPayload
+  ): Promise<RegisterInstructorResponseDTO | ErrorResponseDTO> => {
     try {
       const response = await axiosInstance.post(
         "/api/auth/register-instructor",
         instructorData
       );
-      return response.data as ApiSuccessResponse<RegisterInstructorData>;
+      const result = RegisterInstructorResponseSchema.parse(response.data);
+      return result;
     } catch (error) {
-      if (error instanceof AxiosError && error.response) {
-        return error.response.data as ApiErrorResponse;
-      }
-      return {
-        status: "error",
-        code: 0,
-        message:
-          error instanceof Error ? error.message : "Unknown error occurred",
-      };
+      return handleApiError(error);
     }
   },
 
-  resendOtpApi: async (email: string): Promise<ApiResponse<ResendOtpData>> => {
+  resendOtpApi: async (
+    email: string
+  ): Promise<ResendOtpResponseDTO | ErrorResponseDTO> => {
     try {
       const response = await axiosInstance.post("/api/auth/resend-otp", {
         email,
       });
-      return response.data as ApiSuccessResponse<ResendOtpData>;
+      const result = ResendOtpResponseSchema.parse(response.data);
+      return result;
     } catch (error) {
-      if (error instanceof AxiosError && error.response) {
-        return error.response.data as ApiErrorResponse;
-      }
-      return {
-        status: "error",
-        code: 0,
-        message:
-          error instanceof Error ? error.message : "Unknown error occurred",
-      };
+      return handleApiError(error);
     }
   },
 
   forgotPasswordApi: async (
     email: string
-  ): Promise<ApiResponse<ForgotPasswordData>> => {
+  ): Promise<ForgotPasswordResponseDTO | ErrorResponseDTO> => {
     try {
       const response = await axiosInstance.post("/api/auth/forgot-password", {
         email,
       });
-      return response.data as ApiSuccessResponse<ForgotPasswordData>;
+      const result = ForgotPasswordResponseSchema.parse(response.data);
+      return result;
     } catch (error) {
-      if (error instanceof AxiosError && error.response) {
-        return error.response.data as ApiErrorResponse;
-      }
-      return {
-        status: "error",
-        code: 0,
-        message:
-          error instanceof Error ? error.message : "Unknown error occurred",
-      };
+      return handleApiError(error);
     }
   },
 
-  verifyResetPasswordApi: async ({
-    email,
-    otp,
-  }: {
+  verifyResetPasswordApi: async (data: {
     email: string;
     otp: string;
-  }): Promise<ApiResponse<VerifyResetPasswordData>> => {
+  }): Promise<VerifyResetOtpResponseDTO | ErrorResponseDTO> => {
     try {
       const response = await axiosInstance.post(
         "/api/auth/verify-reset-password",
-        {
-          email,
-          otp,
-        }
+        data
       );
-      return response.data as ApiSuccessResponse<VerifyResetPasswordData>;
+      const result = VerifyResetOtpResponseSchema.parse(response.data);
+      return result;
     } catch (error) {
-      if (error instanceof AxiosError && error.response) {
-        return error.response.data as ApiErrorResponse;
-      }
-      return {
-        status: "error",
-        code: 0,
-        message:
-          error instanceof Error ? error.message : "Unknown error occurred",
-      };
+      return handleApiError(error);
     }
   },
 
-  resetPasswordApi: async ({
-    email,
-    password,
-    token,
-  }: ResetPasswordPayload): Promise<ApiResponse<ResetPasswordData>> => {
+  resetPasswordApi: async (
+    data: ResetPasswordPayload
+  ): Promise<ResetPasswordResponseDTO | ErrorResponseDTO> => {
     try {
-      const response = await axios.post("/api/auth/reset-password", {
-        email,
-        password,
-        token,
-      });
-      return response.data as ApiSuccessResponse<ResetPasswordData>;
+      const response = await axios.post("/api/auth/reset-password", data);
+      const result = ResetPasswordResponseSchema.parse(response.data);
+      return result;
     } catch (error) {
-      if (error instanceof AxiosError && error.response) {
-        return error.response.data as ApiErrorResponse;
-      }
-      return {
-        status: "error",
-        code: 0,
-        message:
-          error instanceof Error ? error.message : "Unknown error occurred",
-      };
+      return handleApiError(error);
     }
   },
 
-  logoutApi: async (): Promise<ApiResponse<LogoutData>> => {
+  logoutApi: async (): Promise<SignOutResponseDTO | ErrorResponseDTO> => {
     try {
       const response = await axiosInstance.post("/api/auth/signout");
-      return response.data as ApiSuccessResponse<LogoutData>;
+      const result = SignOutResponseSchema.parse(response.data);
+      return result;
     } catch (error) {
-      if (error instanceof AxiosError && error.response) {
-        return error.response.data as ApiErrorResponse;
-      }
-      return {
-        status: "error",
-        code: 0,
-        message:
-          error instanceof Error ? error.message : "Unknown error occurred",
-      };
+      return handleApiError(error);
     }
   },
 });

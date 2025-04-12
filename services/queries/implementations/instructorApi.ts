@@ -1,22 +1,19 @@
+import { handleApiError } from "@/util/handle-api-error";
 import { AxiosInstance } from "axios";
 
 const createInstructorApi = (axiosInstance: AxiosInstance) => ({
-
   fetchInstructorProfileApi: async () => {
-    const response = await axiosInstance.get("/api/instructor/profile")
+    const response = await axiosInstance.get("/api/instructor/profile");
     return response.data;
   },
-  createCourseLecture:async (courseId:string,lecture:{title:string,content:string})=>{
-    const response = await axiosInstance.post(
-      `/api/instructor/create-lecture/${courseId}`,lecture);
-    return response.data;   
+  getInstructorDashboard: async () => {
+    try {
+      const response = await axiosInstance.get("/api/instructor/analytics");
+      return response.data;
+    } catch (error) {
+      return handleApiError(error)
+    }
   },
-  reorderCurriculum:async (courseId:string,lecture:{title:string,content:string})=>{
-    const response = await axiosInstance.post(
-      `/api/instructor/create-lecture/${courseId}`,lecture);
-    return response.data;   
-  }
-  
 });
 
 export default createInstructorApi;

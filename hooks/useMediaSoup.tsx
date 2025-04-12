@@ -28,6 +28,7 @@ function useMediaSoup() {
       stream: MediaStream;
       kind: "audio" | "video";
       type: "camera" | "screen" | "mic";
+      profilePicture:string;
       userName: string;
       paused: boolean;
     }[];
@@ -350,6 +351,7 @@ function useMediaSoup() {
           consumerData: IConsumerInfo & {
             userId: string;
             userName: string;
+            profilePicture:string;
             type: "camera" | "screen" | "mic";
             pause:boolean
           };
@@ -379,6 +381,7 @@ function useMediaSoup() {
                   producerId: consumerData.producerId,
                   type: consumerData.type,
                   userName: consumerData.userName,
+                  profilePicture:consumerData.profilePicture,
                   paused: consumerData.pause,
                 });
               }
@@ -391,6 +394,7 @@ function useMediaSoup() {
                   type: consumerData.type,
                   userName: consumerData.userName,
                   paused: consumerData.pause,
+                  profilePicture:consumerData.profilePicture
                 },
               ];
             }

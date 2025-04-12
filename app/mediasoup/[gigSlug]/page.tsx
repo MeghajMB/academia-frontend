@@ -1,16 +1,17 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import useMediaSoup from "@/hooks/useMediaSoup";
-import JoinRoom from "@/features/videoCall/JoinRoom";
-import ConferenceRoom from "@/features/videoCall/ConferenceRoom";
+import JoinRoom from "@/features/video-call/components/JoinRoom";
+import ConferenceRoom from "@/features/video-call/components/ConferenceRoom";
 import { useParams } from "next/navigation";
-import DisconnectRoom from "@/features/videoCall/DisconnectRoom";
-import { Button } from "@heroui/react";
-const gigId = "123";
+import DisconnectRoom from "@/features/video-call/components/DisconnectRoom";
+import { useAppSelector } from "@/lib/hooks";
+import LoadingPage from "@/components/common/LoadingPage";
+
 export default function MediasoupPage() {
   const [hasjoinedRoom, setHasJoinedRoom] = useState<boolean>(false);
   const [hasDisconnected, sethasDisconnected] = useState<boolean>(false);
-  const [loading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
   const { gigSlug } = useParams();
   const {
     handleJoinRoom,
@@ -26,12 +27,14 @@ export default function MediasoupPage() {
     toggleScreenShare,
     isScreenSharing,
   } = useMediaSoup();
-  /*   useEffect(() => {
+  const { accessToken } = useAppSelector((state) => state.auth);
+  useEffect(() => {
     async function joinTheSession() {
       try {
+        if (!accessToken) return;
         const response = await handleJoinRoom({
-          gigId,
-          accessToken: gigSlug! as string,
+          gigId:gigSlug as string,
+          accessToken: accessToken,
         });
       } catch (error) {
         console.log("cant join room");
@@ -40,19 +43,12 @@ export default function MediasoupPage() {
       }
     }
     joinTheSession();
-  }, [gigSlug]); */
+  }, [gigSlug]);
+  if (isLoading) {
+    return <LoadingPage />;
+  }
   return (
     <>
-      <Button
-        onClick={() =>
-          handleJoinRoom({
-            gigId,
-            accessToken: gigSlug! as string,
-          })
-        }
-      >
-        Join the room
-      </Button>
       {!hasjoinedRoom && (
         <JoinRoom
           startMedia={startMedia}

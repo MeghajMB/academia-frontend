@@ -1,5 +1,5 @@
 import ProtectedRoute from "@/hoc/ProtectedRoute";
-import ProfilePage from "@/components/UserProfile";
+import ProfilePage from "@/features/users/components/UserProfile";
 import React from "react";
 
 export default function page() {

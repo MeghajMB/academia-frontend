@@ -44,8 +44,8 @@ export default function AdminNavbar() {
   async function handleLogout() {
     setLoading(true);
     try {
-      const data = await logoutApi();
-      console.log(data);
+      const response = await logoutApi();
+      if (response.status == "error") return;
       dispatch(logout());
     } catch (error) {
       console.log(error);

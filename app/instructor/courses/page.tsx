@@ -29,7 +29,10 @@ const CoursesPage = () => {
       try {
         setIsLoading(true);
         const response = await fetchCoursesOfInstructorWithStatus(id!, "all");
-        setCourses(response);
+        if(response.status=='error'){
+          return;
+        }
+        setCourses(response.data);
       } catch (error) {
         console.error(error);
         toast.error("Failed to fetch courses. Please try again later.");

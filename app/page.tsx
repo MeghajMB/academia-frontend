@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect } from "react";
 import { motion } from "framer-motion";
-import RoleBadge from "@/features/public/RoleBadge";
+import RoleBadge from "@/components/static/RoleBadge";
 import { useAppSelector } from "@/lib/hooks";
 import { useRouter } from "next/navigation";
 import Link from "next/link";

@@ -1,11 +1,5 @@
 "use client";
-import {
-  Input,
-  Pagination,
-  Chip,
-  Tooltip,
-  Spinner,
-} from "@heroui/react";
+import { Input, Pagination, Chip, Tooltip, Spinner } from "@heroui/react";
 import { EyeIcon, SearchIcon } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
@@ -20,7 +14,7 @@ export interface ICourse {
   price: number;
   title: string;
   isBlocked: boolean;
-  status: string;
+  status: "pending" | "accepted" | "rejected" | "draft" | "listed";
 }
 
 export default function AdminCoursePage() {
@@ -34,22 +28,30 @@ export default function AdminCoursePage() {
 
   const { fetchCoursesApi, blockCourseApi } = useAdminApi();
 
-  const fetchAllCourses = useMemo(() => debounce(async (page: number) => {
-    setIsLoading(true);
-    try {
-      const response = await fetchCoursesApi(page);
-      setCourses(response.courses);
-      setTotalPages(response.pagination.totalPages);
-    } catch (error) {
-      console.error("Error fetching courses:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, 500), []);
+  const fetchAllCourses = useMemo(
+    () =>
+      debounce(async (page: number) => {
+        setIsLoading(true);
+        try {
+          const response = await fetchCoursesApi({page});
+          if (response.status == "error") {
+            console.error("Error fetching courses:");
+            return;
+          }
+          setCourses(response.data.courses);
+          setTotalPages(response.data.pagination.totalPages);
+        } catch (error) {
+          console.error("Error fetching courses:", error);
+        } finally {
+          setIsLoading(false);
+        }
+      }, 500),
+    []
+  );
 
   useEffect(() => {
     fetchAllCourses(currentPage);
-  }, [currentPage,filterValue]);
+  }, [currentPage, filterValue]);
 
   async function handleBlockCourse(courseId: string) {
     try {

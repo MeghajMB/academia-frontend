@@ -1,8 +1,24 @@
-export interface VerifyOtpParams {
+export interface InstructorPayload {
+  headline: string;
+  biography: string;
+  facebook: string;
+  linkedin: string;
+  twitter: string;
+  website: string;
+  agreement: boolean;
+}
+export interface ResetPasswordPayload {
+  email: string;
+  password: string;
+  token: string;
+}
+
+export interface VerifyOtpPayload {
   otp: string;
   email: string;
 }
 
+/*  */
 export interface VerifyOtpData {
   userId: string;
 }
@@ -31,21 +47,9 @@ export interface LogoutData {
   data?: null;
 }
 
-export interface InstructorData {
-  headline: string;
-  biography: string;
-  facebook: string;
-  linkedin: string;
-  twitter: string;
-  website: string;
-  agreement: boolean;
-}
 
-export interface ResetPasswordPayload {
-  email: string;
-  password: string;
-  token: string;
-}
+
+
 
 export interface RefreshTokenData {
   accessToken: string;

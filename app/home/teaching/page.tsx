@@ -1,4 +1,4 @@
-import InstructorIntroductionPage from "@/features/public/InstructorIntroductionPage";
+import InstructorIntroductionPage from "@/components/static/InstructorIntroductionPage";
 import ProtectedRoute from "@/hoc/ProtectedRoute";
 export default function Page() {
   return (

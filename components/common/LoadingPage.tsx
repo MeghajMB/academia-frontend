@@ -1,6 +1,8 @@
-"use client"
+"use client";
 import React from "react";
 import { motion } from "framer-motion";
+import AcademiaLogo from "@/public/images/academia-logo.png";
+import Image from "next/image";
 
 const LoadingPage = () => {
   // Dots animation variants
@@ -25,14 +27,17 @@ const LoadingPage = () => {
 
   return (
     <main className="min-h-screen bg-black text-white flex flex-col items-center justify-center px-4 pt-16">
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         className="text-center space-y-6"
       >
         {/* Logo */}
         <div className="flex items-center justify-center space-x-2 mb-8">
-          <div className="w-12 h-12 bg-indigo-600 rounded animate-pulse"></div>
+          <div className="w-12 h-12 bg-indigo-600 rounded animate-pulse relative">
+            <Image src={AcademiaLogo.src} alt="logo" fill />
+          </div>
+
           <span className="text-2xl font-bold">Academia</span>
         </div>
 

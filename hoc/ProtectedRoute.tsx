@@ -2,8 +2,8 @@
 import { RootState } from "@/lib/store";
 import { ReactNode, useEffect, useState } from "react";
 import { useAppSelector } from "@/lib/hooks";
-import LoadingPage from "@/app/loading";
-import PageNotFound from "@/components/common/PageNotFound";
+import Unauthorized from "@/components/common/UnAuthorized";
+import LoadingPage from "@/components/common/LoadingPage";
 
 interface ProtectedRouteProps {
   role: string[];
@@ -31,7 +31,7 @@ export default function ProtectedRoute({
     return <LoadingPage />;
   }
   if (error) {
-    return <PageNotFound />;
+    return <Unauthorized />;
   }
   return <>{children}</>;
 }

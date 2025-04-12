@@ -1,5 +1,4 @@
 "use client";
-
 import {
   Menu,
   X,
@@ -14,6 +13,8 @@ import Link from "next/link";
 import ProtectedRoute from "@/hoc/ProtectedRoute";
 
 const menuItems = [
+  { title: "Profile", icon: BookOpen, path: "/instructor" },
+  { title: "Dashboard", icon: BookOpen, path: "/instructor/dashboard" },
   { title: "Courses", icon: BookOpen, path: "/instructor/courses" },
   { title: "Gigs", icon: Calendar, path: "/instructor/gigs" },
   { title: "Messages", icon: MessageCircle, path: "/instructor/messages" },
