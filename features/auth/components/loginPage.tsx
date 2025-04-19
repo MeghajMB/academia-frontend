@@ -5,7 +5,7 @@ import { useAppDispatch } from "@/lib/hooks";
 import { login } from "@/lib/features/auth/authSlice";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import type { UserCredentials } from "@/types/auth";
 import { Input } from "@heroui/react";
 import { Eye, EyeOff } from "lucide-react";
@@ -33,7 +33,7 @@ function LoginComponent({
   });
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<authErrors>({});
-  const [loading, setLoading] = useState(isLoading);
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   const dispatch = useAppDispatch();
@@ -57,7 +57,7 @@ function LoginComponent({
       setLoading(false);
     }
   };
-
+  useEffect(() => setLoading(isLoading), [isLoading]);
   return (
     <>
       <div className="max-w-md w-full space-y-8  p-8 rounded-xl">

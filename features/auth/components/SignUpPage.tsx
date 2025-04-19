@@ -26,7 +26,7 @@ const SignupPage = ({
 }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [isClient, setIsClient] = useState(false); // Track client-side mount
-  const [isLoading, setIsLoading] = useState(loading);
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const { user } = useAppSelector((state) => state.auth);
   const {
@@ -43,6 +43,7 @@ const SignupPage = ({
     }
     setIsClient(true);
   }, []);
+    useEffect(() => setIsLoading(loading), [loading]);
   if (!isClient) {
     return null;
   }

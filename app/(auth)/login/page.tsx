@@ -37,7 +37,7 @@ const LoginPage = () => {
 
   const handleGoogleSignIn = async () => {
     setLoading(true);
-    window.open(
+    const popup = window.open(
       `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/google`,
       "_blank",
       "width=500,height=600"
@@ -59,6 +59,14 @@ const LoginPage = () => {
 
     // Attach the event listener
     window.addEventListener("message", receiveMessage);
+    //check if the window is closed
+    const popupChecker = setInterval(() => {
+      if (!popup || popup.closed) {
+        setLoading(false);
+        window.removeEventListener("message", receiveMessage);
+        clearInterval(popupChecker);
+      }
+    }, 500);
   };
 
   function handleChangePersist() {
