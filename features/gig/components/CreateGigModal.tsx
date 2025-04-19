@@ -31,6 +31,7 @@ interface GigFormData {
   minBid: number;
   sessionDate: string;
   maxParticipants: number;
+  biddingAllowed:boolean;
 }
 
 function CreateGigModal({
@@ -53,6 +54,7 @@ function CreateGigModal({
       minBid: 10,
       sessionDate: moment().format("YYYY-MM-DDTHH:mm"),
       maxParticipants: 1,
+      biddingAllowed:true
     },
   });
   const [commonError, setCommonError] = useState<null | string>(null);

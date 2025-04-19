@@ -3,9 +3,9 @@
 import React from "react";
 import { Globe, GraduationCap, Calendar } from "lucide-react";
 
-import TwitterSvg from "../../../../components/icons/TwitterSvg";
-import FacebookSvg from "../../../../components/icons/FacebookSvg";
-import LinkedinSvg from "../../../../components/icons/LinkedinSvg";
+import TwitterSvg from "../../../../components/svg/TwitterSvg";
+import FacebookSvg from "../../../../components/svg/FacebookSvg";
+import LinkedinSvg from "../../../../components/svg/LinkedinSvg";
 import moment from "moment";
 import InstructorHeaderSection from "./InstructorHeaderSection";
 

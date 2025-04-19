@@ -1,8 +1,8 @@
 "use client";
 
-import FacebookSvg from "@/components/icons/FacebookSvg";
-import LinkedinSvg from "@/components/icons/LinkedinSvg";
-import TwitterSvg from "@/components/icons/TwitterSvg";
+import FacebookSvg from "@/components/svg/FacebookSvg";
+import LinkedinSvg from "@/components/svg/LinkedinSvg";
+import TwitterSvg from "@/components/svg/TwitterSvg";
 import InstructorHeaderSection from "@/features/users/components/instructor/InstructorHeaderSection";
 import useUserApi from "@/hooks/api/useUserApi";
 import { Calendar, Globe, GraduationCap } from "lucide-react";

@@ -24,6 +24,7 @@ import TopBidders from "@/features/gig/components/TopBidders";
 import useGigApi from "@/hooks/api/useGigApi";
 import CountDownTimer from "@/components/common/CountDownTimer";
 import ProtectedRoute from "@/hoc/ProtectedRoute";
+import useBidApi from "@/hooks/api/useBidApi";
 
 interface IGigDetails {
   id: string;
@@ -34,16 +35,16 @@ interface IGigDetails {
   minBid: number;
   currentBid: number;
   currentBidder: string | null;
-  status: "active" | "expired";
-  biddingExpiresAt: Date;
-  sessionDate: Date;
-  createdAt: Date;
-  updatedAt: Date;
+  status:"active" | "expired" | "completed" | "no-bids" | "missed";
+  biddingExpiresAt: string;
+  sessionDate: string;
+  createdAt: string;
 }
 
 function Page() {
   const { gigSlug } = useParams();
-  const { getGigByIdApi, CreateBidApi } = useGigApi();
+  const { getGigByIdApi } = useGigApi();
+  const { CreateBidApi } = useBidApi();
   const [gigDetails, setGigDetails] = useState<IGigDetails | null>(null);
   const [bid, setBid] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -53,8 +54,12 @@ function Page() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const data = await getGigByIdApi(gigSlug as string);
-        setGigDetails(data);
+        const response = await getGigByIdApi(gigSlug as string);
+        if (response.status == "error") {
+          console.log(response.message);
+          return;
+        }
+        setGigDetails(response.data);
       } catch (error) {
         console.error("Failed to fetch gig details:", error);
       }
@@ -99,8 +104,12 @@ function Page() {
       await CreateBidApi(gigSlug as string, Number(bid));
       onClose();
       // Refresh gig details after successful bid
-      const updatedData = await getGigByIdApi(gigSlug as string);
-      setGigDetails(updatedData);
+      const response = await getGigByIdApi(gigSlug as string);
+      if (response.status == "error") {
+        setError("Failed to place bid. Please try again.");
+        return;
+      }
+      setGigDetails(response.data);
       setBid("");
     } catch (error) {
       console.error(error);
@@ -112,7 +121,7 @@ function Page() {
 
   return (
     <ProtectedRoute role={["instructor", "student", "admin"]}>
-      <div className="max-w-6xl mx-auto p-4 pt-24">
+      <div className="max-w-6xl mx-auto p-4 ">
         <Card className="bg-content1 shadow-lg">
           <CardHeader className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 p-6">
             <div>
@@ -127,9 +136,7 @@ function Page() {
                 {!isExpired && (
                   <Chip color="warning" variant="dot">
                     <span className="font-semibold">Ends in:</span>{" "}
-                    <CountDownTimer
-                      targetDate={gigDetails.biddingExpiresAt.toString()}
-                    />
+                    <CountDownTimer targetDate={gigDetails.biddingExpiresAt} />
                   </Chip>
                 )}
               </div>

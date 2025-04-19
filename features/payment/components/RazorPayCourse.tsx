@@ -78,7 +78,7 @@ const RazorpayCourse = ({
       if (data && data.order_id) {
         // Set options dynamically
         const options = {
-          key: process.env.REACT_APP_RAZORPAY_KEY_ID,
+          key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
           amount: data.amount,
           currency: data.currency,
           name: "Academia",

@@ -24,10 +24,11 @@ interface IGigDetails {
   instructorName: string;
   instructorProfilePicture: string;
   title: string;
-  sessionDuration: string;
+  sessionDuration: number;
   minBid: number;
   biddingExpiresAt: string;
   sessionDate: string;
+  biddingAllowed:boolean;
 }
 
 const GigListing = () => {
@@ -72,11 +73,11 @@ const GigListing = () => {
                   size="md"
                   isBordered
                   color="primary"
-                  alt={"gig.instructorName"}
+                  alt="Profile Picture"
                 />
                 <div className="flex flex-col">
                   <p className="text-md font-semibold">
-                    {"gig.instructorName"}
+                    {gig.instructorName}
                   </p>
                   <p className="text-small text-default-500">Instructor</p>
                 </div>

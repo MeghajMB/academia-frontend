@@ -173,7 +173,7 @@ const UserNavbar: React.FC = () => {
             <NavbarItem>
               <Button
                 as={Link}
-                href="/signUp"
+                href="/login?page=sign-up"
                 variant="flat"
                 color="secondary"
                 className="hover:text-indigo-400 hover:bg-indigo-700/20 transition-colors"
@@ -294,7 +294,7 @@ const UserNavbar: React.FC = () => {
             <NavbarMenuItem>
               <Button
                 as={Link}
-                href="/signUp"
+                href="/login?page=sign-up"
                 color="primary"
                 variant="flat"
                 className="w-full justify-start"

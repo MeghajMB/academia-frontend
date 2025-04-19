@@ -20,7 +20,7 @@ export default function Page(){
   }, []);
   return (
     <>
-      <main className="pt-24 pb-16 px-4">
+      <main className="pt-10 pb-16 px-4">
         {/* Announcement banner */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -102,6 +102,8 @@ export default function Page(){
             className="bottom-20 right-10 md:-right-30 bg-teal-600"
           />
         </div>
+        {/* Rest of the code goes under */}
+        
       </main>
     </>
   );

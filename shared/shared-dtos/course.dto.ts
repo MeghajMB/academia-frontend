@@ -31,12 +31,10 @@ export const GetEnrolledCoursesOfUserResponseSchema =
       z.object({
         id: z.string(),
         title: z.string(),
-        subtitle: z.string(),
-        price: z.number(),
+        completedAt: z.string().nullable(),
         imageThumbnail: z.string(),
-        completedAt: z.string() || undefined,
-        progressPercentage: z.number(),
-        certificate: z.string() || undefined,
+        progressPercentage:z.number(),
+        certificate:z.string().nullable()
       })
     ),
   });

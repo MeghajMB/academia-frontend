@@ -3,6 +3,7 @@ import { Accordion, AccordionItem, Tab, Tabs } from "@heroui/react";
 import React from "react";
 import CourseReviews from "./CourseReviews";
 import { IReview } from "@/types/review";
+import { useAppSelector } from "@/lib/hooks";
 
 function CourseTabs({
   canReview,
@@ -24,6 +25,7 @@ function CourseTabs({
     }[];
   }[];
 }) {
+  const {id}=useAppSelector((state)=>state.auth.user)
   function handleEditReview(review: Partial<IReview>) {
     console.log(review);
   }
@@ -54,7 +56,7 @@ function CourseTabs({
         <Tab key="reviews" title="Reviews">
           <div className="space-y-6 p-4">
             <CourseReviews
-              currentUserId="Current User" // In real app, get from auth
+              currentUserId={id!} // In real app, get from auth
               onEditReview={handleEditReview}
               onDeleteReview={handleDeleteReview}
               canReview={canReview}

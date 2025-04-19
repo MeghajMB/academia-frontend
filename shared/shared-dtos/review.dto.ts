@@ -17,16 +17,32 @@ export type AddReviewResponseDTO = z.infer<typeof AddReviewResponseSchema>;
 
 // Get Reviews Of Course Response
 export const GetReviewsOfCourseResponseSchema = SuccessResponseSchema.extend({
-  data: z.array(
-    z.object({
-      id: z.string(),
-      courseId: z.string(),
-      studentId: z.string(),
-      rating: z.number(),
-      comment: z.string(),
-      createdAt: z.string().optional(),
-    })
-  ),
+  data: z.object({
+    reviews: z.array(
+      z.object({
+        id: z.string(),
+        studentId: z.object({
+          id:z.string(),
+          name: z.string(),
+          avatar: z.string(),
+        }),
+        rating: z.number(),
+        comment: z.string(),
+        createdAt: z.string(),
+      })
+    ),
+    reviewStats: z.object({
+      averageRating: z.number(),
+      totalReviews: z.number(),
+      ratingBreakdown: z.object({
+        "1star": z.number().optional(),
+        "2star": z.number().optional(),
+        "3star": z.number().optional(),
+        "4star": z.number().optional(),
+        "5star": z.number().optional(),
+      }),
+    }),
+  }),
 });
 export type GetReviewsOfCourseResponseDTO = z.infer<
   typeof GetReviewsOfCourseResponseSchema

@@ -1,40 +1,24 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { login } from "@/lib/features/auth/authSlice";
-import { motion } from "framer-motion";
-import { Eye, EyeOff } from "lucide-react";
-import GoogleSvg from "@/components/icons/GoogleSvg";
-import type { UserCredentials } from "@/types/auth";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
-import useAuthApi from "@/hooks/api/useAuthApi";
-
-interface authErrors {
-  email?: string;
-  password?: string;
-  common?: string;
-}
+import RobotCanvas from "@/components/canvas/RobotCanvas";
+import LoginComponent from "@/features/auth/components/loginPage";
+import SignupPage from "@/features/auth/components/SignUpPage";
 
 const LoginPage = () => {
-  const [credentials, setCredentials] = useState<UserCredentials>({
-    email: "",
-    password: "",
-  });
-  const [showPassword, setShowPassword] = useState(false);
-  const [errors, setErrors] = useState<authErrors>({});
   const [loading, setLoading] = useState(false);
   const [persist, setPersist] = useState(false);
   const { user } = useAppSelector((state) => state.auth);
   const router = useRouter();
-
+  const [page, setPage] = useState<string | null>(null);
   const dispatch = useAppDispatch();
-  const { signInApi } = useAuthApi();
+  const param = useSearchParams();
 
-  // Only run this code on the client-side
   useEffect(() => {
     if (user.role == "admin") {
-      router.push("/admin");
+      router.push("/admin-login");
     }
     if (user.role == "student" || user.role == "instructor") {
       router.push("/");
@@ -45,40 +29,11 @@ const LoginPage = () => {
     } else {
       setPersist(localPersist === "true");
     }
-  }, []);
+  }, [user.role]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    let error = false;
-    setErrors({});
-
-    if (!credentials.email.trim()) {
-      error = true;
-      setErrors((prevError: authErrors) => {
-        return { ...prevError, email: "Email cannot be empty" };
-      });
-    }
-    if (!credentials.password.trim()) {
-      error = true;
-      setErrors((prevError: authErrors) => {
-        return { ...prevError, password: "Password cannot be empty" };
-      });
-    }
-    if (error) return;
-
-    try {
-      const response = await signInApi(credentials);
-      if (response.status == "success") {
-        dispatch(login(response.data));
-        router.push("/home");
-      } else {
-        setErrors({ common: response.message || "Login failed" });
-      }
-    } catch (err) {
-      setErrors({ common: "An unexpected error occurred" });
-    }
-  };
+  useEffect(() => {
+    setPage(param.get("page") || "");
+  }, [param]);
 
   const handleGoogleSignIn = async () => {
     setLoading(true);
@@ -113,149 +68,26 @@ const LoginPage = () => {
 
   return (
     <>
-      <main className=" bg-black text-white flex items-center justify-center px-4">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="max-w-md w-full space-y-8 bg-gray-900 p-8 rounded-xl my-8"
-        >
-          <div className="text-center">
-            <h1 className="text-3xl font-bold">Welcome back</h1>
-            <p className="mt-2 text-gray-400">Please enter your details</p>
-          </div>
+      <main className=" bg-black text-white grid grid-cols-1 md:grid-cols-5">
+        <div className="hidden md:block  h-[calc(100vh-70px)] w-full col-span-3">
+          <RobotCanvas />
+        </div>
 
-          <form onSubmit={handleSubmit} className="mt-8 space-y-6">
-            {errors.common && <p className="text-red-600">{errors.common}</p>}
-            <div className="space-y-4">
-              <div>
-                {errors.email && <p className="text-red-600">{errors.email}</p>}
-                <label
-                  htmlFor="email"
-                  className="block text-sm font-medium mb-2"
-                >
-                  Email
-                </label>
-                <input
-                  id="email"
-                  type="email"
-                  required
-                  className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600"
-                  placeholder="Enter your email"
-                  value={credentials.email}
-                  onChange={(e) =>
-                    setCredentials({ ...credentials, email: e.target.value })
-                  }
-                />
-              </div>
-
-              <div>
-                <label
-                  htmlFor="password"
-                  className="block text-sm font-medium mb-2"
-                >
-                  Password
-                </label>
-                <div className="relative">
-                  <input
-                    id="password"
-                    type={showPassword ? "text" : "password"}
-                    required
-                    className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-600"
-                    placeholder="Enter your password"
-                    value={credentials.password}
-                    onChange={(e) =>
-                      setCredentials({
-                        ...credentials,
-                        password: e.target.value,
-                      })
-                    }
-                  />
-                  <button
-                    type="button"
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2"
-                    onClick={() => setShowPassword(!showPassword)}
-                  >
-                    {showPassword ? (
-                      <EyeOff className="w-5 h-5 text-gray-400" />
-                    ) : (
-                      <Eye className="w-5 h-5 text-gray-400" />
-                    )}
-                  </button>
-                </div>
-                {errors.password && (
-                  <p id="password-error" className="mt-1 text-sm text-red-500">
-                    {errors.password}
-                  </p>
-                )}
-              </div>
-            </div>
-
-            <div>
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-700 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {loading ? "Signing in..." : "Sign in"}
-              </button>
-            </div>
-            <div className="flex justify-between">
-              <div className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  name="remember-me"
-                  id="remember-me"
-                  onChange={handleChangePersist}
-                  checked={persist}
-                  className="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500 cursor-pointer"
-                />
-                <label
-                  htmlFor="remember-me"
-                  className="block text-md font-medium "
-                >
-                  Remember me
-                </label>
-              </div>
-              <button
-                className="text-sm hover:text-purple-500"
-                onClick={() => router.push("/login/forgot-password")}
-              >
-                Forgot password?
-              </button>
-            </div>
-
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-700"></div>
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-gray-900 text-gray-400">
-                  Or continue with
-                </span>
-              </div>
-            </div>
-
-            <button
-              type="button"
-              disabled={loading}
-              onClick={handleGoogleSignIn}
-              className="w-full py-3 px-4 bg-white text-black rounded-lg font-medium flex items-center justify-center gap-2 hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <GoogleSvg />
-              Continue with Google
-            </button>
-
-            <p className="text-center text-sm text-gray-400">
-              Don&apos;t have an account?
-              <Link
-                href="/signUp"
-                className="text-indigo-400 hover:text-indigo-300"
-              >
-                Sign up
-              </Link>
-            </p>
-          </form>
-        </motion.div>
+        <div className="flex items-center justify-center col-span-2">
+          {page == "sign-up" ? (
+            <SignupPage
+              loading={loading}
+              handleGoogleSignIn={handleGoogleSignIn}
+            />
+          ) : (
+            <LoginComponent
+              handleChangePersist={handleChangePersist}
+              handleGoogleSignIn={handleGoogleSignIn}
+              persist={persist}
+              isLoading={loading}
+            />
+          )}
+        </div>
       </main>
     </>
   );

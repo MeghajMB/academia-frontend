@@ -44,10 +44,13 @@ function CourseReviews({
 
   const fetchReviews = async () => {
     try {
-      const res = await fetchCourseReviewsApi(courseId);
-      setReviews(res.reviews);
-      setReviewStats(res.reviewStats);
-      console.log(res);
+      const response = await fetchCourseReviewsApi(courseId);
+      if(response.status=='error'){
+        console.log(response.message);
+        return
+      }
+      setReviews(response.data.reviews);
+      setReviewStats(response.data.reviewStats);
     } catch (error) {
       console.error("Error fetching reviews:", error);
     }
@@ -118,7 +121,7 @@ function CourseReviews({
                           </div>
                         </div>
 
-                        {currentUserId === review.studentId.name && (
+                        {currentUserId === review.studentId.id && (
                           <div className="flex gap-2">
                             <Button
                               isIconOnly

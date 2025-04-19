@@ -1,6 +1,7 @@
 export interface IReview {
     id: string
     studentId: {
+      id:string
       name: string
       avatar?: string
     }
