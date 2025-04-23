@@ -14,18 +14,22 @@ import { Bell, Mail, CreditCard, Info, Filter, Check } from "lucide-react";
 import { INotification } from "@/types/notification";
 import moment from "moment";
 import useNotificationApi from "@/hooks/api/useNotificationApi";
-import { useAppSelector } from "@/lib/hooks";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import ProtectedRoute from "@/hoc/ProtectedRoute";
+import { clearNotifications, removeNotification } from "@/store/features/notification/notificationSlice";
 
 // Mock data for notifications
 
 function NotificationPage() {
   const [notifications, setNotifications] = useState<INotification[]>([]);
   const [filter, setFilter] = useState<string>("all");
-  const { fetchUnreadNotificationApi, markNotificationAsReadApi } =
-    useNotificationApi();
+  const {
+    fetchUnreadNotificationApi,
+    markNotificationAsReadApi,
+    markAllNotificationAsReadApi,
+  } = useNotificationApi();
   const { id } = useAppSelector((state) => state.auth.user);
-
+  const dispatch = useAppDispatch();
   useEffect(() => {
     async function fetchData() {
       try {
@@ -46,7 +50,11 @@ function NotificationPage() {
   // Function to mark a notification as read
   const markAsRead = async (index: number, notificationId: string) => {
     try {
-      await markNotificationAsReadApi(notificationId);
+      const response=await markNotificationAsReadApi(notificationId);
+      if(response.status=="error"){
+        return
+      }
+      dispatch(removeNotification(notificationId))
       const updatedNotifications = [...notifications];
       updatedNotifications[index].isRead = true;
       setNotifications(updatedNotifications);
@@ -56,12 +64,21 @@ function NotificationPage() {
   };
 
   // Function to mark all notifications as read
-  const markAllAsRead = () => {
-    const updatedNotifications = notifications.map((notification) => ({
-      ...notification,
-      isRead: true,
-    }));
-    setNotifications(updatedNotifications);
+  const markAllAsRead = async () => {
+    try {
+      const response = await markAllNotificationAsReadApi();
+      if (response.status == "error") {
+        return;
+      }
+      dispatch(clearNotifications())
+      const updatedNotifications = notifications.map((notification) => ({
+        ...notification,
+        isRead: true,
+      }));
+      setNotifications(updatedNotifications);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   // Filter notifications based on selected filter

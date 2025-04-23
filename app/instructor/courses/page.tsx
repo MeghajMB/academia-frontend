@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Plus } from "lucide-react";
 import Link from "next/link";
 import useCourseApi from "@/hooks/api/useCourseApi";
-import { useAppSelector } from "@/lib/hooks";
+import { useAppSelector } from "@/store/hooks";
 import { toast } from "react-toastify";
 import type { ICourse } from "@/types/course";
 import {

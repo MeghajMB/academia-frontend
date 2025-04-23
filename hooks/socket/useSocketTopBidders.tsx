@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getSocket } from "@/lib/socket";
+import { getSocket } from "@/store/socket";
 
 interface Bid {
   userId: string;

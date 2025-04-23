@@ -13,6 +13,12 @@ const createNotificationApi = (axiosInstance: AxiosInstance) => ({
     );
     return response.data;
   },
+  markAllNotificationAsReadApi: async () => {
+    const response = await axiosInstance.patch(
+      `/api/notification/mark-read`
+    );
+    return response.data;
+  },
 });
 
 export default createNotificationApi;

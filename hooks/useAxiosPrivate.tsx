@@ -3,7 +3,7 @@ import { axiosPrivate } from "@/api/axios";
 import useRefreshToken from "./useRefreshToken";
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
-import { RootState } from "@/lib/store";
+import { RootState } from "@/store/store";
 import { InternalAxiosRequestConfig } from "axios";
 
 export default function useAxiosPrivate() {

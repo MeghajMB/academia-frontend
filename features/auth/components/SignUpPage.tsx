@@ -5,7 +5,7 @@ import { Eye, EyeOff } from "lucide-react";
 import GoogleSvg from "@/components/svg/GoogleSvg";
 import { useRouter } from "next/navigation";
 import { customAxios } from "@/api/axios";
-import { useAppSelector } from "@/lib/hooks";
+import { useAppSelector } from "@/store/hooks";
 import { toast } from "react-toastify";
 import { Input, Spinner } from "@heroui/react";
 import { SubmitHandler, useForm } from "react-hook-form";

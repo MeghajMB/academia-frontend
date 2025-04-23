@@ -15,7 +15,7 @@ import moment from "moment";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import useUserApi from "@/hooks/api/useUserApi";
-import { useAppSelector } from "@/lib/hooks";
+import { useAppSelector } from "@/store/hooks";
 
 interface IUser {
   name: string;

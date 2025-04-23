@@ -1,359 +1,274 @@
 "use client";
-import useInstructorApi from "@/hooks/api/useInstructorApi";
-import { Card, CardBody } from "@heroui/react";
+
 import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-} from "recharts";
-type Props = {
-  metrics: {
-    totalEarnings: number;
-    totalStudents: number;
-    totalCourses: number;
-    avgRating: number;
+  Card,
+  CardBody,
+  CardHeader,
+  Divider,
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
+  Button,
+  Spinner,
+} from "@heroui/react";
+import { ChevronDownIcon } from "lucide-react";
+
+import useInstructorApi from "@/hooks/api/useInstructorApi";
+import { MetricCards } from "@/features/dashboard/components/instructor/MetricsCard";
+import { ReviewDistributionChart } from "@/features/dashboard/components/instructor/ReviewDistributionchart";
+import { GigMetricsChart } from "@/features/dashboard/components/instructor/GigMetricsChart";
+import { TimeSeriesChart } from "@/features/dashboard/components/instructor/TimeSeriesChart";
+
+// Types for our data
+type CourseMetrics = {
+  totalCourses: number;
+  totalStudents: number;
+  totalEarnings: number;
+  averageRating: number;
+  totalReviews: number;
+  reviewDistribution: {
+    1: number;
+    2: number;
+    3: number;
+    4: number;
+    5: number;
   };
 };
-const DUMMY_DATA = {
-  // 1. Top Summary
-  topMetrics: {
-    totalEarnings: 45200,
-    totalStudents: 1380,
-    totalCourses: 14,
-    avgRating: 4.6,
-  },
 
-  // 2. Earnings Line Chart
-  earningsByDate: [
-    { date: "2025-03-01", earnings: 1200 },
-    { date: "2025-03-05", earnings: 3000 },
-    { date: "2025-03-10", earnings: 2500 },
-    { date: "2025-03-15", earnings: 4000 },
-    { date: "2025-03-20", earnings: 1800 },
-    { date: "2025-03-25", earnings: 2200 },
-  ],
-
-  // 3. Course Stats Table
-  courseStats: [
-    {
-      title: "Next.js for Beginners",
-      enrollments: 380,
-      completionRate: 40,
-      rating: 4.5,
-      earnings: 12800,
-    },
-    {
-      title: "Mastering TypeScript",
-      enrollments: 240,
-      earnings: 9800,
-      rating: 4.7,
-      completionRate: 40,
-    },
-    {
-      title: "Docker & Kubernetes Bootcamp",
-      enrollments: 560,
-      earnings: 19200,
-      rating: 4.8,
-      completionRate: 40,
-    },
-  ],
-
-  // 4. Student Growth Chart
-  studentsByDate: [
-    { date: "2025-03-01", students: 30 },
-    { date: "2025-03-05", students: 60 },
-    { date: "2025-03-10", students: 90 },
-    { date: "2025-03-15", students: 120 },
-    { date: "2025-03-20", students: 160 },
-    { date: "2025-03-25", students: 180 },
-  ],
-
-  // 5. Top Gigs
-  topGigs: [
-    {
-      title: "1-on-1 Code Review Session",
-      bids: 12,
-      highestBid: 250,
-      status: "Completed",
-    },
-    {
-      title: "Live Debugging Session",
-      bids: 8,
-      highestBid: 180,
-      status: "Ongoing",
-    },
-  ],
-
-  // 6. Reviews Snapshot
-  reviews: {
-    total: 235,
-    positive: 190,
-    negative: 45,
-    avgRating: 4.6,
-  },
-
-  // 7. Coin Balance
-  coins: {
-    gold: 320,
-    purple: 1420,
-  },
+type GigMetrics = {
+  totalGigs: number;
+  activeGigs: number;
+  expiredGigs: number;
+  completedGigs: number;
+  missedGigs: number;
+  noBidGigs: number;
+  totalGigEarnings: number;
 };
-export default function InstructorDashboardPage() {
-  const [data, setData] = useState(DUMMY_DATA);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, seterror] = useState("");
-  const { getInstructorDashboard } = useInstructorApi();
+
+type TimeSeriesData = {
+  courseEarnings: { date: string; earnings: number }[];
+  studentGrowth: { date: string; count: number }[];
+  gigEarnings: { date: string; earnings: number }[];
+};
+
+type TimeFilter = "month" | "quarter" | "year";
+
+export default function InstructorDashboard() {
+  const [summaryData, setSummaryData] = useState<{
+    courseMetrics: CourseMetrics;
+    gigMetrics: GigMetrics;
+  } | null>(null);
+  const [timeSeriesData, setTimeSeriesData] = useState<TimeSeriesData | null>(
+    null
+  );
+  const [timeFilter, setTimeFilter] = useState<TimeFilter>("month");
+  const [loading, setLoading] = useState(true);
+  const { getInstructorAnalyticsSummary, getInstructorAnalytics } =
+    useInstructorApi();
+
   useEffect(() => {
-    async function fetchDashBoard() {
+    // Fetch summary data
+    const fetchSummaryData = async () => {
       try {
-        const response = await getInstructorDashboard();
-        console.log(response)
+        // Replace with your actual API endpoint
+        const response = await getInstructorAnalyticsSummary();
+        console.log(response);
+        setSummaryData(response);
       } catch (error) {
-        console.log(error)
+        console.error("Error fetching summary data:", error);
       }
-    }
-    fetchDashBoard();
+    };
+
+    fetchSummaryData();
   }, []);
-  if (isLoading) return <div className="p-4">Loading dashboard...</div>;
-  if (error)
-    return <div className="p-4 text-red-500">Error loading dashboard</div>;
+
+  useEffect(() => {
+    const fetchTimeSeriesData = async () => {
+      try {
+        // Replace with your actual API endpoint
+        const response = await getInstructorAnalytics(timeFilter);
+        console.log(response);
+        setTimeSeriesData(response);
+      } catch (error) {
+        console.error("Error fetching time series data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchTimeSeriesData();
+  }, [timeFilter]);
+
+  // Animation variants
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: {
+        type: "spring",
+        stiffness: 100,
+        damping: 15,
+      },
+    },
+  };
 
   return (
-    <div className="p-6 space-y-6">
-      <h1 className="text-2xl font-bold">Instructor Dashboard</h1>
-      <TopCards metrics={data.topMetrics} />
+    <main className="container mx-auto px-4 py-8">
+      <motion.div
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+        className="space-y-8"
+      >
+        {/* Metrics Summary Cards */}
+        <motion.div variants={itemVariants}>
+          {summaryData && (
+            <MetricCards
+              courseMetrics={summaryData.courseMetrics}
+              gigMetrics={summaryData.gigMetrics}
+            />
+          )}
+        </motion.div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <EarningsChart data={data.earningsByDate} />
-        <StudentGrowthChart data={data.studentsByDate} />
-      </div>
+        {/* Charts Row 1 - Review Distribution and Gig Metrics */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <motion.div variants={itemVariants}>
+            <Card className="border-none shadow-md">
+              <CardHeader className="flex justify-between">
+                <h3 className="text-xl font-semibold">Review Distribution</h3>
+              </CardHeader>
+              <Divider />
+              <CardBody>
+                {summaryData ? (
+                  <ReviewDistributionChart
+                    data={summaryData.courseMetrics.reviewDistribution}
+                  />
+                ) : (
+                  <Spinner />
+                )}
+              </CardBody>
+            </Card>
+          </motion.div>
 
-      <CourseStatsTable courses={data.courseStats} />
+          <motion.div variants={itemVariants}>
+            <Card className="border-none shadow-md">
+              <CardHeader className="flex justify-between">
+                <h3 className="text-xl font-semibold">
+                  Gig Status Distribution
+                </h3>
+              </CardHeader>
+              <Divider />
+              <CardBody>
+                {summaryData ? (
+                  <GigMetricsChart data={summaryData.gigMetrics} />
+                ) : (
+                  <Spinner />
+                )}
+              </CardBody>
+            </Card>
+          </motion.div>
+        </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <TopGigs gigs={data.topGigs} />
-        <ReviewsSnapshot reviews={data.reviews} />
-      </div>
+        {/* Time Filter */}
+        <motion.div variants={itemVariants} className="flex justify-end">
+          <Dropdown>
+            <DropdownTrigger>
+              <Button
+                variant="flat"
+                endContent={<ChevronDownIcon className="h-4 w-4" />}
+                className="capitalize"
+              >
+                {timeFilter}
+              </Button>
+            </DropdownTrigger>
+            <DropdownMenu
+              aria-label="Time filter options"
+              onAction={(key) => setTimeFilter(key as TimeFilter)}
+              selectedKeys={[timeFilter]}
+              selectionMode="single"
+            >
+              <DropdownItem key="month">Month</DropdownItem>
+              <DropdownItem key="quarter">Quarter</DropdownItem>
+              <DropdownItem key="year">Year</DropdownItem>
+            </DropdownMenu>
+          </Dropdown>
+        </motion.div>
 
-      <CoinBalance coins={data.coins} />
-    </div>
+        {/* Charts Row 2 - Time Series Charts */}
+        <div className="grid grid-cols-1 gap-6">
+          <motion.div variants={itemVariants}>
+            <Card className="border-none shadow-md">
+              <CardHeader className="flex justify-between">
+                <h3 className="text-xl font-semibold">Course Earnings</h3>
+              </CardHeader>
+              <Divider />
+              <CardBody>
+                {timeSeriesData ? (
+                  <TimeSeriesChart
+                    data={timeSeriesData.courseEarnings}
+                    dataKey="earnings"
+                    xAxisKey="date"
+                    color="#0070F3"
+                    prefix="$"
+                  />
+                ) : <Spinner />}
+              </CardBody>
+            </Card>
+          </motion.div>
+
+          <motion.div variants={itemVariants}>
+            <Card className="border-none shadow-md">
+              <CardHeader className="flex justify-between">
+                <h3 className="text-xl font-semibold">Student Growth</h3>
+              </CardHeader>
+              <Divider />
+              <CardBody>
+                {timeSeriesData && (
+                  <TimeSeriesChart
+                    data={timeSeriesData.studentGrowth}
+                    dataKey="count"
+                    xAxisKey="date"
+                    color="#10B981"
+                  />
+                )}
+              </CardBody>
+            </Card>
+          </motion.div>
+
+          <motion.div variants={itemVariants}>
+            <Card className="border-none shadow-md">
+              <CardHeader className="flex justify-between">
+                <h3 className="text-xl font-semibold">Gig Earnings</h3>
+              </CardHeader>
+              <Divider />
+              <CardBody>
+                {timeSeriesData ? (
+                  <TimeSeriesChart
+                    data={timeSeriesData.gigEarnings}
+                    dataKey="earnings"
+                    xAxisKey="date"
+                    color="#8B5CF6"
+                    prefix="$"
+                  />
+                ) : <Spinner />}
+              </CardBody>
+            </Card>
+          </motion.div>
+        </div>
+      </motion.div>
+    </main>
   );
 }
-
-export const TopCards = ({ metrics }: Props) => {
-  const cards = [
-    { title: "Total Earnings", value: `${metrics.totalEarnings} GC` },
-    { title: "Total Students", value: metrics.totalStudents },
-    { title: "Total Courses", value: metrics.totalCourses },
-    { title: "Average Rating", value: metrics.avgRating.toFixed(2) },
-  ];
-
-  return (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-      {cards.map((card, idx) => (
-        <Card key={idx} shadow="sm" className="p-2 rounded-2xl">
-          <CardBody>
-            <h2 className="text-sm text-gray-500">{card.title}</h2>
-            <p className="text-xl font-semibold">{card.value}</p>
-          </CardBody>
-        </Card>
-      ))}
-    </div>
-  );
-};
-
-type EarningsChartProps = {
-  data: { date: string; earnings: number }[];
-};
-
-export const EarningsChart = ({ data }: EarningsChartProps) => {
-  return (
-    <Card shadow="sm" className="rounded-2xl">
-      <CardBody>
-        <h2 className="text-md font-semibold mb-2">Earnings (Last 30 days)</h2>
-        <ResponsiveContainer width="100%" height={250}>
-          <LineChart data={data}>
-            <XAxis dataKey="date" />
-            <YAxis />
-            <Tooltip />
-            <Line
-              type="monotone"
-              dataKey="total"
-              stroke="#4ade80"
-              strokeWidth={2}
-            />
-          </LineChart>
-        </ResponsiveContainer>
-      </CardBody>
-    </Card>
-  );
-};
-
-type CourseStatsTableProps = {
-  courses: {
-    title: string;
-    enrollments: number;
-    completionRate: number;
-    rating: number;
-    earnings: number;
-  }[];
-};
-
-export const CourseStatsTable = ({ courses }: CourseStatsTableProps) => {
-  return (
-    <Card shadow="sm" className="rounded-2xl">
-      <CardBody>
-        <h2 className="text-md font-semibold mb-2">Course Performance</h2>
-        <div className="overflow-auto">
-          <table className="min-w-full text-sm">
-            <thead>
-              <tr className="text-left border-b border-gray-700">
-                <th>Course</th>
-                <th>Enrollments</th>
-                <th>Completion</th>
-                <th>Rating</th>
-                <th>Earnings</th>
-              </tr>
-            </thead>
-            <tbody>
-              {courses.map((course, i) => (
-                <tr key={i} className="border-t border-gray-800">
-                  <td>{course.title}</td>
-                  <td>{course.enrollments}</td>
-                  <td>{course.completionRate}%</td>
-                  <td>⭐ {course.rating.toFixed(1)}</td>
-                  <td>{course.earnings} GC</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </CardBody>
-    </Card>
-  );
-};
-
-type StudentGrowthChartProps = {
-  data: { date: string; students: number }[];
-};
-
-export const StudentGrowthChart = ({ data }: StudentGrowthChartProps) => {
-  return (
-    <Card shadow="sm" className="rounded-2xl">
-      <CardBody>
-        <h2 className="text-md font-semibold mb-2">Student Growth</h2>
-        <ResponsiveContainer width="100%" height={250}>
-          <LineChart data={data}>
-            <XAxis dataKey="date" />
-            <YAxis />
-            <Tooltip />
-            <Line
-              type="monotone"
-              dataKey="students"
-              stroke="#60a5fa"
-              strokeWidth={2}
-            />
-          </LineChart>
-        </ResponsiveContainer>
-      </CardBody>
-    </Card>
-  );
-};
-
-type Gig = {
-  title: string;
-  bids: number;
-  highestBid: number;
-  status: string;
-};
-
-type TopGigsProps = {
-  gigs: Gig[];
-};
-
-export const TopGigs = ({ gigs }: TopGigsProps) => {
-  return (
-    <Card shadow="sm" className="rounded-2xl">
-      <CardBody>
-        <h2 className="text-md font-semibold mb-2">Top Gigs</h2>
-        <ul className="space-y-2">
-          {gigs.map((gig, i) => (
-            <li key={i} className="flex justify-between items-center">
-              <div>
-                <p className="font-medium">{gig.title}</p>
-                <span className="text-xs text-gray-400">
-                  {gig.bids} bids · {gig.status}
-                </span>
-              </div>
-              <span className="text-green-400 font-semibold">
-                {gig.highestBid} GC
-              </span>
-            </li>
-          ))}
-        </ul>
-      </CardBody>
-    </Card>
-  );
-};
-
-type ReviewsSnapshotProps = {
-  reviews: {
-    total: number;
-    positive: number;
-    negative: number;
-    avgRating: number;
-  };
-};
-
-export const ReviewsSnapshot = ({ reviews }: ReviewsSnapshotProps) => {
-  return (
-    <Card shadow="sm" className="rounded-2xl">
-      <CardBody>
-        <h2 className="text-md font-semibold mb-2">Reviews Snapshot</h2>
-        <div className="grid grid-cols-2 gap-2 text-sm">
-          <p>
-            Total Reviews: <strong>{reviews.total}</strong>
-          </p>
-          <p>
-            Avg Rating: <strong>⭐ {reviews.avgRating.toFixed(1)}</strong>
-          </p>
-          <p>
-            👍 Positive: <strong>{reviews.positive}</strong>
-          </p>
-          <p>
-            👎 Negative: <strong>{reviews.negative}</strong>
-          </p>
-        </div>
-      </CardBody>
-    </Card>
-  );
-};
-
-type CoinBalanceProps = {
-  coins: {
-    gold: number;
-    purple: number;
-  };
-};
-
-export const CoinBalance = ({ coins }: CoinBalanceProps) => {
-  return (
-    <Card shadow="sm" className="rounded-2xl">
-      <CardBody>
-        <h2 className="text-md font-semibold mb-2">Coin Balance</h2>
-        <div className="flex space-x-6 text-sm">
-          <p>
-            🥇 Gold Coins: <strong>{coins.gold}</strong>
-          </p>
-          <p>
-            🟣 Purple Coins: <strong>{coins.purple}</strong>
-          </p>
-        </div>
-      </CardBody>
-    </Card>
-  );
-};

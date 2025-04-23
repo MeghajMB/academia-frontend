@@ -1,8 +1,8 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { login } from "@/lib/features/auth/authSlice";
-import { useAppDispatch, useAppSelector } from "@/lib/hooks";
+import { login } from "@/store/features/auth/authSlice";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import RobotCanvas from "@/components/canvas/RobotCanvas";
 import LoginComponent from "@/features/auth/components/loginPage";
 import SignupPage from "@/features/auth/components/SignUpPage";
@@ -77,7 +77,7 @@ const LoginPage = () => {
   return (
     <>
       <main className=" bg-black text-white grid grid-cols-1 md:grid-cols-5">
-        <div className="hidden md:block  h-[calc(100vh-70px)] w-full col-span-3">
+        <div className="hidden md:block  h-[calc(100vh-70px)] w-full col-span-3 cursor-grab active:cursor-grabbing">
           <RobotCanvas />
         </div>
 

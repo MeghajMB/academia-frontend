@@ -2,8 +2,8 @@
 import React, { useEffect, useState } from "react";
 import { LockKeyhole, User } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useAppDispatch, useAppSelector } from "@/lib/hooks";
-import { login } from "@/lib/features/auth/authSlice";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { login } from "@/store/features/auth/authSlice";
 import LoadingPage from "@/components/common/LoadingPage";
 import useAuthApi from "@/hooks/api/useAuthApi";
 

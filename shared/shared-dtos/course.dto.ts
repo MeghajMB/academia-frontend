@@ -315,6 +315,7 @@ export const GetCoursesResponseSchema = SuccessResponseSchema.extend({
         totalDuration: z.number(),
         totalLectures: z.number(),
         totalSections: z.number(),
+        totalReviews:z.number(),
         isBlocked: z.boolean(),
         status: z.string(),
         imageThumbnail: z.string(),

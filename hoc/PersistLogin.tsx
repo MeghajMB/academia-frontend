@@ -1,8 +1,8 @@
 "use client"
 import { useState, useEffect } from "react";
 import useRefreshToken from "@/hooks/useRefreshToken";
-import { RootState } from "@/lib/store";
-import { useAppSelector } from "@/lib/hooks";
+import { RootState } from "@/store/store";
+import { useAppSelector } from "@/store/hooks";
 
 interface PersistLoginProps {
   children: React.ReactNode;

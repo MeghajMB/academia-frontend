@@ -3,12 +3,16 @@ import { Edit2, Star, Trash2 } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { ReviewForm } from "./ReviewForm";
 import { ReviewStatistics } from "./ReviewStatistics";
-import { IReview, IReviewStats } from "@/types/review";
+import { Review, IReviewStats } from "@/types/review";
 import useReviewApi from "@/hooks/api/useReviewApi";
 
 interface CourseReviewsProps {
   currentUserId?: string;
-  onEditReview: (review: Partial<IReview>) => void;
+  onEditReview: (review: {
+    comment: string;
+    id: string;
+    rating: number;
+  }) => void;
   onDeleteReview: (reviewId: string) => void;
   canReview: boolean;
   hasReviewed: boolean;
@@ -23,7 +27,7 @@ function CourseReviews({
   courseId,
   hasReviewed,
 }: CourseReviewsProps) {
-  const [reviews, setReviews] = useState<IReview[]>([]);
+  const [reviews, setReviews] = useState<Review[]>([]);
   const [reviewStats, setReviewStats] = useState<IReviewStats>({
     averageRating: 0,
     totalReviews: 0,
@@ -45,9 +49,9 @@ function CourseReviews({
   const fetchReviews = async () => {
     try {
       const response = await fetchCourseReviewsApi(courseId);
-      if(response.status=='error'){
+      if (response.status == "error") {
         console.log(response.message);
-        return
+        return;
       }
       setReviews(response.data.reviews);
       setReviewStats(response.data.reviewStats);
@@ -56,13 +60,20 @@ function CourseReviews({
     }
   };
 
-  const handleAddReview = async (review: Partial<IReview>) => {
+  const handleAddReview = async (review: Partial<Review>) => {
     await addReviewApi(courseId, Number(review.rating), review.comment);
     setIsAddingReview(false);
   };
 
-  const handleEditReview = (review: Partial<IReview>) => {
-    onEditReview(review);
+  const handleEditReview = (review: Partial<Review>) => {
+    console.log(review);
+    onEditReview(
+      review as unknown as {
+        comment: string;
+        id: string;
+        rating: number;
+      }
+    );
     setEditingReviewId(null);
   };
 

@@ -1,6 +1,6 @@
 "use client";
 import { axiosPrivate } from "@/api/axios";
-import { login, logout } from "@/lib/features/auth/authSlice";
+import { login, logout } from "@/store/features/auth/authSlice";
 import { AxiosError } from "axios";
 
 import { useDispatch } from "react-redux";

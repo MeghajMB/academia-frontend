@@ -1,8 +1,8 @@
 "use client";
 import GoogleSvg from "@/components/svg/GoogleSvg";
 import useAuthApi from "@/hooks/api/useAuthApi";
-import { useAppDispatch } from "@/lib/hooks";
-import { login } from "@/lib/features/auth/authSlice";
+import { useAppDispatch } from "@/store/hooks";
+import { login } from "@/store/features/auth/authSlice";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";

@@ -3,6 +3,7 @@
 import { Button } from "@heroui/react";
 import { ShieldAlert, Lock, ArrowLeft } from "lucide-react";
 import { motion } from "framer-motion";
+import Link from "next/link";
 
 export default function Unauthorized() {
   return (
@@ -62,17 +63,17 @@ export default function Unauthorized() {
           >
             Go Back
           </Button>
-          {/* <Button
+          <Button
             as={Link}
-            href="/login"
+            href="/"
             color="secondary"
             variant="bordered"
             size="lg"
-            startContent={<LogIn size={18} />}
+      
             className="font-medium"
           >
-            Log In
-          </Button> */}
+            Go Home
+          </Button>
         </motion.div>
       </div>
 

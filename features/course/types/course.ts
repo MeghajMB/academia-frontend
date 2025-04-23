@@ -15,6 +15,7 @@ export interface ListCourses {
   totalDuration: number;
   totalLectures: number;
   totalSections: number;
+  totalReviews:number,
   isBlocked: boolean;
   status: string;
   imageThumbnail: string;

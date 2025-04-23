@@ -1,6 +1,6 @@
 "use client";
 
-import { useAppSelector } from "@/lib/hooks";
+import { useAppSelector } from "@/store/hooks";
 import { ISection } from "@/types/course";
 import {
   SortableContext,

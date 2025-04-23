@@ -1,25 +1,28 @@
-import { getSocket } from "@/lib/socket";
+"use client";
+import { setNotifications } from "@/store/features/notification/notificationSlice";
+import { useAppDispatch } from "@/store/hooks";
+import { getSocket } from "@/store/socket";
 import { INotification } from "@/types/notification";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 function useNotification(userId: string | null) {
-  const [notifications, setNotifications] = useState<INotification[]>([]);
-  const [notificationCount, setNotificationCount] = useState<number>(0);
+  const dispatch = useAppDispatch();
   useEffect(() => {
     if (!userId) return;
     const socket = getSocket();
     socket.emit("registerUser", userId);
-    socket.on("notifications", (data) => {
-      console.log(data);
-      setNotifications(data.notifications);
-      setNotificationCount(data.count);
-    });
+    socket.on(
+      "notifications",
+      (data: { notifications: INotification[]; count: number }) => {
+        console.log(data);
+        dispatch(setNotifications(data));
+      }
+    );
     return () => {
       socket.emit("unRegisterUser", userId);
       socket.off("notifications");
     };
   }, [userId]);
-  return { notifications, notificationCount };
 }
 
 export default useNotification;

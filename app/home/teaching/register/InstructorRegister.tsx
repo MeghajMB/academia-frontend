@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { Loader2, AlertCircle } from "lucide-react";
-import { useAppSelector } from "@/lib/hooks";
+import { useAppSelector } from "@/store/hooks";
 import useAuthApi from "@/hooks/api/useAuthApi";
 import useUserApi from "@/hooks/api/useUserApi";
 import {

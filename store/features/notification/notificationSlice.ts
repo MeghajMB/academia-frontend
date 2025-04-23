@@ -66,9 +66,12 @@ const notificationSlice = createSlice({
       state.notificationCount = 0;
     },
 
-    setNotifications(state, action: PayloadAction<Notification[]>) {
-      state.notifications = action.payload;
-      state.notificationCount = action.payload.filter((n) => !n.isRead).length;
+    setNotifications(
+      state,
+      action: PayloadAction<{ count: number; notifications: Notification[] }>
+    ) {
+      state.notifications = action.payload.notifications;
+      state.notificationCount = action.payload.count;
     },
 
     setNotificationCount(state, action: PayloadAction<number>) {

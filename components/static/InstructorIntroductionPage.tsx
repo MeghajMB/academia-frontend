@@ -1,6 +1,6 @@
 "use client";
 
-import { useAppSelector } from "@/lib/hooks";
+import { useAppSelector } from "@/store/hooks";
 import Link from "next/link";
 
 export default function InstructorIntroductionPage() {

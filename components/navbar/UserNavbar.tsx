@@ -5,10 +5,10 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
-import type { RootState } from "@/lib/store";
+import type { RootState } from "@/store/store";
 import { customAxios } from "@/api/axios";
-import { logout } from "@/lib/features/auth/authSlice";
-import { useAppDispatch, useAppSelector } from "@/lib/hooks";
+import { logout } from "@/store/features/auth/authSlice";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import {
   Navbar,
   NavbarBrand,
@@ -25,6 +25,7 @@ import {
   Badge,
   User,
 } from "@heroui/react";
+import InstructorSvg from "../svg/InstructorSvg";
 import {
   Bell,
   LogOut,
@@ -34,17 +35,19 @@ import {
   Home,
   Briefcase,
   ChevronDown,
-  Glasses,
 } from "lucide-react";
 import ProfilePicture from "@/public/images/blankUserProfile.jpeg";
 import useNotification from "@/hooks/socket/useSocketNotification";
 import Image from "next/image";
-import AcademiaLogo from '@/public/images/academia-logo.png'
+import AcademiaLogo from "@/public/images/academia-logo.png";
 const UserNavbar: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
   const [loading, setLoading] = useState(false);
   const [isClient, setIsClient] = useState(false);
   const { user } = useAppSelector((state: RootState) => state.auth);
+  const { notificationCount, notifications } = useAppSelector(
+    (state) => state.notification
+  );
   const dispatch = useAppDispatch();
   const router = useRouter();
   const path = usePathname();
@@ -53,7 +56,7 @@ const UserNavbar: React.FC = () => {
     setIsClient(true);
   }, []);
 
-  const { notifications, notificationCount } = useNotification(user.id);
+  useNotification(user.id);
 
   async function handleLogout() {
     setLoading(true);
@@ -70,9 +73,17 @@ const UserNavbar: React.FC = () => {
 
   let instructorRoute;
   if (user?.role === "student") {
-    instructorRoute = { path: "/home/teaching", label: "Become an Instructor",icon:<Glasses />  };
+    instructorRoute = {
+      path: "/home/teaching",
+      label: "Become an Instructor",
+      icon: <InstructorSvg />,
+    };
   } else {
-    instructorRoute = { path: "/instructor", label: "Instructor",icon:<Glasses /> };
+    instructorRoute = {
+      path: "/instructor",
+      label: "Instructor",
+      icon: <InstructorSvg />,
+    };
   }
 
   const navigationItems = [
@@ -134,7 +145,9 @@ const UserNavbar: React.FC = () => {
             }}
             className="flex items-center cursor-pointer"
           >
-            <div className="w-8 h-8 bg-primary rounded relative"><Image src={AcademiaLogo.src} alt="logo" fill/></div>
+            <div className="w-8 h-8 bg-primary rounded relative">
+              <Image src={AcademiaLogo.src} alt="logo" fill />
+            </div>
             <span className="text-xl font-bold ml-2">Academia</span>
           </motion.div>
         </NavbarBrand>
@@ -217,10 +230,7 @@ const UserNavbar: React.FC = () => {
                       </DropdownItem>
                     );
                   })}
-                  <DropdownItem
-                    key="view-all"
-                    color="secondary"
-                  >
+                  <DropdownItem key="view-all" color="secondary">
                     <Link href="/home/notification">
                       View All Notifications
                     </Link>

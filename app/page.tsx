@@ -2,14 +2,13 @@
 import React, { useEffect } from "react";
 import { motion } from "framer-motion";
 import RoleBadge from "@/components/static/RoleBadge";
-import { useAppSelector } from "@/lib/hooks";
+import { useAppSelector } from "@/store/hooks";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { TiltChartCard } from "@/components/static/landing/TiltCard";
 import { LandingSection } from "@/components/static/LandingSection";
 import Cube from "@/components/static/landing/Cube";
 import { ConnectSection } from "@/components/static/landing/VideoCallSection";
-import MotionPath from "@/components/svg/MotionPath";
 
 export default function Page() {
   const { user } = useAppSelector((state) => state.auth);

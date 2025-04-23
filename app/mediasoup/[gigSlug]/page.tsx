@@ -5,7 +5,7 @@ import JoinRoom from "@/features/video-call/components/JoinRoom";
 import ConferenceRoom from "@/features/video-call/components/ConferenceRoom";
 import { useParams } from "next/navigation";
 import DisconnectRoom from "@/features/video-call/components/DisconnectRoom";
-import { useAppSelector } from "@/lib/hooks";
+import { useAppSelector } from "@/store/hooks";
 import LoadingPage from "@/components/common/LoadingPage";
 
 export default function MediasoupPage() {

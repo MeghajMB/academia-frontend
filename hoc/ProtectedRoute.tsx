@@ -1,7 +1,7 @@
 "use client";
-import { RootState } from "@/lib/store";
+import { RootState } from "@/store/store";
 import { ReactNode, useEffect, useState } from "react";
-import { useAppSelector } from "@/lib/hooks";
+import { useAppSelector } from "@/store/hooks";
 import Unauthorized from "@/components/common/UnAuthorized";
 import LoadingPage from "@/components/common/LoadingPage";
 

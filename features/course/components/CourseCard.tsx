@@ -8,7 +8,7 @@ import {
   Chip,
   Image,
 } from "@heroui/react";
-import { BookOpen, Clock, Star, Users } from "lucide-react";
+import { BookOpen, Clock, Star } from "lucide-react";
 import Link from "next/link";
 import { ListCourses } from "../types/course";
 
@@ -81,7 +81,7 @@ export default function CourseCard({ course }: { course: ListCourses }) {
                 />
               ))}
             </div>
-            (2034 Reviews)
+            ({course.totalReviews} Reviews)
           </div>
 
           <div className="flex items-center gap-4 text-xs text-default-500 mt-1">
@@ -92,10 +92,6 @@ export default function CourseCard({ course }: { course: ListCourses }) {
             <div className="flex items-center gap-1">
               <BookOpen size={14} />
               <span>{course.totalLectures} lectures</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <Users size={14} />
-              <span>{course.totalLectures} Students</span>
             </div>
           </div>
         </CardBody>

@@ -1,4 +1,4 @@
-export interface IReview {
+export interface Review {
     id: string
     studentId: {
       id:string

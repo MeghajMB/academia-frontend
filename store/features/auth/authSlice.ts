@@ -1,4 +1,4 @@
-import { disconnectSocket } from "@/lib/socket";
+import { disconnectSocket } from "@/store/socket";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface authState {

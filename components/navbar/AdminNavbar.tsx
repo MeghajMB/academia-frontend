@@ -15,8 +15,8 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
-import { useAppDispatch, useAppSelector } from "@/lib/hooks";
-import { logout } from "@/lib/features/auth/authSlice";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { logout } from "@/store/features/auth/authSlice";
 import useAuthApi from "@/hooks/api/useAuthApi";
 
 export default function AdminNavbar() {
