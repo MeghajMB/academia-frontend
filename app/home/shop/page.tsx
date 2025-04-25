@@ -4,7 +4,6 @@ import { Card, CardBody, CardHeader, Badge } from "@heroui/react";
 import { Coins } from "lucide-react";
 import ProtectedRoute from "@/hoc/ProtectedRoute";
 import RenderRazorpay from "@/features/payment/components/RenderRazorpay";
-import usePaymentApi from "@/hooks/api/usePaymentApi";
 
 const coinPackages = [
   { coins: 100, price: 90 },
@@ -45,11 +44,7 @@ const ShopCoins = () => {
                     </Badge>
                   )}
                 </div>
-                <RenderRazorpay
-                  keyId={process.env.REACT_APP_RAZORPAY_KEY_ID!}
-                  coins={coins}
-                  price={price}
-                />
+                <RenderRazorpay courseId="" type="coins"/>
               </CardBody>
             </Card>
           ))}

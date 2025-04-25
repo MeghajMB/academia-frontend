@@ -21,6 +21,8 @@ import {
   ErrorResponseDTO,
   GenerateLectureUrlResponseDTO,
   GenerateLectureUrlResponseSchema,
+  GetCourseAnalyticsResponseDTO,
+  GetCourseAnalyticsResponseSchema,
   GetCourseCreationDetailsResponseDTO,
   GetCourseCreationDetailsResponseSchema,
   GetCourseDetailsResponseDTO,
@@ -55,6 +57,23 @@ const createCourseApi = (axiosInstance: AxiosInstance) => ({
       );
       return result;
     } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  fetchCourseAnalyticsApi: async (
+    filter: "quarter" | "month" | "year",
+    courseId: string
+  ): Promise<GetCourseAnalyticsResponseDTO | ErrorResponseDTO> => {
+    try {
+      const response = await axiosInstance.get(
+        `/api/course/analytics/${courseId}`,
+        { params: { filter } }
+      );
+      const result = GetCourseAnalyticsResponseSchema.parse(response.data);
+      return result;
+    } catch (error) {
+      console.log(error)
       return handleApiError(error);
     }
   },
@@ -169,7 +188,9 @@ const createCourseApi = (axiosInstance: AxiosInstance) => ({
     search?: string;
   }): Promise<GetCoursesResponseDTO | ErrorResponseDTO> => {
     try {
-      const response = await axiosInstance.get(`/api/course/all`,{params:{sort,category,page,search}});
+      const response = await axiosInstance.get(`/api/course/all`, {
+        params: { sort, category, page, search },
+      });
       const result = GetCoursesResponseSchema.parse(response.data);
       return result;
     } catch (error) {

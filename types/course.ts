@@ -2,8 +2,8 @@ export interface ILecture {
   id: string;
   title: string;
   videoUrl: string;
-  order: number;
   duration: number;
+  order: number;
   status: string;
   sectionId: string;
   progress: "completed" | "not completed" | "locked" | "instructor";

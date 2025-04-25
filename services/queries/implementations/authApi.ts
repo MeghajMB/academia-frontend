@@ -1,4 +1,3 @@
-// src/services/queries/authApi.ts
 import {
   ErrorResponseDTO,
   ForgotPasswordResponseDTO,

@@ -93,7 +93,11 @@ export default function InstructorDetail({
 
             <div className="space-y-4">
               <a
-                href={user?.links.facebook}
+                href={
+                  user?.links.facebook?.startsWith("http://")
+                    ? user.links.facebook
+                    : `https://${user?.links.facebook}`
+                }
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 text-gray-300 hover:text-purple-400 transition-colors group"
@@ -105,7 +109,11 @@ export default function InstructorDetail({
               </a>
 
               <a
-                href={user?.links.twitter}
+                href={
+                  user?.links.twitter?.startsWith("http")
+                    ? user.links.twitter
+                    : `https://${user?.links.twitter}`
+                }
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 text-gray-300 hover:text-purple-400 transition-colors group"
@@ -117,7 +125,11 @@ export default function InstructorDetail({
               </a>
 
               <a
-                href={user?.links.linkedin}
+                href={
+                  user?.links.linkedin?.startsWith("http")
+                    ? user.links.linkedin
+                    : `https://${user?.links.linkedin}`
+                }
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 text-gray-300 hover:text-purple-400 transition-colors group"
@@ -129,7 +141,11 @@ export default function InstructorDetail({
               </a>
 
               <a
-                href={user?.links.website}
+                href={
+                  user?.links.website?.startsWith("http")
+                    ? user.links.website
+                    : `https://${user?.links.website}`
+                }
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 text-gray-300 hover:text-purple-400 transition-colors group"

@@ -9,7 +9,7 @@ import useCourseApi from "@/hooks/api/useCourseApi";
 import { toast } from "react-toastify";
 import { ICourseDetails } from "@/types/course";
 import { Tab, Tabs } from "@heroui/react";
-import RazorpayCourse from "@/features/payment/components/RazorPayCourse";
+import RenderRazorpay from "@/features/payment/components/RenderRazorpay";
 import CourseTabs from "@/features/course/components/course-detail/CourseTabs";
 
 export default function Page() {
@@ -152,7 +152,7 @@ const CourseDetails = ({ course }: { course: ICourseDetails }) => {
           <p className="mt-4 text-3xl font-bold">₹{course.price}</p>
           <div className="mt-4 flex gap-4">
             {course.enrollmentStatus == "not enrolled" && (
-              <RazorpayCourse courseId={course.courseId} type="course" />
+              <RenderRazorpay courseId={course.courseId} type="course" />
             )}
             {course.enrollmentStatus == "instructor" && (
               <Link

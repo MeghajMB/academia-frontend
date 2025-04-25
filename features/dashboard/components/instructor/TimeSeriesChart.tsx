@@ -18,6 +18,7 @@ type TimeSeriesChartProps = {
   xAxisKey: string;
   color: string;
   prefix?: string;
+  filter:"month" | "quarter" | "year"
 };
 
 export const TimeSeriesChart = ({
@@ -26,15 +27,40 @@ export const TimeSeriesChart = ({
   xAxisKey,
   color,
   prefix = "",
+  filter
 }: TimeSeriesChartProps) => {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
   const formatDate = (dateStr: string) => {
-    const date = new Date(dateStr);
-    return date.toLocaleDateString("en-US", {
+    let date: Date;
+    if (filter === "quarter" && /^\d{4}-\d{2}$/.test(dateStr)) {
+      date = parseISOWeek(dateStr); // Convert ISO week to a real date
+    } else {
+      date = new Date(dateStr);
+    }
+
+    return date.toLocaleDateString("en-In", {
       month: "short",
       year: "numeric",
     });
+  };
+  
+  const parseISOWeek = (isoWeekStr: string): Date => {
+    const [yearStr, weekStr] = isoWeekStr.split("-");
+    const year = parseInt(yearStr, 10);
+    const week = parseInt(weekStr, 10);
+  
+    const simple = new Date(year, 0, 1 + (week - 1) * 7);
+    const dow = simple.getDay();
+    const ISOweekStart = simple;
+  
+    if (dow <= 4) {
+      ISOweekStart.setDate(simple.getDate() - simple.getDay() + 1);
+    } else {
+      ISOweekStart.setDate(simple.getDate() + 8 - simple.getDay());
+    }
+  
+    return ISOweekStart;
   };
 
   const CustomTooltip = ({ active, payload, label }: any) => {
@@ -71,6 +97,7 @@ export const TimeSeriesChart = ({
       />
     );
   };
+
   if (!data || data.length === 0) {
     return (
       <div className="h-80 flex items-center justify-center text-white ">

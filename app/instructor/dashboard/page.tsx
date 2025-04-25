@@ -73,9 +73,7 @@ export default function InstructorDashboard() {
     // Fetch summary data
     const fetchSummaryData = async () => {
       try {
-        // Replace with your actual API endpoint
         const response = await getInstructorAnalyticsSummary();
-        console.log(response);
         setSummaryData(response);
       } catch (error) {
         console.error("Error fetching summary data:", error);
@@ -88,9 +86,7 @@ export default function InstructorDashboard() {
   useEffect(() => {
     const fetchTimeSeriesData = async () => {
       try {
-        // Replace with your actual API endpoint
         const response = await getInstructorAnalytics(timeFilter);
-        console.log(response);
         setTimeSeriesData(response);
       } catch (error) {
         console.error("Error fetching time series data:", error);
@@ -223,8 +219,11 @@ export default function InstructorDashboard() {
                     xAxisKey="date"
                     color="#0070F3"
                     prefix="$"
+                    filter={timeFilter}
                   />
-                ) : <Spinner />}
+                ) : (
+                  <Spinner />
+                )}
               </CardBody>
             </Card>
           </motion.div>
@@ -242,6 +241,7 @@ export default function InstructorDashboard() {
                     dataKey="count"
                     xAxisKey="date"
                     color="#10B981"
+                    filter={timeFilter}
                   />
                 )}
               </CardBody>
@@ -262,8 +262,11 @@ export default function InstructorDashboard() {
                     xAxisKey="date"
                     color="#8B5CF6"
                     prefix="$"
+                    filter={timeFilter}
                   />
-                ) : <Spinner />}
+                ) : (
+                  <Spinner />
+                )}
               </CardBody>
             </Card>
           </motion.div>

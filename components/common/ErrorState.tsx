@@ -1,8 +1,8 @@
 "use client";
 
 import type React from "react";
-import { Button, Card, CardBody, CardFooter, Spinner } from "@heroui/react";
-import { AlertTriangle, RefreshCw, ArrowLeft, HelpCircle } from "lucide-react";
+import { Button, Card, CardBody, Spinner } from "@heroui/react";
+import { AlertTriangle, RefreshCw, ArrowLeft } from "lucide-react";
 import { motion } from "framer-motion";
 
 export interface ErrorStateProps {
