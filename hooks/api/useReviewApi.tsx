@@ -1,4 +1,4 @@
-import createReviewApi from "@/services/reviewApi"; 
+import createReviewApi from "@/services/queries/implementations/reviewApi"; 
 import useAxiosPrivate from "../useAxiosPrivate";
 
 export default function useReviewApi() {

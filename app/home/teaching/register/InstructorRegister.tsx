@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { Loader2, AlertCircle } from "lucide-react";
-import { useAppSelector } from "@/lib/hooks";
+import { useAppSelector } from "@/store/hooks";
 import useAuthApi from "@/hooks/api/useAuthApi";
 import useUserApi from "@/hooks/api/useUserApi";
 import {
@@ -15,7 +15,7 @@ import {
   ModalHeader,
   Textarea,
   useDisclosure,
-} from "@nextui-org/react";
+} from "@heroui/react";
 
 interface InstructorForm {
   headline: string;
@@ -57,7 +57,7 @@ const InstructorRegister = () => {
 
   const { user } = useAppSelector((state) => state.auth);
 
-  const { registerInstructor } = useAuthApi();
+  const { registerInstructorApi } = useAuthApi();
   const { fetchUserProfileApi } = useUserApi();
 
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
@@ -140,14 +140,18 @@ const InstructorRegister = () => {
     }
 
     try {
-      await registerInstructor(formData);
-      window.location.reload();
+      const response = await registerInstructorApi(formData);
+      if (response.status == "success") {
+        window.location.reload();
+      } else {
+        setErrors({
+          general: response.message,
+        });
+      }
     } catch (error: any) {
       console.error(error);
       setErrors({
-        general:
-          error.response?.data?.message ||
-          "An unexpected error occurred. Please try again.",
+        general: "An unexpected error occurred. Please try again.",
       });
     } finally {
       setLoading(false);

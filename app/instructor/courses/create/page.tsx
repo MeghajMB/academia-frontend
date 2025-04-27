@@ -1,4 +1,4 @@
-import CourseCreation from "@/components/instructor/courses/CourseCreation";
+import CourseCreation from "@/features/course/components/instructor/CourseCreation";
 import React from "react";
 
 export default function page() {
@@ -8,7 +8,7 @@ export default function page() {
         Enter Course Details
       </h2>
       <div className="w-full max-w-3xl mx-auto p-4">
-      <CourseCreation />
+      <CourseCreation isEditMode={false} />
       </div>
     </>
   );

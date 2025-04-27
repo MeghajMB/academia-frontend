@@ -1,10 +1,9 @@
 "use client";
-import React, { useState } from "react";
-import { Card, CardBody, CardHeader, Badge, Button } from "@nextui-org/react";
+import React from "react";
+import { Card, CardBody, CardHeader, Badge } from "@heroui/react";
 import { Coins } from "lucide-react";
 import ProtectedRoute from "@/hoc/ProtectedRoute";
-import RenderRazorpay from "@/components/Payment/RenderRazorpay";
-import usePaymentApi from "@/hooks/api/usePaymentApi";
+import RenderRazorpay from "@/features/payment/components/RenderRazorpay";
 
 const coinPackages = [
   { coins: 100, price: 90 },
@@ -16,8 +15,8 @@ const coinPackages = [
 ];
 const ShopCoins = () => {
   return (
-    <ProtectedRoute role="common">
-      <div className="container mx-auto px-4 py-8 max-w-6xl">
+    <ProtectedRoute role={["instructor","student"]}>
+      <div className="container mx-auto px-4 max-w-6xl">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold mb-2">Purchase Coins</h1>
           <p className="text-gray-600">
@@ -45,11 +44,7 @@ const ShopCoins = () => {
                     </Badge>
                   )}
                 </div>
-                <RenderRazorpay
-                  keyId={process.env.REACT_APP_RAZORPAY_KEY_ID!}
-                  coins={coins}
-                  price={price}
-                />
+                <RenderRazorpay courseId="" type="coins"/>
               </CardBody>
             </Card>
           ))}

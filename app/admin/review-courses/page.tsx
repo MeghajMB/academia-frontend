@@ -1,20 +1,14 @@
 "use client";
-import {
-  Input,
-  Pagination,
-  Chip,
-  Tooltip,
-  useDisclosure,
-} from "@nextui-org/react";
+import { Input, Pagination, Tooltip, useDisclosure } from "@heroui/react";
 import { EyeIcon, SearchIcon } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import AdminTable from "@/components/Table";
+import AdminTable from "@/components/common/Table";
 import ProtectedRoute from "@/hoc/ProtectedRoute";
 import useAdminApi from "@/hooks/api/useAdminApi";
 import { toast } from "react-toastify";
 import Link from "next/link";
-import ReviewRejectModal from "@/components/Admin/reviewCourse/ReviewRejectModal";
+import ReviewRejectModal from "@/features/course/components/admin/ReviewRejectModal";
 
 export interface IReviewRequests {
   id: string;
@@ -22,7 +16,6 @@ export interface IReviewRequests {
   price: number;
   title: string;
   isBlocked: boolean;
-  status: string;
 }
 export default function Page() {
   const [reviewRequests, setReviewRequests] = useState<IReviewRequests[]>([]);
@@ -34,18 +27,28 @@ export default function Page() {
   const [filterValue, setFilterValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const {
-    fetchCoursesForReview,
-    approveCourseRequestApi,
-  } = useAdminApi();
+  const { fetchCoursesForReviewApi, approveCourseRequestApi } = useAdminApi();
 
   const fetchAllCoursesForReview = useCallback(async (page: number) => {
     setIsLoading(true);
     try {
-      const response = await fetchCoursesForReview(page);
-      console.log(response);
-      setReviewRequests(response.reviewRequests);
-      setTotalPages(response.pagination.totalPages);
+      const response = await fetchCoursesForReviewApi(page);
+      if (response.status == "error") {
+        console.log(response.message);
+        toast.error("Something happened", {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: true,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+        });
+        return;
+      }
+      setReviewRequests(response.data.requests);
+      setTotalPages(response.data.pagination.totalPages);
     } catch (error) {
       console.error("Error fetching requests:", error);
     } finally {
@@ -59,12 +62,16 @@ export default function Page() {
 
   async function handleApproveRequest(courseId: string) {
     try {
-      await approveCourseRequestApi(courseId);
+      const response = await approveCourseRequestApi(courseId);
       setReviewRequests((prevRequests) => {
         return prevRequests.filter((request) => {
           return request.id != courseId;
         });
       });
+      if (response.status == "error") {
+        console.log(response.message);
+        return;
+      }
       toast("Request Approved!", {
         position: "top-right",
         autoClose: 5000,
@@ -144,11 +151,6 @@ export default function Page() {
       key: "title",
       label: "TITLE",
     },
-
-    {
-      key: "status",
-      label: "STATUS",
-    },
     {
       key: "curriculum",
       label: "CURRICULUM",
@@ -174,12 +176,6 @@ export default function Page() {
               <EyeIcon className="w-5 h-5" />
             </Link>
           </Tooltip>
-        );
-      case "status":
-        return (
-          <Chip className="capitalize" color="primary" size="sm" variant="flat">
-            {request.status === "pending" ? "pending" : "rejected"}
-          </Chip>
         );
       case "actions":
         return (
@@ -223,7 +219,7 @@ export default function Page() {
 
   return (
     <>
-      <ProtectedRoute role="admin">
+      <ProtectedRoute role={["admin"]}>
         <main className="overflow-x-auto p-20 flex-1">
           <ReviewRejectModal
             isOpen={isOpen}

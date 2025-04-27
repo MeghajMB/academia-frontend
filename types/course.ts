@@ -2,15 +2,19 @@ export interface ILecture {
   id: string;
   title: string;
   videoUrl: string;
-  order: number;
   duration: number;
+  order: number;
   status: string;
+  sectionId: string;
+  progress: "completed" | "not completed" | "locked" | "instructor";
 }
 
 export interface ISection {
   id: string;
   title: string;
   order: number;
+  description:string;
+  courseId:string;
   lectures: ILecture[];
 }
 
@@ -21,7 +25,7 @@ export interface ICourse {
   price: number;
   subtitle: string;
   description: string;
-  category: { description: string,name:string };
+  category: { description: string; name: string };
   totalDuration: number;
   totalLectures: number;
   totalSections: number;
@@ -30,11 +34,11 @@ export interface ICourse {
   rejectedReason: string;
   imageThumbnail: string;
   promotionalVideo: string;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: string;
+  updatedAt: string;
 }
 
-export interface ICourseDetails{
+export interface ICourseDetails {
   courseId: string;
   instructorId: string;
   instructorName: string;
@@ -47,7 +51,7 @@ export interface ICourseDetails{
   price: number;
   subtitle: string;
   description: string;
-  enrollmentStatus:"enrolled" | "not enrolled";
-  canReview:boolean
-  hasReviewed:boolean;
+  enrollmentStatus: "enrolled" | "not enrolled"|"instructor";
+  canReview: boolean;
+  hasReviewed: boolean;
 }

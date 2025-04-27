@@ -1,12 +1,12 @@
 "use client";
-
 import {
   Menu,
   X,
   BookOpen,
-  Calendar,
-  MessageCircle,
   ChevronRight,
+  ChartNoAxesCombined,
+  Briefcase,
+  UserIcon,
 } from "lucide-react";
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -14,9 +14,10 @@ import Link from "next/link";
 import ProtectedRoute from "@/hoc/ProtectedRoute";
 
 const menuItems = [
+  { title: "Profile", icon: UserIcon, path: "/instructor" },
+  { title: "Dashboard", icon: ChartNoAxesCombined, path: "/instructor/dashboard" },
   { title: "Courses", icon: BookOpen, path: "/instructor/courses" },
-  { title: "Services", icon: Calendar, path: "/instructor/services" },
-  { title: "Messages", icon: MessageCircle, path: "/instructor/messages" },
+  { title: "Gigs", icon: Briefcase, path: "/instructor/gigs" },
 ];
 
 export default function InstructorLayout({
@@ -27,8 +28,8 @@ export default function InstructorLayout({
   const [open, setOpen] = useState(false);
   return (
     <>
-      <ProtectedRoute role="instructor">
-        <main className="pt-24">
+      <ProtectedRoute role={["instructor"]}>
+        <main className="pt-10">
           <button
             className="fixed top-24 left-4 z-50 p-2 hover:bg-white/10 rounded-lg transition-colors"
             onClick={() => setOpen((prevState) => !prevState)}
@@ -80,7 +81,7 @@ export default function InstructorLayout({
             )}
           </AnimatePresence>
 
-          <div className="pl-20">{children}</div>
+          <div className="pl-5 sm:pl-20">{children}</div>
         </main>
       </ProtectedRoute>
     </>

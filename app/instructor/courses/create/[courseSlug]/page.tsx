@@ -1,59 +1,57 @@
 "use client";
 import LoadingPage from "@/app/loading";
-import AddLecture from "@/components/instructor/courses/AddLecture";
-import AddSection from "@/components/instructor/courses/AddSection";
+import AddSection from "@/features/course/components/instructor/AddSection";
+import CourseLectureCard from "@/features/course/components/instructor/CourseLectureCard";
+import CourseSection from "@/features/course/components/instructor/CourseSection";
+import NoContentAvailable from "@/components/common/NoContentAvailable";
 import useCourseApi from "@/hooks/api/useCourseApi";
-import useFilesApi from "@/hooks/api/useFilesApi";
-import { useAppSelector } from "@/lib/hooks";
 import { ILecture, ISection } from "@/types/course";
-import { closestCorners, DndContext, DragOverlay } from "@dnd-kit/core";
+import {
+  closestCorners,
+  DndContext,
+  DragEndEvent,
+  DragOverlay,
+  DragStartEvent,
+} from "@dnd-kit/core";
 import {
   SortableContext,
-  useSortable,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
-import { Button, Form, Input } from "@nextui-org/react";
-import axios from "axios";
-import { Grip } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
+import { ErrorState } from "@/components/common/ErrorState";
 import { toast } from "react-toastify";
-
-interface ICourseDetails {
-  status: string;
-}
 
 export default function Page() {
   const [curriculum, setCurriculum] = useState<ISection[]>([]);
   const [activeLecture, setActiveLecture] = useState<ILecture | null>(null);
-  const [courseDetails, setCourseDetails] = useState<ICourseDetails>({
-    status: "draft",
-  });
   const [isClient, setIsClient] = useState(false);
+  const [error, setError] = useState(false);
   const router = useRouter();
 
   const { courseSlug } = useParams();
   //function api calls
-  const { fetchCurriculum, submitCourseForReview, changeOrderOfLectureApi } =
-    useCourseApi();
+  const { fetchCurriculum, changeOrderOfLectureApi } = useCourseApi();
 
   useEffect(() => {
     async function fetchData() {
       try {
         if (typeof courseSlug === "string") {
-          const data = await fetchCurriculum(courseSlug, "instructor");
-
-          setCurriculum(data);
-          //setCourseDetails({ status: data.courseDetails.status });
+          const response = await fetchCurriculum(courseSlug, "instructor");
+          if (response.status == "error") {
+            console.log(response.message);
+            setError(true);
+            return;
+          }
+          setCurriculum(response.data);
           setIsClient(true);
         } else {
           router.push("/instructor/courses");
         }
       } catch (error) {
-        //router.push("/instructor/courses");
+        setError(true);
         console.log(error);
       }
     }
@@ -63,31 +61,13 @@ export default function Page() {
   if (!isClient) {
     return <LoadingPage />;
   }
-
-  async function handleSendSubmitReviewRequest() {
-    try {
-      if (typeof courseSlug == "string") {
-        const response = await submitCourseForReview(courseSlug);
-        console.log(response);
-        toast.success("Request send successfully!", {
-          position: "top-center",
-          autoClose: 5000,
-          hideProgressBar: true,
-          closeOnClick: false,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "dark",
-        });
-        router.push("/instructor/courses");
-      }
-    } catch (error) {
-      console.log(error);
-    }
+  if (error) {
+    return <ErrorState />;
   }
 
-  const handleDragStart = (event: any) => {
-    const [type, id] = event.active.id.split("-");
+  const handleDragStart = (event: DragStartEvent) => {
+    const idString = String(event.active.id);
+    const [type, id] = idString.split("-");
     if (type === "lecture") {
       const lecture = curriculum
         .flatMap((section) => section.lectures)
@@ -96,7 +76,7 @@ export default function Page() {
     }
   };
 
-  const handleDragEnd = async (event: any) => {
+  const handleDragEnd = async (event: DragEndEvent) => {
     try {
       const { active, over } = event;
 
@@ -106,16 +86,17 @@ export default function Page() {
       }
 
       // take the id of the dragged item
-      const [activeType, activeId] = active.id.split("-");
+      const [activeType, activeId] = active.id.toString().split("-");
       // take the id of the area of dropped item
-      const [overType, overId] = over.id.split("-");
+      const [overType, overId] = over.id.toString().split("-");
 
       //section indexes of dopped and dragged
+      if (!active.data.current) return;
+      if (!over.data.current) return;
       const activeSectionIndex = active.data.current.sectionIndex;
       const overSectionIndex = over.data.current.sectionIndex;
 
       if (activeType === "lecture" && overType === "lecture") {
-        
         if (
           activeSectionIndex !== undefined &&
           overSectionIndex !== undefined
@@ -140,14 +121,23 @@ export default function Page() {
             0,
             movedLecture
           );
-          console.log(over);
 
           setCurriculum(updatedSections);
 
-          await changeOrderOfLectureApi(activeId,overId);
+          await changeOrderOfLectureApi(activeId, overId);
         }
       }
     } catch (error) {
+      toast.error("Failed to change order.Reload page.", {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: true,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+      });
       console.log(error);
     }
     setActiveLecture(null);
@@ -160,34 +150,31 @@ export default function Page() {
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
       >
-        {(courseDetails!.status == "draft" ||
-          courseDetails!.status == "rejected") &&
-          curriculum.length > 0 && (
-            <Button color="success" onPress={handleSendSubmitReviewRequest}>
-              Submit for review
-            </Button>
-          )}
-        {courseDetails!.status == "rejected" && (
-          <Button color="danger">Rejected Reason</Button>
-        )}
-
-        {curriculum.length > 0 && (
+        <div className="flex gap-4">
           <Link
-            href={`${courseSlug}/preview`}
-            className="bg-primary-400 rounded-lg p-2"
+            href={`/instructor/courses/${courseSlug}`}
+            className="bg-neutral-700 p-2 rounded-lg text-sm sm:text-base"
           >
-            Preview Course
+            Go to Course Creation Page
           </Link>
-        )}
+          {curriculum.length > 0 && (
+            <Link
+              href={`${courseSlug}/preview`}
+              className="bg-primary-400 rounded-lg p-2 text-sm sm:text-base"
+            >
+              Preview Course
+            </Link>
+          )}
+        </div>
 
-        <div className="p-20 max-h-screen">
+        <div className="sm:p-20 max-h-screen">
           <SortableContext
             items={curriculum.map((section) => `section-${section.id}`)}
             strategy={verticalListSortingStrategy}
           >
             {curriculum.map((section, index) => {
               return (
-                <Section
+                <CourseSection
                   key={section.id}
                   section={section}
                   sectionIndex={index}
@@ -198,12 +185,21 @@ export default function Page() {
               );
             })}
           </SortableContext>
-          <AddSection setSections={setCurriculum} courseId={courseSlug} />
+          {curriculum.length == 0 && (
+            <NoContentAvailable
+              title="No content added"
+              content="Add sections to get started"
+            />
+          )}
+          <AddSection
+            setSections={setCurriculum}
+            courseId={courseSlug as string}
+          />
         </div>
 
         <DragOverlay>
           {activeLecture ? (
-            <LectureCard
+            <CourseLectureCard
               lecture={activeLecture}
               isOverlay={true} // Special styling for the overlay
             />
@@ -213,241 +209,3 @@ export default function Page() {
     </>
   );
 }
-
-const Section = ({
-  section,
-  sectionIndex,
-  setSections,
-  courseId,
-  sectionId,
-}: {
-  section: ISection;
-  sectionIndex: number;
-  setSections: React.Dispatch<React.SetStateAction<ISection[]>>;
-  courseId: string;
-  sectionId: string;
-}) => {
-  const { id } = useAppSelector((state) => state.auth.user);
-  return (
-    <div className="p-4 bg-[#1c1f26] text-white rounded-lg mt-5">
-      <h3 className="font-bold mb-3">
-        Section {sectionIndex + 1}: {section.title}
-      </h3>
-      <SortableContext
-        items={section.lectures.map((lecture) => `lecture-${lecture.id}`)}
-        strategy={verticalListSortingStrategy}
-      >
-        <div className="space-y-3">
-          {section.lectures.map((lecture) => (
-            <LectureCard
-              key={lecture.id}
-              lecture={lecture}
-              sectionIndex={sectionIndex}
-              courseId={courseId}
-              sectionId={sectionId}
-              userId={id!}
-            />
-          ))}
-        </div>
-        <AddLecture
-          setSections={setSections}
-          courseId={courseId}
-          sectionId={sectionId}
-        />
-      </SortableContext>
-    </div>
-  );
-};
-
-const LectureCard = ({
-  lecture,
-  isOverlay = false,
-  sectionIndex,
-  userId,
-  courseId,
-  sectionId,
-}: {
-  courseId?: string;
-  sectionId?: string;
-  userId?: string;
-  lecture: ILecture;
-  isOverlay?: boolean;
-  sectionIndex?: number;
-}) => {
-  const { attributes, listeners, setNodeRef, transform, transition } =
-    useSortable({
-      id: `lecture-${lecture.id}`,
-      data: { order: lecture.order, sectionIndex, sectionId },
-    });
-  const [isEditing, setIsEditing] = useState(false);
-  const [title, setTitle] = useState(lecture.title);
-  const [videoFile, setVideoFile] = useState<File | null>(null);
-  const [videoDuration, setVideoDuration] = useState<number | null>(null);
-  const { editlecture } = useCourseApi();
-  const { generatePutSignedUrlApi } = useFilesApi();
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    backgroundColor: "rgb(31 41 55 / var(--tw-bg-opacity, 1))",
-    padding: "12px",
-    borderRadius: "4px",
-  };
-
-  const handleChangeLecture = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    const formData = new FormData(e.currentTarget);
-    const title = formData.get("title") as string;
-
-    if (!title) {
-      return;
-    }
-
-    try {
-      let videoKey = lecture.videoUrl,
-        duration = lecture.duration;
-      //generate the signed url
-      if (videoFile) {
-        videoKey = `${userId}-${courseId}-${sectionId}-${Date.now()}`;
-        duration = videoDuration!;
-        const videoContentType = videoFile.type;
-
-        const videoSignedUrl = await generatePutSignedUrlApi(
-          videoKey,
-          videoContentType,
-          false,
-          true
-        );
-
-        //store the video into s3
-        await axios.put(videoSignedUrl, videoFile, {
-          headers: { "Content-Type": videoContentType },
-        });
-      }
-
-      const lectureData = {
-        title,
-        videoUrl: videoKey,
-        duration,
-      };
-
-      const response = await editlecture(lecture.id, lectureData);
-      console.log(response);
-      // setSections((prevSections) =>
-      //   prevSections.map((section) =>
-      //     section.id === sectionId
-      //       ? { ...section, lectures: [...section.lectures, response] }
-      //       : section
-      //   )
-      // );
-
-      // setIsActive(false);
-    } catch (error) {
-      console.error("Error adding lecture:", error);
-      //setErrors("Failed to add lecture. Please try again.");
-    } finally {
-      //setIsLoading(false);
-    }
-  };
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      setVideoFile(file);
-
-      const video = document.createElement("video");
-      video.preload = "metadata";
-
-      video.onloadedmetadata = () => {
-        window.URL.revokeObjectURL(video.src);
-        setVideoDuration(video.duration);
-      };
-
-      video.src = URL.createObjectURL(file);
-    }
-  };
-
-  return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      className="flex flex-col space-y-4 p-4 rounded-md bg-gray-800"
-    >
-      <div className="flex">
-        <button
-          {...attributes}
-          {...listeners}
-          className="text-gray-400 hover:text-gray-600"
-        >
-          <Grip />
-        </button>
-        <p className="text-lg">{title}</p>
-        <button
-          onClick={() => setIsEditing((prevState) => !prevState)}
-          className="text-blue-400 hover:text-blue-600 text-sm"
-        >
-          {isEditing ? "Cancel" : "Edit"}
-        </button>
-      </div>
-      {/* Lecture Content */}
-      <div className={`text-white ${isOverlay && "opacity-70"}`}>
-        {/* Editing Form */}
-        {isEditing && (
-          <Form validationBehavior="native" onSubmit={handleChangeLecture}>
-            <div className="mt-4 space-y-4">
-              {/* Title Input */}
-
-              <Input
-                id="title"
-                label="Title"
-                name="title"
-                labelPlacement="outside"
-                type="text"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="Enter new title"
-              />
-
-              {/* Video Upload */}
-              <div>
-                <label
-                  htmlFor="videoKey"
-                  className="block text-sm text-gray-400"
-                >
-                  Upload New Video
-                </label>
-                <input
-                  type="file"
-                  accept="video/*"
-                  onChange={handleFileChange}
-                  className="block w-full text-sm text-gray-200 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-gray-700 file:text-gray-200 hover:file:bg-gray-600"
-                />
-                {lecture.status === "processing" ? (
-                  <p className="text-yellow-400">Processing...</p>
-                ) : (
-                  <p className="text-green-400">processing complete</p>
-                )}
-              </div>
-
-              <div className="flex justify-between mt-4">
-                <button
-                  onClick={() => setIsEditing(false)}
-                  className="text-red-400 hover:text-red-600 px-4 py-2 rounded-md"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="text-green-400 hover:text-green-600 px-4 py-2 rounded-md"
-                >
-                  Save
-                </button>
-              </div>
-            </div>
-          </Form>
-        )}
-      </div>
-    </div>
-  );
-};

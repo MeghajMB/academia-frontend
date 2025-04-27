@@ -1,11 +1,12 @@
 "use client";
-import { RootState } from "@/lib/store";
-import { useRouter } from "next/navigation";
+import { RootState } from "@/store/store";
 import { ReactNode, useEffect, useState } from "react";
-import { useAppSelector } from "@/lib/hooks";
+import { useAppSelector } from "@/store/hooks";
+import Unauthorized from "@/components/common/UnAuthorized";
+import LoadingPage from "@/components/common/LoadingPage";
 
 interface ProtectedRouteProps {
-  role: "common" | "admin" | "student" | "instructor";
+  role: string[];
   children: ReactNode;
 }
 
@@ -13,28 +14,24 @@ export default function ProtectedRoute({
   role,
   children,
 }: ProtectedRouteProps) {
-  const router = useRouter();
   const { user } = useAppSelector((state: RootState) => state.auth);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
-    if(role==='common'){
-      if(user.role==='admin'){
-        router.push('/admin')
-        return;
-      }
-      if(!user.role){
-        router.push('/')
-        return;
-      }
-    }else if(role!==user.role){
-      router.push('/')
-      return;
+    if (role.includes(user.role as string)) {
+      setIsLoading(false);
+    } else {
+      setIsLoading(false);
+      setError(true);
     }
-    setIsLoading(false)
-  }, [user.role, role, router]);
+  }, [user.role, role]);
+
   if (isLoading) {
-    return null;
+    return <LoadingPage />;
+  }
+  if (error) {
+    return <Unauthorized />;
   }
   return <>{children}</>;
 }

@@ -1,5 +1,5 @@
 "use client";
-import InstructorDetail from "@/components/instructor/InstructorDetail";
+import InstructorDetail from "@/features/users/components/instructor/InstructorDetail";
 import useInstructorApi from "@/hooks/api/useInstructorApi";
 import { useEffect, useState } from "react";
 

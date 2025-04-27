@@ -1,12 +1,16 @@
 "use client";
 import React, { useEffect } from "react";
 import { motion } from "framer-motion";
-import RoleBadge from "@/components/landingPage/RoleBadge";
-import { useAppSelector } from "@/lib/hooks";
+import RoleBadge from "@/components/static/RoleBadge";
+import { useAppSelector } from "@/store/hooks";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { TiltChartCard } from "@/components/static/landing/TiltCard";
+import { LandingSection } from "@/components/static/LandingSection";
+import Cube from "@/components/static/landing/Cube";
+import { ConnectSection } from "@/components/static/landing/VideoCallSection";
 
-export default function Page(){
+export default function Page() {
   const { user } = useAppSelector((state) => state.auth);
   const router = useRouter();
   useEffect(() => {
@@ -20,7 +24,7 @@ export default function Page(){
   }, []);
   return (
     <>
-      <main className="pt-24 pb-16 px-4">
+      <main className="pt-10 pb-16 px-4">
         {/* Announcement banner */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -102,8 +106,35 @@ export default function Page(){
             className="bottom-20 right-10 md:-right-30 bg-teal-600"
           />
         </div>
+
+        {/* Analytics section */}
+        <LandingSection
+          chip="Analytics Dashboard"
+          title="Know Your Impact"
+          description="Dive into comprehensive analytics to understand your performance,
+              track earnings, and measure engagement metrics in real-time."
+          order="left"
+          AnimatedContent={TiltChartCard}
+        />
+        {/* Coin System */}
+        <LandingSection
+          chip="Coins & Rewards"
+          title="A Learning Economy Like No Other"
+          description="Use Virtual coins to engage in a gamified educational experience. 
+          Use them to unlock exclusive instructor services through competitive bidding."
+          order="right"
+          AnimatedContent={Cube}
+        />
+        {/* Videocall */}
+        <LandingSection
+          chip="Connect"
+          title="Connect Live with Experts"
+          description="Join real-time video calls with instructors through built-in WebRTC integration.
+           Get personalized guidance and immediate feedback on your progress."
+          order="left"
+          AnimatedContent={ConnectSection}
+        />
       </main>
     </>
   );
-};
-
+}

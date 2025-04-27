@@ -1,7 +1,7 @@
 "use client";
 import LoadingPage from "@/app/loading";
-import CourseContent from "@/components/course/courseView/CourseContent";
-import CourseLectureView from "@/components/course/courseView/CourseLectureView";
+import CourseContent from "@/features/course/components/course-view/CourseContent";
+import CourseLectureView from "@/features/course/components/course-view/CourseLectureView";
 import useCourseApi from "@/hooks/api/useCourseApi";
 import { ILecture, ISection } from "@/types/course";
 import { useParams } from "next/navigation";
@@ -20,8 +20,12 @@ export default function PreviewCoursePage() {
       try {
         if (courseSlug && typeof courseSlug == "string") {
           const response = await fetchCurriculum(courseSlug,'instructor');
-          setSections(response);
-          setActiveLecture( response[0].lectures[0]);
+          if(response.status=='error'){
+            console.log(response.message);
+            return
+          }
+          setSections(response.data);
+          setActiveLecture( response.data[0].lectures[0]);
           setIsClient(true);
         }
       } catch (error) {

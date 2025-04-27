@@ -1,4 +1,4 @@
-import createCategoryApi from "@/services/categoryApi";
+import createCategoryApi from "@/services/queries/implementations/categoryApi";
 import useAxiosPrivate from "../useAxiosPrivate";
 
 export default function useCategoryApi() {
