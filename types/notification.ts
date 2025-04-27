@@ -2,9 +2,9 @@ export interface INotification {
   id: string;
   userId: string;
   type: "course" | "payment" | "message" | "system";
-  title: string; // Short title for the notification
-  message: string; // Detailed message
+  title: string;
+  message: string;
   entityId?: string;
-  isRead: boolean; // Whether the user has seen it
+  isRead: boolean;
   createdAt: Date;
 }

@@ -4,7 +4,6 @@ import {
   X,
   BookOpen,
   ChevronRight,
-  Wallet,
   ChartNoAxesCombined,
   Briefcase,
   UserIcon,
@@ -19,7 +18,6 @@ const menuItems = [
   { title: "Dashboard", icon: ChartNoAxesCombined, path: "/instructor/dashboard" },
   { title: "Courses", icon: BookOpen, path: "/instructor/courses" },
   { title: "Gigs", icon: Briefcase, path: "/instructor/gigs" },
-  { title: "Wallet", icon: Wallet, path: "/instructor/wallet" },
 ];
 
 export default function InstructorLayout({

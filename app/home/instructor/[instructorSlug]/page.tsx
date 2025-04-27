@@ -27,7 +27,7 @@ export default function Page() {
   }
 
   return (
-    <ProtectedRoute role={["instructor", "student", "admin"]}>
+    <ProtectedRoute role={["instructor", "student"]}>
       <InstructorDetail reviews={200} totalStudents={200} user={profile} />
     </ProtectedRoute>
   );

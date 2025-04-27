@@ -25,6 +25,7 @@ function JoinRoom({
         if (streamRef.current) return;
         const stream = await navigator.mediaDevices.getUserMedia({
           video: true,
+          audio:true
         });
         streamRef.current = stream;
         setIsVideoEnabled(true);
@@ -66,7 +67,7 @@ function JoinRoom({
 
   async function handleAudioChange() {
     if (!streamRef.current) return;
-
+    console.log(isAudioEnabled)
     const audioTracks = streamRef.current.getAudioTracks();
     if (audioTracks.length > 0) {
       audioTracks[0].enabled = !isAudioEnabled;

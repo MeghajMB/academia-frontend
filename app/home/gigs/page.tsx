@@ -47,7 +47,7 @@ const GigListing = () => {
   }, []);
 
   return (
-    <ProtectedRoute role={["instructor", "student", "admin"]}>
+    <ProtectedRoute role={["instructor", "student"]}>
       <div className="max-w-6xl mx-auto p-4 md:p-6 space-y-8">
         <div className="flex items-center justify-between">
           <h2 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">

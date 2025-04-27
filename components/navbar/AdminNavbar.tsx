@@ -1,14 +1,13 @@
 "use client";
 import React, { useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard,
   Users,
   GraduationCap,
   FolderTree,
   BookOpen,
-  Wrench,
   Star,
   User,
   LogOut,
@@ -26,6 +25,7 @@ export default function AdminNavbar() {
   const { logoutApi } = useAuthApi();
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state.auth);
+  const router=useRouter()
 
   if (user.role !== "admin") {
     return null;
@@ -37,7 +37,6 @@ export default function AdminNavbar() {
     { name: "Instructors", icon: GraduationCap, href: "/admin/instructors" },
     { name: "Categories", icon: FolderTree, href: "/admin/categories" },
     { name: "Courses", icon: BookOpen, href: "/admin/courses" },
-    { name: "Services", icon: Wrench, href: "/admin/services" },
     { name: "Review Courses", icon: Star, href: "/admin/review-courses" },
     { name: "Review Instructor", icon: User, href: "/admin/review-instructor" },
   ];
@@ -47,6 +46,7 @@ export default function AdminNavbar() {
       const response = await logoutApi();
       if (response.status == "error") return;
       dispatch(logout());
+      router.push('/admin-login')
     } catch (error) {
       console.log(error);
     } finally {

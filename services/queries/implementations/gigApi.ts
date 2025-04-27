@@ -11,6 +11,10 @@ import {
   GetGigsOfInstructorResponseDTO,
   GetGigsOfInstructorResponseSchema,
 } from "@/shared";
+import {
+  GetSessionsOfUserResponseDTO,
+  GetSessionsOfUserResponseSchema,
+} from "@/shared/shared-dtos/session.dto";
 import { ICreateGigDTO } from "@/types/gig";
 import { handleApiError } from "@/util/handle-api-error";
 import { AxiosInstance } from "axios";
@@ -82,9 +86,27 @@ const createGigApi = (axiosInstance: AxiosInstance) => ({
       const response = await axiosInstance.get(`/api/gig/all`, {
         params: { sort, status, page, search },
       });
-      const result = GetGigsOfInstructorResponseSchema.parse(
-        response.data
-      );
+      const result = GetGigsOfInstructorResponseSchema.parse(response.data);
+      return result;
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
+  getSessionsOfUserApi: async ({
+    status,
+    page,
+    search,
+  }: {
+    status: "scheduled" | "in-progress" | "completed" | "missed" | "all";
+    page: number;
+    search?: string;
+  }): Promise<GetSessionsOfUserResponseDTO | ErrorResponseDTO> => {
+    try {
+      const response = await axiosInstance.get(`/api/gig/session/all`, {
+        params: { status, page, search },
+      });
+      const result = GetSessionsOfUserResponseSchema.parse(response.data);
       return result;
     } catch (error) {
       return handleApiError(error);

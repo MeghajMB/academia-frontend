@@ -1,5 +1,5 @@
 "use client";
-import { Input, Pagination, Chip, Tooltip, useDisclosure } from "@heroui/react";
+import { Input, Pagination, Tooltip, useDisclosure } from "@heroui/react";
 import { EyeIcon, SearchIcon } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
@@ -16,7 +16,6 @@ export interface IReviewRequests {
   price: number;
   title: string;
   isBlocked: boolean;
-  status: string;
 }
 export default function Page() {
   const [reviewRequests, setReviewRequests] = useState<IReviewRequests[]>([]);
@@ -34,9 +33,19 @@ export default function Page() {
     setIsLoading(true);
     try {
       const response = await fetchCoursesForReviewApi(page);
-      if(response.status=='error'){
-        console.log(response.message)
-        return
+      if (response.status == "error") {
+        console.log(response.message);
+        toast.error("Something happened", {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: true,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+        });
+        return;
       }
       setReviewRequests(response.data.requests);
       setTotalPages(response.data.pagination.totalPages);
@@ -142,11 +151,6 @@ export default function Page() {
       key: "title",
       label: "TITLE",
     },
-
-    {
-      key: "status",
-      label: "STATUS",
-    },
     {
       key: "curriculum",
       label: "CURRICULUM",
@@ -172,12 +176,6 @@ export default function Page() {
               <EyeIcon className="w-5 h-5" />
             </Link>
           </Tooltip>
-        );
-      case "status":
-        return (
-          <Chip className="capitalize" color="primary" size="sm" variant="flat">
-            {request.status === "pending" ? "pending" : "rejected"}
-          </Chip>
         );
       case "actions":
         return (

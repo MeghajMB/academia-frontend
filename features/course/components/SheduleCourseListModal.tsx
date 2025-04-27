@@ -9,10 +9,6 @@ import {
   ModalFooter,
   ModalHeader,
   Input,
-  Textarea,
-  Select,
-  SelectItem,
-  Checkbox,
   PressEvent,
 } from "@heroui/react";
 import moment from "moment";
@@ -87,7 +83,7 @@ function ScheduleCourseListModal({
               <div>
                 <Input
                   type="datetime-local"
-                  label="Service Date"
+                  label="List Date"
                   defaultValue={moment().format("YYYY-MM-DDTHH:mm")}
                   variant="bordered"
                   {...register("sessionDate", {
@@ -111,7 +107,7 @@ function ScheduleCourseListModal({
             Cancel
           </Button>
           <Button
-            color="primary"
+            color="secondary"
             onPress={
               handleSubmit(onSubmit) as unknown as (e: PressEvent) => void
             }
@@ -120,7 +116,7 @@ function ScheduleCourseListModal({
             Schedule course
           </Button>
           <Button
-            color="primary"
+            color="success"
             onPress={
               handleSubmit(onSubmit) as unknown as (e: PressEvent) => void
             }

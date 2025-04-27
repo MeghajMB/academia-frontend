@@ -138,11 +138,9 @@ export const GetCourseReviewRequestsResponseSchema =
       requests: z.array(
         z.object({
           id: z.string(),
-          courseId: z.string(),
           price: z.number(),
           title: z.string(),
           isBlocked: z.boolean(),
-          status:z.string(),
           category: z.object({ name: z.string(), description: z.string() }),
         })
       ),

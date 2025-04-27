@@ -19,7 +19,7 @@ interface IConsumerInfo {
 function useMediaSoup() {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const screenRef = useRef<HTMLVideoElement | null>(null);
-  const [gigId, setGigId] = useState<string | null>(null);
+  const [sessionId, setSessionId] = useState<string | null>(null);
 
   /* State to store the details of the remote streams */
   const [remoteStreams, setRemoteStreams] = useState<{
@@ -68,17 +68,17 @@ function useMediaSoup() {
    */
   const handleJoinRoom = useCallback(
     function handleJoinRoom({
-      gigId,
+      sessionId,
       accessToken,
     }: {
-      gigId: string;
+      sessionId: string;
       accessToken: string;
     }): Promise<string> {
-      setGigId(gigId);
+      setSessionId(sessionId);
       return new Promise((resolve, reject) => {
         socket.emit(
-          "joinGig",
-          { gigId, accessToken },
+          "joinSession",
+          { sessionId, accessToken },
           (response: { status: "ok" | "error"; message: string }) => {
             if (response.status == "ok") {
               resolve(response.message);
@@ -104,7 +104,7 @@ function useMediaSoup() {
         routerRtpCapabilities: mediasoupClient.types.RtpCapabilities;
       }) => {
         try {
-          if (!gigId || device) return;
+          if (!sessionId || device) return;
           const newDevice = new mediasoupClient.Device();
           await newDevice.load({
             routerRtpCapabilities: data.routerRtpCapabilities,
@@ -114,7 +114,7 @@ function useMediaSoup() {
           setDevice(newDevice);
           console.log("Successfully set the new device");
           socket.emit("createTransport", {
-            gigId: gigId,
+            sessionId: sessionId,
             transportType: "sender",
           });
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -129,7 +129,7 @@ function useMediaSoup() {
     return () => {
       socket.off("routerCapabilities");
     };
-  }, [device, gigId, socket]);
+  }, [device, sessionId, socket]);
   /**
    * step:3
    * After creating a web transport in the backend it sends an event 'sendTransportCreated'
@@ -165,7 +165,7 @@ function useMediaSoup() {
               await new Promise((resolve, reject) => {
                 socket.emit(
                   "connectProducerTransport",
-                  { dtlsParameters, gigId, transportId: transport.id },
+                  { dtlsParameters, sessionId, transportId: transport.id },
                   (data: { status: "ok" | "error"; message?: string }) => {
                     if (data.status === "error") {
                       reject(new Error(data.message));
@@ -201,7 +201,7 @@ function useMediaSoup() {
                 {
                   kind,
                   rtpParameters,
-                  gigId,
+                  sessionId,
                   transportId: transport.id,
                   appData,
                 },
@@ -223,7 +223,7 @@ function useMediaSoup() {
           }
         );
         socket.emit("createTransport", {
-          gigId: gigId,
+          sessionId: sessionId,
           transportType: "consumer",
         });
       }
@@ -231,7 +231,7 @@ function useMediaSoup() {
     return () => {
       socket.off("sendTransportCreated");
     };
-  }, [device, gigId, socket]);
+  }, [device, sessionId, socket]);
   /**
    * Step:4
    * setup recieve transport
@@ -262,7 +262,7 @@ function useMediaSoup() {
               "connectConsumerTransport",
               {
                 dtlsParameters,
-                gigId,
+                sessionId,
                 transportId: transport.id,
               },
               (data: { status: "ok" | "error"; message?: string }) => {
@@ -280,7 +280,7 @@ function useMediaSoup() {
       /* emit an event to fetch all active producers(producerId) and store it in the state */
       socket.emit(
         "getProducers",
-        { gigId },
+        { sessionId },
         ({
           producerIds,
         }: {
@@ -303,7 +303,7 @@ function useMediaSoup() {
     return () => {
       socket.off("recvTransportCreated");
     };
-  }, [device, gigId, socket]);
+  }, [device, sessionId, socket]);
 
   /**
    * In this use effect,we are checking for new producers and update the producerId state
@@ -338,7 +338,7 @@ function useMediaSoup() {
       socket.emit(
         "consumeMedia",
         {
-          gigId,
+          sessionId,
           consumerTransportId: consumerTransport.id,
           producerId: producerDetails.producerId,
           rtpCapabilities: device.rtpCapabilities,
@@ -409,7 +409,7 @@ function useMediaSoup() {
             )
           );
           socket.emit("resumePausedConsumer", {
-            gigId,
+            sessionId,
             consumerId: consumer.id,
           });
         }
@@ -419,7 +419,7 @@ function useMediaSoup() {
     Promise.all(pendingProducers.map(consumeProducer)).catch((err) =>
       console.error("Batch consume error:", err)
     );
-  }, [producerIds, consumerTransport, device, socket, gigId]);
+  }, [producerIds, consumerTransport, device, socket, sessionId]);
 
   /**
    * this useeffect is triggered when a producer state has changed(mute/unmute/pause/unpause)
@@ -565,7 +565,7 @@ function useMediaSoup() {
     socket.emit("producerStateChanged", {
       producerId: audioProducer.id,
       paused: isAudioMuted,
-      gigId,
+      sessionId,
     });
   };
 
@@ -595,7 +595,7 @@ function useMediaSoup() {
     socket.emit("producerStateChanged", {
       producerId: videoProducer.id,
       paused: !isVideoPaused,
-      gigId,
+      sessionId,
     });
   };
 
@@ -640,7 +640,7 @@ function useMediaSoup() {
       socket.emit("producerStateChanged", {
         producerId: screenProducer.id,
         paused: isScreenSharing,
-        gigId,
+        sessionId,
       });
     } catch (err) {
       console.error("Error starting screen share:", err);
@@ -679,16 +679,16 @@ function useMediaSoup() {
     }
 
     // Notify server and others
-    socket.emit("leaveGig", { gigId });
+    socket.emit("leaveGig", { sessionId });
 
     // Reset state
-    setGigId(null);
+    setSessionId(null);
     setProducerIds([]);
     setRemoteStreams({});
     setIsAudioMuted(false);
     setIsVideoPaused(false);
   }, [
-    gigId,
+    sessionId,
     socket,
     videoProducer,
     audioProducer,

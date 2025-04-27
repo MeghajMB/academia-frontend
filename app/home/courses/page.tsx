@@ -67,7 +67,7 @@ export default function CourseListingPage() {
   }, [searchQuery, selectedCategory, sortBy, currentPage]);
 
   return (
-    <ProtectedRoute role={["instructor", "student", "admin"]}>
+    <ProtectedRoute role={["instructor", "student"]}>
       <div>
         {/* Header */}
 

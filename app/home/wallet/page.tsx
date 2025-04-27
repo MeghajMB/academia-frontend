@@ -6,9 +6,11 @@ import { RedeemableCoinsCard } from "@/features/payment/components/wallet/Redeem
 import { EarningsChart } from "@/features/payment/components/wallet/EarningsChart";
 import { TransactionHistory } from "@/features/payment/components/wallet/TransactionHistory";
 import { WalletStats } from "@/features/payment/components/wallet/WalletStats";
+import ProtectedRoute from "@/hoc/ProtectedRoute";
 
-export default function InstructorWallet() {
+export default function WalletPage() {
   return (
+    <ProtectedRoute role={["instructor","student"]}>
     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -17,7 +19,7 @@ export default function InstructorWallet() {
         className="mb-8"
       >
         <h1 className="text-3xl font-bold text-zinc-900 dark:text-zinc-50">
-          Instructor Wallet
+          Wallet
         </h1>
         <p className="text-zinc-500 dark:text-zinc-400 mt-1">
           Manage your earnings, redeem coins, and track your financial
@@ -43,6 +45,6 @@ export default function InstructorWallet() {
       <div className="grid grid-cols-1">
         <TransactionHistory />
       </div>
-    </main>
+    </main></ProtectedRoute>
   );
 }

@@ -35,6 +35,7 @@ import {
   Home,
   Briefcase,
   ChevronDown,
+  Wallet,
 } from "lucide-react";
 import ProfilePicture from "@/public/images/blankUserProfile.jpeg";
 import useNotification from "@/hooks/socket/useSocketNotification";
@@ -101,8 +102,8 @@ const UserNavbar: React.FC = () => {
       icon: <BookOpen size={18} />,
     },
     {
-      path: "/home/my-gigs",
-      label: "My Gigs",
+      path: "/home/my-session",
+      label: "My Session",
       icon: <Briefcase size={18} />,
     },
     { path: "/home/shop", label: "Shop", icon: <ShoppingCart size={18} /> },
@@ -269,6 +270,13 @@ const UserNavbar: React.FC = () => {
                   textValue="Profile"
                 >
                   <Link href="/home/profile">My Profile</Link>
+                </DropdownItem>
+                <DropdownItem
+                  key="wallet"
+                  startContent={<Wallet size={16} />}
+                  textValue="Wallet"
+                >
+                  <Link href="/home/wallet">Wallet</Link>
                 </DropdownItem>
                 <DropdownItem
                   key="logout"
