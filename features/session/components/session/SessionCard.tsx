@@ -75,7 +75,7 @@ export default function SessionCard({ session }: { session: Session }) {
                 </Button>
               )}
 
-{/*               <Button
+              {/*               <Button
                 variant="flat"
                 color="secondary"
                 endContent={<ExternalLink size={16} />}

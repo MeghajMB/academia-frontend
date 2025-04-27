@@ -9,7 +9,7 @@ import LinkedinSvg from "../../../../components/svg/LinkedinSvg";
 import moment from "moment";
 import InstructorHeaderSection from "./InstructorHeaderSection";
 
-interface IInstructorDetail {
+export interface IInstructorDetail {
   name: string;
   headline: string;
   totalStudents: number;

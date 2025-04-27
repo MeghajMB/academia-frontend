@@ -9,16 +9,15 @@ import {
   Button,
 } from "@heroui/react";
 import { CalendarIcon, ClockIcon, DollarSignIcon } from "lucide-react";
-import { IGig } from "@/types/gig";
 import CountDownTimer from "@/components/common/CountDownTimer";
 import moment from "moment";
+import { GigData } from "@/types/gig";
 
 interface GigCardProps {
-  gig: IGig;
+  gig: GigData;
 }
 
 export function GigCard({ gig }: GigCardProps) {
-
   return (
     <Card key={gig.id} className="shadow-md">
       <CardHeader className="flex justify-between items-start">
@@ -50,7 +49,7 @@ export function GigCard({ gig }: GigCardProps) {
           <div className="flex items-center gap-2">
             <CalendarIcon size={16} className="text-gray-500" />
             <span className="text-sm">
-            {moment(gig.sessionDate).format("MMM D, YYYY, h:mm A")}
+              {moment(gig.sessionDate).format("MMM D, YYYY, h:mm A")}
             </span>
           </div>
           <div className="flex items-center gap-2">

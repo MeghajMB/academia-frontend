@@ -6,12 +6,12 @@ import { useEffect, useState } from "react";
 import { Button } from "@heroui/react";
 import { PlusIcon } from "lucide-react";
 import { GigCard } from "@/features/gig/components/GigCard";
-import { IGig } from "@/types/gig";
+import { GigData, ICreateGigDTO } from "@/types/gig";
 import CreateGigModal from "@/features/gig/components/CreateGigModal";
 
 function GigPage() {
   const { getGigsOfInstructorApi, createGigApi } = useGigApi();
-  const [gigs, setGigs] = useState<IGig[]>([]);
+  const [gigs, setGigs] = useState<GigData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -38,7 +38,7 @@ function GigPage() {
     fetchData();
   }, []);
 
-  const handleCreateGig = async (data) => {
+  const handleCreateGig = async (data:ICreateGigDTO) => {
     try {
       const response = await createGigApi(data);
       if (response.status == "error") {

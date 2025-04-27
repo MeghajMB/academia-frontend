@@ -86,7 +86,7 @@ const InstructorRegister = () => {
     } else {
       setIsClient(true);
     }
-  }, []);
+  }, [ router, user.id, user.verified]);
 
   if (!isClient) {
     return null;

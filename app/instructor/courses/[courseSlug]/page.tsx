@@ -45,7 +45,7 @@ export default function Page() {
       }
     }
     fetchData();
-  }, []);
+  }, [courseSlug]);
   if (!courseDetails) {
     return <LoadingPage />;
   }

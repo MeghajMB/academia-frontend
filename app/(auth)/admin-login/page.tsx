@@ -47,7 +47,7 @@ const AdminLogin = () => {
       setPersist(localPersist === "true");
     }
     setIsClient(true);
-  }, []);
+  }, [router, user.role]);
   if (!isClient) {
     return <LoadingPage />;
   }

@@ -48,7 +48,7 @@ export default function MediasoupPage() {
       }
     }
     joinTheSession();
-  }, [sessionSlug]);
+  }, [accessToken, sessionSlug]);
   if (error) {
     return (
       <ErrorState

@@ -22,3 +22,17 @@ export interface IGig {
   sessionDate: string;
   createdAt: string;
 }
+
+export interface GigData {
+  id: string;
+  instructorId: string;
+  title: string;
+  description: string;
+  sessionDuration: number;
+  minBid: number;
+  currentBid: number;
+  status: "active" | "expired" | "completed" | "no-bids" | "missed";
+  biddingExpiresAt: string;
+  sessionDate: string;
+  createdAt: string;
+}

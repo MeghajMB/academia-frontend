@@ -10,25 +10,48 @@ import moment from "moment";
 import { useParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
+interface InstructorData {
+  id: string;
+  name: string;
+  role: "student" | "instructor";
+  email: string;
+  purpleCoin: number;
+  profilePicture: string;
+  headline?: string;
+  verified: "pending" | "rejected" | "notRequested" | "verified";
+  biography?: string;
+  links?: {
+    facebook?: string;
+    linkedin?: string;
+    twitter?: string;
+    website?: string;
+  };
+  createdAt: string; // You can adjust this to a Date if needed
+}
+
 export default function Page() {
   const { instructorSlug } = useParams();
-  const { fetchUserProfileApi } = useUserApi();
-  const [profile, setProfile] = useState();
+  const { fetchInstructorProfileApi } = useUserApi();
+  const [profile, setProfile] = useState<InstructorData | null>(null);
   useEffect(() => {
     async function getProfile() {
       try {
         if (!instructorSlug || typeof instructorSlug !== "string") {
           return;
         }
-        const profile = await fetchUserProfileApi(instructorSlug);
-        setProfile(profile);
+        const response = await fetchInstructorProfileApi(instructorSlug);
+        if (response.status == "error") {
+          console.log(response.message);
+          return;
+        }
+        setProfile(response.data);
       } catch (error) {
         console.log(error);
       }
     }
 
     getProfile();
-  }, []);
+  }, [instructorSlug]);
 
   if (!profile) {
     return null;
@@ -41,8 +64,8 @@ export default function Page() {
             <InstructorHeaderSection
               profilePicture={profile!.profilePicture}
               name={profile!.name}
-              headline={profile!.headline}
-              biography={profile!.biography}
+              headline={profile.headline!}
+              biography={profile.biography!}
               students={0}
               reviewRating={0}
               coins={0}
@@ -92,7 +115,7 @@ export default function Page() {
 
               <div className="space-y-4">
                 <a
-                  href={profile?.links.facebook}
+                  href={profile!.links!.facebook}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-2 text-gray-300 hover:text-purple-400 transition-colors group"
@@ -104,7 +127,7 @@ export default function Page() {
                 </a>
 
                 <a
-                  href={profile?.links.twitter}
+                  href={profile!.links!.twitter}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-2 text-gray-300 hover:text-purple-400 transition-colors group"
@@ -116,7 +139,7 @@ export default function Page() {
                 </a>
 
                 <a
-                  href={profile?.links.linkedin}
+                  href={profile!.links!.linkedin}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-2 text-gray-300 hover:text-purple-400 transition-colors group"
@@ -128,7 +151,7 @@ export default function Page() {
                 </a>
 
                 <a
-                  href={profile?.links.website}
+                  href={profile!.links!.website}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-2 text-gray-300 hover:text-purple-400 transition-colors group"

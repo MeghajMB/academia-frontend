@@ -56,7 +56,7 @@ export default function Page() {
       }
     }
     fetchData();
-  }, [courseSlug]);
+  }, [courseSlug, router]);
 
   if (!isClient) {
     return <LoadingPage />;

@@ -29,7 +29,7 @@ const LoginPage = () => {
     } else {
       setPersist(localPersist === "true");
     }
-  }, [user.role]);
+  }, [router, user.role]);
 
   useEffect(() => {
     setPage(param.get("page") || "");

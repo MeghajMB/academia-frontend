@@ -45,7 +45,7 @@ function NotificationPage() {
       }
     }
     fetchData();
-  }, []);
+  }, [ id]);
 
   // Function to mark a notification as read
   const markAsRead = async (index: number, notificationId: string) => {

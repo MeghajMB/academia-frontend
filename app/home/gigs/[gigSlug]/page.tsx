@@ -65,7 +65,7 @@ function Page() {
       }
     }
     fetchData();
-  }, []);
+  }, [ gigSlug]);
 
   if (!gigDetails) {
     return <PageNotFound />;

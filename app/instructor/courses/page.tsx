@@ -293,14 +293,14 @@ const CourseCard = ({
         </CardFooter>
       </Card>
       {/* Schedule List Modal */}
-      <ScheduleCourseListModal
+      {/*       <ScheduleCourseListModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onListCourse={(data) => {
           console.log(data);
           return new Promise((resolve) => resolve("something"));
         }}
-      />
+      /> */}
       {/* Analytics Drawer */}
       {isAnalyticsOpen && (
         <CourseAnalyticsDrawer
