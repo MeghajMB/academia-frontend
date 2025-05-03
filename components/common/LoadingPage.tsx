@@ -26,7 +26,7 @@ const LoadingPage = () => {
   };
 
   return (
-    <main className="min-h-screen bg-black text-white flex flex-col items-center justify-center px-4 pt-16">
+    <main className="h-full bg-black text-white flex flex-col items-center justify-center px-4 pt-16">
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}

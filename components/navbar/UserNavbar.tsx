@@ -54,8 +54,12 @@ const UserNavbar: React.FC = () => {
   const path = usePathname();
 
   useEffect(() => {
-    setIsClient(true);
-  }, []);
+    if(user.role!=='admin'){
+      setIsClient(true);
+    }else{
+      setIsClient(false);
+    }
+  }, [user.role]);
 
   useNotification(user.id);
 
@@ -114,7 +118,9 @@ const UserNavbar: React.FC = () => {
       <Navbar className="bg-black">
         <NavbarContent>
           <NavbarBrand>
-            <div className="w-8 h-8 bg-primary rounded"></div>
+          <div className="w-8 h-8 bg-primary rounded relative">
+              <Image src={AcademiaLogo.src} alt="logo" fill />
+            </div>
             <p className="font-bold text-inherit ml-2">Academia</p>
           </NavbarBrand>
         </NavbarContent>
@@ -226,7 +232,7 @@ const UserNavbar: React.FC = () => {
                   </DropdownItem>
                   {notifications.map((notification) => {
                     return (
-                      <DropdownItem key={notification.message}>
+                      <DropdownItem key={notification.id}>
                         {notification.title}
                       </DropdownItem>
                     );
@@ -268,15 +274,17 @@ const UserNavbar: React.FC = () => {
                   key="profile"
                   startContent={<UserIcon size={16} />}
                   textValue="Profile"
+                  href="/home/profile"
                 >
-                  <Link href="/home/profile">My Profile</Link>
+                  My Profile
                 </DropdownItem>
                 <DropdownItem
                   key="wallet"
                   startContent={<Wallet size={16} />}
                   textValue="Wallet"
+                  href="/home/wallet"
                 >
-                  <Link href="/home/wallet">Wallet</Link>
+                  Wallet
                 </DropdownItem>
                 <DropdownItem
                   key="logout"

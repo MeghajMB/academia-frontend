@@ -10,4 +10,5 @@ export * from './shared-dtos/notification.dto'
 //export * from './shared-dtos/payment.dto'
 export * from './shared-dtos/review.dto'
 //export * from './shared-dtos/user.dto'
+export * from "./shared-dtos/coin.dto"
 export * from "./api"

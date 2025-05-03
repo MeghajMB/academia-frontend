@@ -20,3 +20,8 @@ export type SuccessResponseDTO<T> = z.infer<typeof SuccessResponseSchema> & {
   data: T;
 };
 export type ErrorResponseDTO = z.infer<typeof ErrorResponseSchema>;
+
+export const NullResponseSchema=SuccessResponseSchema.extend({
+  data: z.null(),
+});
+export type NullResponseDTO = z.infer<typeof NullResponseSchema>;

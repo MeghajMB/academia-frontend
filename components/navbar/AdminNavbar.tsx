@@ -13,6 +13,7 @@ import {
   LogOut,
   ChevronLeft,
   ChevronRight,
+  Coins,
 } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { logout } from "@/store/features/auth/authSlice";
@@ -37,6 +38,7 @@ export default function AdminNavbar() {
     { name: "Instructors", icon: GraduationCap, href: "/admin/instructors" },
     { name: "Categories", icon: FolderTree, href: "/admin/categories" },
     { name: "Courses", icon: BookOpen, href: "/admin/courses" },
+    { name: "Coins", icon: Coins, href: "/admin/coins" },
     { name: "Review Courses", icon: Star, href: "/admin/review-courses" },
     { name: "Review Instructor", icon: User, href: "/admin/review-instructor" },
   ];

@@ -48,7 +48,7 @@ const DeleteConfirmationModal = ({
 
             <ModalBody className="py-4">
               <p className="text-gray-300">
-                Are you sure you want to delete the {itemType}
+                Are you sure you want to delete {itemType}
                 <span className="font-semibold text-white">
                   &quot;{itemName}&quot;
                 </span>

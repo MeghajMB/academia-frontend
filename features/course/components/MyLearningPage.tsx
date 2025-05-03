@@ -12,9 +12,9 @@ export interface IEnrolledCourses {
   id: string;
   imageThumbnail: string;
   title: string;
-  completedAt: string | undefined;
+  completedAt: string | null;
   progressPercentage: number;
-  certificate: string | undefined;
+  certificate: string | null;
 }
 
 export default function LearningPage() {
@@ -23,7 +23,7 @@ export default function LearningPage() {
   const [completedCourses, setCompletedCourses] = useState<IEnrolledCourses[]>(
     []
   );
-  const [error,setError]=useState<string>('')
+  const [error, setError] = useState<string>("");
 
   const { fetchEnrolledCoursesApi } = useCourseApi();
 
@@ -31,9 +31,9 @@ export default function LearningPage() {
     async function fetchCourses() {
       try {
         const response = await fetchEnrolledCoursesApi();
-        if(response.status=='error'){
+        if (response.status == "error") {
           setError(response.message);
-          return
+          return;
         }
         const completedCourses = response.data.filter(
           (course) => course.completedAt
@@ -53,7 +53,7 @@ export default function LearningPage() {
   }
 
   return (
-    <div className=" bg-black text-white pt-10 px-4 sm:px-6 lg:px-8">
+    <div className=" bg-black text-white px-4 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto py-8">
         {/* Stats Overview */}
         <motion.div

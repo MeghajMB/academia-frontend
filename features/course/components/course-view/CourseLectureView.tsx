@@ -10,7 +10,7 @@ function CourseLectureView({
   courseId,
   onEnded,
 }: {
-  activeLecture: ILecture;
+  activeLecture: ILecture | null;
   courseId: string;
   onEnded?: () => void;
 }) {
@@ -21,14 +21,14 @@ function CourseLectureView({
   useEffect(() => {
     async function fetchUrl() {
       try {
+        if (!activeLecture) return;
+        setError(false);
         const response = await getLectureUrlApi(courseId, activeLecture.id);
         if (response.status == "error") {
-          setError(true);
-          return;
+          throw new Error("Something happened");
         }
 
         setVideoUrl(response.data.url);
-
       } catch (error) {
         console.log(error);
         setError(true);
@@ -37,12 +37,12 @@ function CourseLectureView({
       }
     }
     fetchUrl();
-  }, [activeLecture.id, courseId]);
+  }, [courseId, activeLecture]);
   if (isLoading) {
     return <Spinner />;
   }
-  if(error){
-    return <ErrorState />
+  if (error) {
+    return <ErrorState />;
   }
   return (
     <div>
@@ -51,7 +51,7 @@ function CourseLectureView({
         <VideoPlayer videoLink={videoUrl} onEnded={onEnded} />
       </div>
 
-      <h1 className="text-3xl font-bold">{activeLecture.title}</h1>
+      <h1 className="text-3xl font-bold">{activeLecture?.title}</h1>
     </div>
   );
 }

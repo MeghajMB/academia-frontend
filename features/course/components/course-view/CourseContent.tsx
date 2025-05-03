@@ -9,7 +9,7 @@ const CourseContent = ({
 }: {
   sections: ISection[];
   setActiveLecture: (lecture: ILecture) => void;
-  activeLecture: ILecture;
+  activeLecture: ILecture|null;
 }) => {
   return (
     <div className=" backdrop-blur-sm rounded-xl">
@@ -17,7 +17,7 @@ const CourseContent = ({
         <h2 className="text-2xl font-bold text-white">Course Content</h2>
       </div>
 
-      <Accordion
+      {activeLecture && <Accordion
         variant="shadow"
         selectionMode="multiple"
         defaultExpandedKeys={[activeLecture.sectionId]}
@@ -96,7 +96,8 @@ const CourseContent = ({
             </ul>
           </AccordionItem>
         ))}
-      </Accordion>
+      </Accordion>}
+      
     </div>
   );
 };

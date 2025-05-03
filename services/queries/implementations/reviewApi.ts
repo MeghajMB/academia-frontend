@@ -8,13 +8,15 @@ import {
 import { handleApiError } from "@/util/handle-api-error";
 import { AxiosInstance } from "axios";
 
+const BASE_REVIEW_PATH = "/api/reviews";
+
 const createReviewApi = (axiosInstance: AxiosInstance) => ({
   // Fetch all reviews for a specific course
   fetchCourseReviewsApi: async (
     courseId: string
   ): Promise<GetReviewsOfCourseResponseDTO | ErrorResponseDTO> => {
     try {
-      const response = await axiosInstance.get(`/api/review/get/${courseId}`);
+      const response = await axiosInstance.get(`${BASE_REVIEW_PATH}/course/${courseId}`);
       const result = GetReviewsOfCourseResponseSchema.parse(response.data);
       return result;
     } catch (error) {
@@ -27,7 +29,7 @@ const createReviewApi = (axiosInstance: AxiosInstance) => ({
   ): Promise<GetReviewsOfCourseResponseDTO | ErrorResponseDTO> => {
     try {
       const response = await axiosInstance.get(
-        `/api/review/course/statitics/${courseId}`
+        `${BASE_REVIEW_PATH}/course/statitics/${courseId}`
       );
       return response.data;
     } catch (error) {
@@ -41,9 +43,10 @@ const createReviewApi = (axiosInstance: AxiosInstance) => ({
     rating: number;
   }): Promise<GetReviewsOfCourseResponseDTO | ErrorResponseDTO> => {
     try {
+      const {reviewId,...data}=reviewData;
       const response = await axiosInstance.put(
-        `/api/review/edit-review`,
-        reviewData
+        `${BASE_REVIEW_PATH}/${reviewId}`,
+        data
       );
       return response.data;
     } catch (error) {
@@ -55,7 +58,7 @@ const createReviewApi = (axiosInstance: AxiosInstance) => ({
   ): Promise<DeleteReviewResponseDTO | ErrorResponseDTO> => {
     try {
       const response = await axiosInstance.delete(
-        `/api/review/delete/${reviewId}`
+        `${BASE_REVIEW_PATH}/delete/${reviewId}`
       );
       const result = DeleteReviewResponseSchema.parse(response.data);
       return result;
@@ -71,7 +74,7 @@ const createReviewApi = (axiosInstance: AxiosInstance) => ({
     comment?: string
   ): Promise<GetReviewsOfCourseResponseDTO | ErrorResponseDTO> => {
     try {
-      const response = await axiosInstance.post("/api/review/add-review", {
+      const response = await axiosInstance.post(`${BASE_REVIEW_PATH}/add-review`, {
         courseId,
         rating,
         comment,

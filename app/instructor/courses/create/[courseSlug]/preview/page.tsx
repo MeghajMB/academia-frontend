@@ -13,19 +13,22 @@ export default function PreviewCoursePage() {
   const [sections, setSections] = useState<ISection[]>([]);
   const [isClient, setIsClient] = useState(false);
   const [showContent, setShowContent] = useState(false);
-  const [activeLecture, setActiveLecture] = useState<ILecture>();
+  const [activeLecture, setActiveLecture] = useState<ILecture|null>(null);
 
   useEffect(() => {
     async function getCurriculum() {
       try {
         if (courseSlug && typeof courseSlug == "string") {
-          const response = await fetchCurriculum(courseSlug,'instructor');
-          if(response.status=='error'){
+          const response = await fetchCurriculum(courseSlug, "instructor");
+          if (response.status == "error") {
             console.log(response.message);
-            return
+            return;
           }
+          console.log(response);
           setSections(response.data);
-          setActiveLecture( response.data[0].lectures[0]);
+          setActiveLecture(
+            response.data[0].lectures[0] || null
+          );
           setIsClient(true);
         }
       } catch (error) {
@@ -37,8 +40,9 @@ export default function PreviewCoursePage() {
 
   if (!isClient) {
     return (
-      <div className="-mt-24 -ml-20"><LoadingPage /></div>
-      
+      <div className="-mt-24 -ml-20">
+        <LoadingPage />
+      </div>
     );
   }
   return (
@@ -52,7 +56,7 @@ export default function PreviewCoursePage() {
           } lg:w-2/3 p-4`}
         >
           <CourseLectureView
-            activeLecture={activeLecture!}
+            activeLecture={activeLecture}
             courseId={courseSlug as string}
           />
         </div>
@@ -66,7 +70,7 @@ export default function PreviewCoursePage() {
           <CourseContent
             sections={sections}
             setActiveLecture={setActiveLecture}
-            activeLecture={activeLecture!}
+            activeLecture={activeLecture}
           />
         </div>
 
@@ -83,4 +87,3 @@ export default function PreviewCoursePage() {
     </>
   );
 }
-

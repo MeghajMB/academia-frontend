@@ -28,7 +28,11 @@ export default function ProtectedRoute({
   }, [user.role, role]);
 
   if (isLoading) {
-    return <LoadingPage />;
+    return (
+      <div className="min-h-screen">
+        <LoadingPage />
+      </div>
+    );
   }
   if (error) {
     return <Unauthorized />;

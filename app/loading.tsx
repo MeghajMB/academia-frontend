@@ -1,6 +1,9 @@
 import LoadingPage from "@/components/common/LoadingPage";
 
 export default function Loading() {
-
-  return <LoadingPage />
+  return (
+    <div className="min-h-screen">
+      <LoadingPage />
+    </div>
+  );
 }

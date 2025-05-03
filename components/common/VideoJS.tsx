@@ -22,10 +22,10 @@ export const VideoJS = (props) => {
         onReady && onReady(player);
       }));
 
-            // Initialize the quality selector plugin
-            player.hlsQualitySelector({
-              displayCurrentQuality: true,
-            });
+      // Initialize the quality selector plugin
+      player.hlsQualitySelector({
+        displayCurrentQuality: true,
+      });
 
       // You could update an existing player in the `else` block here
       // on prop change, for example:

@@ -7,7 +7,7 @@ import Link from "next/link";
 
 export default function Unauthorized() {
   return (
-    <div className="min-h-screen bg-gray-950 flex flex-col items-center justify-center px-4 py-12">
+    <div className=" bg-gray-950 flex flex-col items-center justify-center px-4 py-12">
       <div className="max-w-lg w-full">
         {/* Animated Shield Icon */}
         <motion.div
