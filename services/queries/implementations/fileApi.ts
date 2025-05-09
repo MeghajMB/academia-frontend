@@ -6,7 +6,7 @@ import {
   GenerateGetSignedUrlResponseSchema,
   GeneratePutSignedUrlResponseDTO,
   GeneratePutSignedUrlResponseSchema,
-} from "@academia-dev/common";
+} from "@/shared/index";
 import { handleApiError } from "@/util/handle-api-error";
 
 const createfileApi = (axiosInstance: AxiosInstance) => ({
