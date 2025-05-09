@@ -28,6 +28,10 @@ const nextConfig: NextConfig = {
         hostname:  process.env.NEXT_PUBLIC_S3_HOSTNAME!,
         pathname: "/**", // Allow all images in the bucket
       },
+      {
+        protocol: "https",
+        hostname: "res.cloudinary.com",
+      },
     ],
   },
 };

@@ -43,6 +43,7 @@ function LoginComponent({
 
     try {
       setLoading(true);
+      console.log(process.env.NEXT_PUBLIC_BACKEND_URL)
       const response = await signInApi(credentials);
       if (response.status == "success") {
         dispatch(login(response.data));
