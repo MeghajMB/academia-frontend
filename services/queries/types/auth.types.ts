@@ -47,10 +47,6 @@ export interface LogoutData {
   data?: null;
 }
 
-
-
-
-
 export interface RefreshTokenData {
   accessToken: string;
   refreshToken: string;
@@ -59,7 +55,6 @@ export interface RefreshTokenData {
   name: string;
   email: string;
   verified: boolean;
-  goldCoin: number;
   profilePicture: string;
 }
 

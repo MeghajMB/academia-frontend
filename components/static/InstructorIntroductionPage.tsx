@@ -25,7 +25,7 @@ export default function InstructorIntroductionPage() {
               </p>
             ) : (
               <Link
-                href="/home/teaching/register"
+                href="/teaching/register"
                 className={`mt-8 inline-block text-white py-3 px-6 rounded-lg ${
                   user.verified == "rejected" ? "bg-red-500" : "bg-blue-700"
                 }`}
@@ -87,7 +87,7 @@ export default function InstructorIntroductionPage() {
               Join Academia and start teaching today!
             </p>
             <Link
-              href="/home/teaching/register"
+              href="/teaching/register"
               className="mt-8 inline-block bg-blue-600 text-white py-3 px-6 rounded-lg"
             >
               Get Started

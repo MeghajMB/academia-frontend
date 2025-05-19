@@ -1,6 +1,5 @@
 "use client";
 import usePaymentApi from "@/hooks/api/usePaymentApi";
-import { Button } from "@heroui/react";
 import { useRouter } from "next/navigation";
 import { useRef } from "react";
 import { toast } from "react-toastify";
@@ -21,13 +20,7 @@ const loadScript = (src: string) =>
     document.body.appendChild(script);
   });
 
-const RenderRazorpay = ({
-  entityId,
-  type,
-}: {
-  entityId: string;
-  type: string;
-}) => {
+const useRazorpayPayment = () => {
   const paymentId = useRef<string | null>(null);
   const paymentMethod = useRef<string | null>(null);
   const { createOrderApi, paymentSuccessApi } = usePaymentApi();
@@ -71,7 +64,7 @@ const RenderRazorpay = ({
   };
 
   // Function to initiate a purchase
-  async function handlePurchase() {
+  async function handlePurchase(entityId: string, type: "course" | "coins") {
     try {
       const data = await createOrderApi(entityId, type);
 
@@ -115,7 +108,10 @@ const RenderRazorpay = ({
               }
             );
             if (type == "course") {
-              router.push("/home/my-learning"); // show the success page
+              router.push("/home/my-learning");
+            }
+            if (type == "coins") {
+              router.push("/home/wallet");
             }
           },
           modal: {
@@ -136,20 +132,7 @@ const RenderRazorpay = ({
     }
   }
 
-  return (
-    <Button
-      color="default"
-      className={`w-full font-semibold ${
-        type == "coins"
-          ? " bg-gradient-to-r from-amber-500 to-amber-600"
-          : undefined
-      }`}
-      size="lg"
-      onPress={() => handlePurchase()} // Example values (coins, price)
-    >
-      Purchase Now
-    </Button>
-  );
+  return { handlePurchase };
 };
 
-export default RenderRazorpay;
+export default useRazorpayPayment;

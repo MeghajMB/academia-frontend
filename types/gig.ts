@@ -10,15 +10,18 @@ export interface ICreateGigDTO {
 
 export interface IGig {
   id: string;
-  instructorId: string;
-  title: string;
+  sessionDate: string;
   description: string;
+  biddingAllowed:boolean;
   sessionDuration: number;
+  maxParticipants:number;
   minBid: number;
+  status: "completed" | "active" | "expired" | "no-bids" | "missed";
   currentBid: number;
   currentBidder: string | null;
-  status: "active" | "expired" | "completed" | "no-bids" | "missed";
+  title: string;
+
+  instructorId: string;
   biddingExpiresAt: string;
-  sessionDate: string;
   createdAt: string;
 }

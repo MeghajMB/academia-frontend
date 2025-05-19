@@ -1,24 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ChartNoAxesCombined, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import Link from "next/link";
 import useCourseApi from "@/hooks/api/useCourseApi";
 import { useAppSelector } from "@/store/hooks";
 import { toast } from "react-toastify";
 import type { ICourse } from "@/types/course";
-import {
-  Button,
-  Card,
-  CardBody,
-  CardFooter,
-  Chip,
-  Divider,
-  Spinner,
-} from "@heroui/react";
+import { Button, Spinner } from "@heroui/react";
 import NoContentAvailable from "@/components/common/NoContentAvailable";
-import { CourseAnalyticsDrawer } from "@/features/course/components/analytics/CourseAnalyticsDrawer";
-import ScheduleCourseListModal from "@/features/course/components/SheduleCourseListModal";
+import CourseCategory from "@/features/course/components/instructor/CourseCategory";
 
 const CoursesPage = () => {
   const { fetchCoursesOfInstructorWithStatus, listCourseApi } = useCourseApi();
@@ -45,18 +36,20 @@ const CoursesPage = () => {
     fetchAllCourses();
   }, [id]);
 
-  const handleListCourse = async (courseId: string) => {
+  const handleListCourse = async (courseId: string, date: string) => {
     try {
-      await listCourseApi(courseId);
-
+      const response = await listCourseApi(courseId, date);
+      if (response.status == "error") {
+        throw new Error(response.message);
+      }
       // Update the course status in the state
       setCourses((prevCourses) =>
         prevCourses.map((course) =>
-          course.id === courseId ? { ...course, status: "listed" } : course
+          course.id === courseId ? { ...course, status: "scheduled" } : course
         )
       );
 
-      toast.success("Course listed successfully!");
+      toast.success("Course scheduled successfully!");
     } catch (error) {
       console.log(error);
       toast.error("Something happened. Try again later!");
@@ -90,6 +83,12 @@ const CoursesPage = () => {
       title: "Incomplete Courses",
       description: "Courses that are still in draft mode.",
       courses: courses.filter((course) => course.status === "draft"),
+    },
+    {
+      id: "scheduled",
+      title: "Scheduled Courses",
+      description: "Courses that are scheduled.",
+      courses: courses.filter((course) => course.status === "scheduled"),
     },
     {
       id: "rejected",
@@ -142,7 +141,6 @@ const CoursesPage = () => {
               description={category.description}
               courses={category.courses}
               handleListCourse={handleListCourse}
-              showListButton={category.id === "accepted"}
             />
           ))}
         </div>
@@ -152,164 +150,3 @@ const CoursesPage = () => {
 };
 
 export default CoursesPage;
-
-const CourseCategory = ({
-  title,
-  description,
-  courses,
-  handleListCourse,
-  showListButton = false,
-}: {
-  title: string;
-  description: string;
-  courses: ICourse[];
-  handleListCourse: (courseId: string) => void;
-  showListButton?: boolean;
-}) => {
-  if (!courses || courses.length === 0) {
-    return null; // Don't show empty categories
-  }
-
-  return (
-    <div>
-      <h2 className="text-2xl md:text-3xl font-bold text-foreground">
-        {title}
-      </h2>
-      <p className="mt-2 text-muted-foreground">{description}</p>
-      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
-        {courses.map((course) => (
-          <CourseCard
-            key={course.id}
-            course={course}
-            handleListCourse={handleListCourse}
-            showListButton={showListButton}
-          />
-        ))}
-      </div>
-    </div>
-  );
-};
-
-const CourseCard = ({
-  course,
-  handleListCourse,
-  showListButton,
-}: {
-  course: ICourse;
-  handleListCourse: (courseId: string) => void;
-  showListButton: boolean;
-}) => {
-  const [isAnalyticsOpen, setIsAnalyticsOpen] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const statusColorMap: Record<
-    string,
-    {
-      color:
-        | "success"
-        | "primary"
-        | "warning"
-        | "default"
-        | "danger"
-        | "secondary";
-      label: string;
-    }
-  > = {
-    listed: { color: "success", label: "Listed" },
-    accepted: { color: "primary", label: "Approved" },
-    pending: { color: "warning", label: "Pending" },
-    draft: { color: "default", label: "Draft" },
-    rejected: { color: "danger", label: "Rejected" },
-  };
-
-  const statusInfo = statusColorMap[course.status] || {
-    color: "default",
-    label: course.status,
-  };
-
-  return (
-    <>
-      <Card className="bg-content1 border-none shadow-md hover:shadow-lg transition-shadow">
-        <CardBody className="p-5">
-          <h3 className="text-xl font-semibold text-foreground line-clamp-1">
-            {course.title}
-          </h3>
-          <p className="text-muted-foreground text-sm mt-2 line-clamp-3">
-            {course.description || "No description available"}
-          </p>
-        </CardBody>
-        <Divider />
-        <CardFooter className="flex justify-between items-center p-5">
-          <Chip
-            color={statusInfo.color}
-            variant="flat"
-            size="sm"
-            className={`${course.status === "rejected" && "font-semibold"}`}
-          >
-            {statusInfo.label}
-          </Chip>
-          <div className="flex gap-2">
-            {showListButton && (
-              <Button
-                color="success"
-                size="sm"
-                variant="flat"
-                onPress={() => handleListCourse(course.id)}
-                className="font-medium"
-              >
-                List Course
-              </Button>
-            )}
-            <Button
-              color="success"
-              size="sm"
-              variant="flat"
-              onPress={() => setIsModalOpen(true)}
-              className="font-medium"
-            >
-              List Course
-            </Button>
-            {course.status == "listed" && (
-              <Button
-                color="warning"
-                size="sm"
-                variant="flat"
-                className="font-medium"
-                onPress={() => setIsAnalyticsOpen(true)}
-              >
-                <ChartNoAxesCombined />
-              </Button>
-            )}
-            <Button
-              as={Link}
-              href={`/instructor/courses/${course.id}`}
-              color="secondary"
-              variant="light"
-              size="sm"
-              className="font-medium"
-            >
-              View Details
-            </Button>
-          </div>
-        </CardFooter>
-      </Card>
-      {/* Schedule List Modal */}
-      <ScheduleCourseListModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onListCourse={(data) => {
-          console.log(data);
-          return new Promise((resolve) => resolve("something"));
-        }}
-      />
-      {/* Analytics Drawer */}
-      {isAnalyticsOpen && (
-        <CourseAnalyticsDrawer
-          isOpen={isAnalyticsOpen}
-          onClose={() => setIsAnalyticsOpen(false)}
-          courseId={course.id}
-          courseTitle={course.title}
-        />
-      )}
-    </>
-  );
-};

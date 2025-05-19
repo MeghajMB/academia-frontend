@@ -11,7 +11,7 @@ import {
   Input,
   Textarea,
 } from "@heroui/react";
-import useAdminApi from "@/hooks/api/useAdminApi";
+import useCategoryApi from "@/hooks/api/useCategoryApi";
 
 // Define the structure of category data
 export interface Category {
@@ -60,7 +60,7 @@ export default function CategoryModal({
   const [errors, setErrors] = useState<FormErrors>({});
   const [isLoading, setIsLoading] = useState(false);
 
-  const { createCategoryApi, editCategoryApi } = useAdminApi();
+  const { createCategoryApi, editCategoryApi } = useCategoryApi();
 
   useEffect(() => {
     if (!isOpen) {

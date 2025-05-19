@@ -2,15 +2,37 @@
 
 import { motion } from "framer-motion";
 import { GoldCoinsCard } from "@/features/payment/components/wallet/GoldCoinsCard";
-import { RedeemableCoinsCard } from "@/features/payment/components/wallet/RedeemableCoinsCard";
-import { EarningsChart } from "@/features/payment/components/wallet/EarningsChart";
+import RedeemablePointsCard from "@/features/payment/components/wallet/RedeemableCoinsCard";
 import { TransactionHistory } from "@/features/payment/components/wallet/TransactionHistory";
-import { WalletStats } from "@/features/payment/components/wallet/WalletStats";
-import ProtectedRoute from "@/hoc/ProtectedRoute";
+import WalletStats from "@/features/payment/components/wallet/WalletStats";
+import { useEffect, useState } from "react";
+import usePaymentApi from "@/hooks/api/usePaymentApi";
+import { WalletData } from "./type";
 
 export default function WalletPage() {
+  const { getWalletApi } = usePaymentApi();
+  const [walletData, setWalletData] = useState<WalletData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchWallet() {
+      try {
+        setIsLoading(true);
+        const response = await getWalletApi();
+        if (response.status == "error") {
+          throw new Error(response.message);
+        }
+        setWalletData(response.data);
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    fetchWallet();
+  }, []);
+
   return (
-    <ProtectedRoute role={["instructor","student"]}>
     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -18,7 +40,7 @@ export default function WalletPage() {
         transition={{ duration: 0.5 }}
         className="mb-8"
       >
-        <h1 className="text-3xl font-bold text-zinc-900 dark:text-zinc-50">
+        <h1 className="text-3xl mt-7 font-bold text-zinc-900 dark:text-zinc-50">
           Wallet
         </h1>
         <p className="text-zinc-500 dark:text-zinc-400 mt-1">
@@ -29,22 +51,32 @@ export default function WalletPage() {
 
       {/* Coins Overview */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        <GoldCoinsCard />
-        <RedeemableCoinsCard />
+        <GoldCoinsCard
+          goldCoins={walletData?.goldCoins}
+          goldConversion={walletData?.goldConversion}
+          setWalletData={setWalletData}
+        />
+        <RedeemablePointsCard
+          setWalletData={setWalletData}
+          redeemablePoints={walletData?.redeemPoints}
+          redeemConversion={walletData?.redeemConversion}
+        />
       </div>
 
       {/* Wallet Stats */}
-      <WalletStats className="mb-8" />
 
-      {/* Earnings Chart */}
-      <div className="mb-8">
-        <EarningsChart />
-      </div>
+      <WalletStats
+        goldConversion={walletData?.goldConversion}
+        redeemConversion={walletData?.redeemConversion}
+        totalEarnings={walletData?.totalEarnings}
+        isLoading={isLoading}
+        className="mb-8"
+      />
 
       {/* Bottom Section */}
       <div className="grid grid-cols-1">
         <TransactionHistory />
       </div>
-    </main></ProtectedRoute>
+    </main>
   );
 }

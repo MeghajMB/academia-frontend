@@ -1,16 +1,27 @@
 "use client";
 
+import { Skeleton } from "@heroui/react";
 import { motion } from "framer-motion";
 
 interface WalletStatsProps {
   className?: string;
+  totalEarnings?: number;
+  goldConversion?: number;
+  redeemConversion?: number;
+  isLoading:boolean;
 }
 
-export const WalletStats = ({ className }: WalletStatsProps) => {
+export default function WalletStats({
+  className,
+  totalEarnings,
+  goldConversion,
+  redeemConversion,
+  isLoading,
+}: WalletStatsProps) {
   const stats = [
-    {
+    /* {
       title: "Total Earnings",
-      value: "$24,568",
+      value: totalEarnings,
       change: "+18%",
       changeType: "positive",
       icon: (
@@ -30,10 +41,10 @@ export const WalletStats = ({ className }: WalletStatsProps) => {
           <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
         </svg>
       ),
-    },
+    }, */
     {
       title: "Gold Coin Conversion Rate",
-      value: "1.25:1",
+      value: goldConversion,
       change: "Standard",
       changeType: "neutral",
       icon: (
@@ -57,7 +68,7 @@ export const WalletStats = ({ className }: WalletStatsProps) => {
     },
     {
       title: "Redeem Coin Conversion Rate",
-      value: "5:1",
+      value: redeemConversion,
       change: "Standard",
       changeType: "neutral",
       icon: (
@@ -84,45 +95,46 @@ export const WalletStats = ({ className }: WalletStatsProps) => {
   return (
     <div
       className={
-        "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 " + className
+        "grid grid-cols-1 md:grid-cols-2 gap-4 " + className
       }
     >
       {stats.map((stat, i) => (
-        <motion.div
-          key={i}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: i * 0.1 }}
-          className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-5 shadow-sm"
-        >
-          <div className="flex justify-between">
-            <div>
-              <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400">
-                {stat.title}
-              </p>
-              <p className="text-2xl font-bold mt-1 text-zinc-900 dark:text-zinc-50">
-                {stat.value}
-              </p>
+        <Skeleton isLoaded={!isLoading} key={i}>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: i * 0.1 }}
+            className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-5 shadow-sm"
+          >
+            <div className="flex justify-between">
+              <div>
+                <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400">
+                  {stat.title}
+                </p>
+                <p className="text-2xl font-bold mt-1 text-zinc-900 dark:text-zinc-50">
+                  1 : {stat.value}
+                </p>
+              </div>
+              <div className="h-12 w-12 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center">
+                {stat.icon}
+              </div>
             </div>
-            <div className="h-12 w-12 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center">
-              {stat.icon}
+            <div className="mt-2">
+              <span
+                className={`text-xs font-medium ${
+                  stat.changeType === "positive"
+                    ? "text-emerald-600 dark:text-emerald-500"
+                    : stat.changeType === "negative"
+                    ? "text-red-600 dark:text-red-500"
+                    : "text-zinc-600 dark:text-zinc-400"
+                }`}
+              >
+                {stat.change}
+              </span>
             </div>
-          </div>
-          <div className="mt-2">
-            <span
-              className={`text-xs font-medium ${
-                stat.changeType === "positive"
-                  ? "text-emerald-600 dark:text-emerald-500"
-                  : stat.changeType === "negative"
-                  ? "text-red-600 dark:text-red-500"
-                  : "text-zinc-600 dark:text-zinc-400"
-              }`}
-            >
-              {stat.change}
-            </span>
-          </div>
-        </motion.div>
+          </motion.div>
+        </Skeleton>
       ))}
     </div>
   );
-};
+}

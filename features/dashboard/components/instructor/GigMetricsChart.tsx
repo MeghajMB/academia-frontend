@@ -40,14 +40,6 @@ export const GigMetricsChart = ({ data }: GigMetricsProps) => {
           <p className="text-sm">
             <span className="font-semibold">{payload[0].value}</span> gigs
           </p>
-          <p className="text-xs text-gray-500 dark:text-gray-400">
-            {(
-              (payload[0].value /
-                Object.values(data).reduce((a, b) => a + b, 0)) *
-              100
-            ).toFixed(1)}
-            % of total
-          </p>
         </div>
       );
     }
@@ -75,7 +67,6 @@ export const GigMetricsChart = ({ data }: GigMetricsProps) => {
       </ul>
     );
   };
-console.log(data)
   return (
     <div className="h-80">
       <ResponsiveContainer width="100%" height="100%">

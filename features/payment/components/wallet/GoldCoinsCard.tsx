@@ -3,8 +3,9 @@
 import type React from "react";
 import { motion } from "framer-motion";
 import { Card, CardHeader, CardBody, Button } from "@heroui/react";
+import { Coins, Wallet } from "lucide-react";
 
-export const GoldCoinsCard = () => {
+export const GoldCoinsCard = ({ goldCoins, goldConversion,setWalletData }) => {
   return (
     <Card
       className="h-full bg-gradient-to-br from-amber-50 to-amber-100 dark:from-amber-900/20 dark:to-amber-800/10 border-amber-200 dark:border-amber-800/30"
@@ -12,23 +13,8 @@ export const GoldCoinsCard = () => {
     >
       <CardHeader className="flex gap-3 pb-0">
         <div className="flex items-center text-amber-900 dark:text-amber-300">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="mr-2"
-          >
-            <circle cx="12" cy="12" r="10"></circle>
-            <path d="M12 6v12"></path>
-            <path d="M8 12h8"></path>
-          </svg>
-          <div>
+          <Coins />
+          <div className="px-1">
             <h4 className="text-lg font-medium">Gold Coins</h4>
             <p className="text-sm text-amber-700 dark:text-amber-400">
               Your primary currency for withdrawals
@@ -41,10 +27,10 @@ export const GoldCoinsCard = () => {
         <div className="flex items-center justify-between mb-6 relative">
           <div>
             <div className="text-4xl font-bold text-amber-900 dark:text-amber-300">
-              24,680
+              {goldCoins}
             </div>
             <div className="text-sm text-amber-700 dark:text-amber-400 mt-1">
-              ≈ $2,468.00 USD
+              ≈ ${goldCoins * goldConversion} INR
             </div>
           </div>
 
@@ -76,23 +62,7 @@ export const GoldCoinsCard = () => {
         <Button
           color="warning"
           className="bg-amber-600 hover:bg-amber-700 text-white"
-          startContent={
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"></path>
-              <path d="M3 5v14a2 2 0 0 0 2 2h16v-5"></path>
-              <path d="M18 12a2 2 0 0 0 0 4h4v-4Z"></path>
-            </svg>
-          }
+          startContent={<Wallet />}
         >
           Withdraw
         </Button>

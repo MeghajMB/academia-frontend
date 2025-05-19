@@ -1,4 +1,4 @@
-import { ErrorResponseDTO, ErrorResponseSchema } from "@/shared/index";
+import { ErrorResponseDTO, ErrorResponseSchema } from "@academia-dev/common";
 import { AxiosError } from "axios";
 
 export const handleApiError = (error: unknown): ErrorResponseDTO => {

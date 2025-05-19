@@ -4,20 +4,8 @@ import {
   AddLectureResponseSchema,
   AddSectionResponseDTO,
   AddSectionResponseSchema,
-  ChangeOrderOfLectureResponseDTO,
-  ChangeOrderOfLectureResponseSchema,
   CreateCourseResponseDTO,
   CreateCourseResponseSchema,
-  DeleteLectureResponseDTO,
-  DeleteLectureResponseSchema,
-  DeleteSectionResponseDTO,
-  DeleteSectionResponseSchema,
-  EditCourseCreationDetailsResponseDTO,
-  EditCourseCreationDetailsResponseSchema,
-  EditLectureResponseDTO,
-  EditLectureResponseSchema,
-  EditSectionResponseDTO,
-  EditSectionResponseSchema,
   ErrorResponseDTO,
   GenerateLectureUrlResponseDTO,
   GenerateLectureUrlResponseSchema,
@@ -37,25 +25,33 @@ import {
   GetEnrolledCoursesOfUserResponseSchema,
   GetNewCoursesResponseDTO,
   GetNewCoursesResponseSchema,
-  ListCourseResponseDTO,
-  ListCourseResponseSchema,
-  MarkLectureAsCompletedResponseDTO,
-  MarkLectureAsCompletedResponseSchema,
-  SubmitCourseForReviewResponseDTO,
-  SubmitCourseForReviewResponseSchema,
-} from "@/shared/index";
+  NullResponseDTO,
+  NullResponseSchema,
+} from "@academia-dev/common";
 import { AxiosInstance } from "axios";
 
-const BASE_COURSE_PATH = "/api/courses";
+const BASE_PATH = "/api/courses";
 
 const createCourseApi = (axiosInstance: AxiosInstance) => ({
+  blockCourseApi: async (
+    courseId: string
+  ): Promise<NullResponseDTO | ErrorResponseDTO> => {
+    try {
+      const response = await axiosInstance.put(
+        `${BASE_PATH}/block/${courseId}`
+      );
+      const result = NullResponseSchema.parse(response.data);
+      return result;
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
+
   fetchEnrolledCoursesApi: async (): Promise<
     GetEnrolledCoursesOfUserResponseDTO | ErrorResponseDTO
   > => {
     try {
-      const response = await axiosInstance.get(
-        `${BASE_COURSE_PATH}/enrolled-courses`
-      );
+      const response = await axiosInstance.get(`${BASE_PATH}/enrolled-courses`);
       const result = GetEnrolledCoursesOfUserResponseSchema.parse(
         response.data
       );
@@ -71,7 +67,7 @@ const createCourseApi = (axiosInstance: AxiosInstance) => ({
   ): Promise<GetCourseAnalyticsResponseDTO | ErrorResponseDTO> => {
     try {
       const response = await axiosInstance.get(
-        `${BASE_COURSE_PATH}/analytics/${courseId}`,
+        `${BASE_PATH}/analytics/${courseId}`,
         { params: { filter } }
       );
       const result = GetCourseAnalyticsResponseSchema.parse(response.data);
@@ -87,7 +83,7 @@ const createCourseApi = (axiosInstance: AxiosInstance) => ({
   ): Promise<GetCourseCreationDetailsResponseDTO | ErrorResponseDTO> => {
     try {
       const response = await axiosInstance.get(
-        `${BASE_COURSE_PATH}/create-course/${courseId}`
+        `${BASE_PATH}/create-course/${courseId}`
       );
       const result = GetCourseCreationDetailsResponseSchema.parse(
         response.data
@@ -109,15 +105,13 @@ const createCourseApi = (axiosInstance: AxiosInstance) => ({
       title: string;
       promotionalVideo: string | null;
     }
-  ): Promise<EditCourseCreationDetailsResponseDTO | ErrorResponseDTO> => {
+  ): Promise<NullResponseDTO | ErrorResponseDTO> => {
     try {
       const response = await axiosInstance.put(
-        `${BASE_COURSE_PATH}/edit-course/${courseId}`,
+        `${BASE_PATH}/edit-course/${courseId}`,
         courseDetails
       );
-      const result = EditCourseCreationDetailsResponseSchema.parse(
-        response.data
-      );
+      const result = NullResponseSchema.parse(response.data);
       return result;
     } catch (error) {
       return handleApiError(error);
@@ -130,7 +124,7 @@ const createCourseApi = (axiosInstance: AxiosInstance) => ({
   ): Promise<GetCurriculumResponseDTO | ErrorResponseDTO> => {
     try {
       const response = await axiosInstance.get(
-        `${BASE_COURSE_PATH}/${courseId}/curriculum?status=${status}`
+        `${BASE_PATH}/${courseId}/curriculum?status=${status}`
       );
       const result = GetCurriculumResponseSchema.parse(response.data);
       return result;
@@ -142,15 +136,15 @@ const createCourseApi = (axiosInstance: AxiosInstance) => ({
   markLectureCompleted: async (
     courseId: string,
     lectureId: string
-  ): Promise<MarkLectureAsCompletedResponseDTO | ErrorResponseDTO> => {
+  ): Promise<NullResponseDTO | ErrorResponseDTO> => {
     try {
       const response = await axiosInstance.post(
-        `${BASE_COURSE_PATH}/lectures/${lectureId}/complete`,
+        `${BASE_PATH}/lectures/${lectureId}/complete`,
         {
           courseId,
         }
       );
-      const result = MarkLectureAsCompletedResponseSchema.parse(response.data);
+      const result = NullResponseSchema.parse(response.data);
       return result;
     } catch (error) {
       return handleApiError(error);
@@ -162,7 +156,7 @@ const createCourseApi = (axiosInstance: AxiosInstance) => ({
   ): Promise<GetCourseDetailsResponseDTO | ErrorResponseDTO> => {
     try {
       const response = await axiosInstance.get(
-        `${BASE_COURSE_PATH}/course-details/${courseId}`
+        `${BASE_PATH}/course-details/${courseId}`
       );
       const result = GetCourseDetailsResponseSchema.parse(response.data);
       return result;
@@ -175,7 +169,7 @@ const createCourseApi = (axiosInstance: AxiosInstance) => ({
     GetNewCoursesResponseDTO | ErrorResponseDTO
   > => {
     try {
-      const response = await axiosInstance.get(`${BASE_COURSE_PATH}/new`);
+      const response = await axiosInstance.get(`${BASE_PATH}/new`);
       const result = GetNewCoursesResponseSchema.parse(response.data);
       return result;
     } catch (error) {
@@ -194,7 +188,7 @@ const createCourseApi = (axiosInstance: AxiosInstance) => ({
     search?: string;
   }): Promise<GetCoursesResponseDTO | ErrorResponseDTO> => {
     try {
-      const response = await axiosInstance.get(`${BASE_COURSE_PATH}`, {
+      const response = await axiosInstance.get(`${BASE_PATH}`, {
         params: { sort, category, page, search },
       });
       const result = GetCoursesResponseSchema.parse(response.data);
@@ -210,14 +204,11 @@ const createCourseApi = (axiosInstance: AxiosInstance) => ({
     lectureData: { title: string; videoUrl: string; duration: number }
   ): Promise<AddLectureResponseDTO | ErrorResponseDTO> => {
     try {
-      const response = await axiosInstance.post(
-        `${BASE_COURSE_PATH}/lectures`,
-        {
-          courseId,
-          sectionId,
-          lectureData,
-        }
-      );
+      const response = await axiosInstance.post(`${BASE_PATH}/lectures`, {
+        courseId,
+        sectionId,
+        lectureData,
+      });
       const result = AddLectureResponseSchema.parse(response.data);
       return result;
     } catch (error) {
@@ -228,13 +219,13 @@ const createCourseApi = (axiosInstance: AxiosInstance) => ({
   editlecture: async (
     lectureId: string,
     lectureData: { title: string; videoUrl: string; duration: number }
-  ): Promise<EditLectureResponseDTO | ErrorResponseDTO> => {
+  ): Promise<NullResponseDTO | ErrorResponseDTO> => {
     try {
       const response = await axiosInstance.put(
-        `${BASE_COURSE_PATH}/lectures/${lectureId}`,
+        `${BASE_PATH}/lectures/${lectureId}`,
         { lectureData }
       );
-      const result = EditLectureResponseSchema.parse(response.data);
+      const result = NullResponseSchema.parse(response.data);
       return result;
     } catch (error) {
       return handleApiError(error);
@@ -243,12 +234,12 @@ const createCourseApi = (axiosInstance: AxiosInstance) => ({
 
   deleteLecture: async (
     lectureId: string
-  ): Promise<DeleteLectureResponseDTO | ErrorResponseDTO> => {
+  ): Promise<NullResponseDTO | ErrorResponseDTO> => {
     try {
       const response = await axiosInstance.delete(
-        `${BASE_COURSE_PATH}/lectures/${lectureId}`
+        `${BASE_PATH}/lectures/${lectureId}`
       );
-      const result = DeleteLectureResponseSchema.parse(response.data);
+      const result = NullResponseSchema.parse(response.data);
       return result;
     } catch (error) {
       return handleApiError(error);
@@ -257,13 +248,13 @@ const createCourseApi = (axiosInstance: AxiosInstance) => ({
   editSectionApi: async (
     sectionId: string,
     sectionData: { title: string; description: string }
-  ): Promise<EditSectionResponseDTO | ErrorResponseDTO> => {
+  ): Promise<NullResponseDTO | ErrorResponseDTO> => {
     try {
       const response = await axiosInstance.put(
-        `${BASE_COURSE_PATH}/sections/${sectionId}`,
+        `${BASE_PATH}/sections/${sectionId}`,
         sectionData
       );
-      const result = EditSectionResponseSchema.parse(response.data);
+      const result = NullResponseSchema.parse(response.data);
       return result;
     } catch (error) {
       return handleApiError(error);
@@ -272,12 +263,12 @@ const createCourseApi = (axiosInstance: AxiosInstance) => ({
 
   deleteSectionApi: async (
     sectionId: string
-  ): Promise<DeleteSectionResponseDTO | ErrorResponseDTO> => {
+  ): Promise<NullResponseDTO | ErrorResponseDTO> => {
     try {
       const response = await axiosInstance.delete(
-        `${BASE_COURSE_PATH}/sections/${sectionId}`
+        `${BASE_PATH}/sections/${sectionId}`
       );
-      const result = DeleteSectionResponseSchema.parse(response.data);
+      const result = NullResponseSchema.parse(response.data);
       return result;
     } catch (error) {
       return handleApiError(error);
@@ -289,13 +280,10 @@ const createCourseApi = (axiosInstance: AxiosInstance) => ({
     section: { title: string; description: string }
   ): Promise<AddSectionResponseDTO | ErrorResponseDTO> => {
     try {
-      const response = await axiosInstance.post(
-        `${BASE_COURSE_PATH}/sections`,
-        {
-          section,
-          courseId,
-        }
-      );
+      const response = await axiosInstance.post(`${BASE_PATH}/sections`, {
+        section,
+        courseId,
+      });
       const result = AddSectionResponseSchema.parse(response.data);
       return result;
     } catch (error) {
@@ -309,7 +297,7 @@ const createCourseApi = (axiosInstance: AxiosInstance) => ({
   ): Promise<GenerateLectureUrlResponseDTO | ErrorResponseDTO> => {
     try {
       const response = await axiosInstance.get(
-        `${BASE_COURSE_PATH}/lectures/url/${courseId}/${lectureId}`
+        `${BASE_PATH}/lectures/url/${courseId}/${lectureId}`
       );
       const result = GenerateLectureUrlResponseSchema.parse(response.data);
       return result;
@@ -321,16 +309,13 @@ const createCourseApi = (axiosInstance: AxiosInstance) => ({
   changeOrderOfLectureApi: async (
     draggedLectureId: string,
     targetLectureId: string
-  ): Promise<ChangeOrderOfLectureResponseDTO | ErrorResponseDTO> => {
+  ): Promise<NullResponseDTO | ErrorResponseDTO> => {
     try {
-      const response = await axiosInstance.put(
-        `${BASE_COURSE_PATH}/lectures/order`,
-        {
-          draggedLectureId,
-          targetLectureId,
-        }
-      );
-      const result = ChangeOrderOfLectureResponseSchema.parse(response.data);
+      const response = await axiosInstance.put(`${BASE_PATH}/lectures/order`, {
+        draggedLectureId,
+        targetLectureId,
+      });
+      const result = NullResponseSchema.parse(response.data);
       return result;
     } catch (error) {
       return handleApiError(error);
@@ -347,10 +332,7 @@ const createCourseApi = (axiosInstance: AxiosInstance) => ({
     promotionalVideo: string;
   }): Promise<CreateCourseResponseDTO | ErrorResponseDTO> => {
     try {
-      const response = await axiosInstance.post(
-        `${BASE_COURSE_PATH}`,
-        courseDetails
-      );
+      const response = await axiosInstance.post(`${BASE_PATH}`, courseDetails);
       const result = CreateCourseResponseSchema.parse(response.data);
       return result;
     } catch (error) {
@@ -360,12 +342,12 @@ const createCourseApi = (axiosInstance: AxiosInstance) => ({
 
   submitCourseForReview: async (
     courseId: string
-  ): Promise<SubmitCourseForReviewResponseDTO | ErrorResponseDTO> => {
+  ): Promise<NullResponseDTO | ErrorResponseDTO> => {
     try {
       const response = await axiosInstance.patch(
-        `${BASE_COURSE_PATH}/${courseId}/submit-review`
+        `${BASE_PATH}/${courseId}/submit-review`
       );
-      const result = SubmitCourseForReviewResponseSchema.parse(response.data);
+      const result = NullResponseSchema.parse(response.data);
       return result;
     } catch (error) {
       return handleApiError(error);
@@ -378,7 +360,7 @@ const createCourseApi = (axiosInstance: AxiosInstance) => ({
   ): Promise<GetCoursesOfInstructorResponseDTO | ErrorResponseDTO> => {
     try {
       const response = await axiosInstance.get(
-        `${BASE_COURSE_PATH}/instructor/${instructorId}?status=${status}`
+        `${BASE_PATH}/instructor/${instructorId}?status=${status}`
       );
       const result = GetCoursesOfInstructorResponseSchema.parse(response.data);
       return result;
@@ -388,13 +370,15 @@ const createCourseApi = (axiosInstance: AxiosInstance) => ({
   },
 
   listCourseApi: async (
-    courseId: string
-  ): Promise<ListCourseResponseDTO | ErrorResponseDTO> => {
+    courseId: string,
+    scheduleDate: string
+  ): Promise<NullResponseDTO | ErrorResponseDTO> => {
     try {
       const response = await axiosInstance.patch(
-        `${BASE_COURSE_PATH}/${courseId}/publish`
+        `${BASE_PATH}/${courseId}/publish`,
+        { scheduleDate }
       );
-      const result = ListCourseResponseSchema.parse(response.data);
+      const result = NullResponseSchema.parse(response.data);
       return result;
     } catch (error) {
       return handleApiError(error);

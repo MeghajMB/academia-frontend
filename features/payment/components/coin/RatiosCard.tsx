@@ -9,8 +9,8 @@ function RatiosCard({
   setEditingRatios,
   goldToINRRatio,
   setGoldToINRRatio,
-  redeemCoinToGoldRatio,
-  setRedeemCoinToGoldRatio,
+  redeemPointsToGoldRatio,
+  setRedeemPointsToGoldRatio,
 }) {
   return (
     <motion.div
@@ -87,9 +87,9 @@ function RatiosCard({
               </label>
               <Input
                 type="number"
-                value={redeemCoinToGoldRatio.toString()}
+                value={redeemPointsToGoldRatio.toString()}
                 onChange={(e) =>
-                  setRedeemCoinToGoldRatio(Number(e.target.value))
+                  setRedeemPointsToGoldRatio(Number(e.target.value))
                 }
                 disabled={!editingRatios}
                 variant="bordered"
@@ -103,7 +103,7 @@ function RatiosCard({
                 }}
               />
               <p className="text-xs text-purple-200">
-                1 Redeem Coin = {redeemCoinToGoldRatio} Gold Coin
+                1 Redeem Coin = {redeemPointsToGoldRatio} Gold Coin
               </p>
             </div>
           </div>

@@ -6,8 +6,10 @@ import {
   GenerateGetSignedUrlResponseSchema,
   GeneratePutSignedUrlResponseDTO,
   GeneratePutSignedUrlResponseSchema,
-} from "@/shared/index";
+} from "@academia-dev/common";
 import { handleApiError } from "@/util/handle-api-error";
+
+const BASE_PATH = "/api/files";
 
 const createfileApi = (axiosInstance: AxiosInstance) => ({
   generatePutSignedUrlApi: async (
@@ -15,7 +17,7 @@ const createfileApi = (axiosInstance: AxiosInstance) => ({
   ): Promise<GeneratePutSignedUrlResponseDTO | ErrorResponseDTO> => {
     try {
       const response = await axiosInstance.post(
-        "/api/files/generate-put-signed-url",
+        `${BASE_PATH}/generate-put-signed-url`,
         payload
       );
       const result = GeneratePutSignedUrlResponseSchema.parse(response.data);
@@ -29,7 +31,7 @@ const createfileApi = (axiosInstance: AxiosInstance) => ({
   ): Promise<GenerateGetSignedUrlResponseDTO | ErrorResponseDTO> => {
     try {
       const response = await axiosInstance.post(
-        "/api/files/generate-get-signed-url",
+        `${BASE_PATH}/generate-get-signed-url`,
         { key }
       );
       const result = GenerateGetSignedUrlResponseSchema.parse(response.data);

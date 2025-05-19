@@ -4,11 +4,10 @@ import Link from "next/link";
 import { Eye, EyeOff } from "lucide-react";
 import GoogleSvg from "@/components/svg/GoogleSvg";
 import { useRouter } from "next/navigation";
-import { customAxios } from "@/api/axios";
-import { useAppSelector } from "@/store/hooks";
 import { toast } from "react-toastify";
 import { Input, Spinner } from "@heroui/react";
 import { SubmitHandler, useForm } from "react-hook-form";
+import useAuthApi from "@/hooks/api/useAuthApi";
 
 type FormInputs = {
   name: string;
@@ -25,10 +24,9 @@ const SignupPage = ({
   loading: boolean;
 }) => {
   const [showPassword, setShowPassword] = useState(false);
-  const [isClient, setIsClient] = useState(false); // Track client-side mount
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
-  const { user } = useAppSelector((state) => state.auth);
+  const { signUpApi } = useAuthApi();
   const {
     register,
     handleSubmit,
@@ -36,28 +34,20 @@ const SignupPage = ({
     formState: { errors },
   } = useForm<FormInputs>({ mode: "onChange" });
 
-  // To prevent hydration error
-  useEffect(() => {
-    if (user.role) {
-      router.push("/home");
-    }
-    setIsClient(true);
-  }, []);
-    useEffect(() => setIsLoading(loading), [loading]);
-  if (!isClient) {
-    return null;
-  }
+  useEffect(() => setIsLoading(loading), [loading]);
+
   const onSubmit: SubmitHandler<FormInputs> = async (data) => {
     setIsLoading(true);
     try {
-      await customAxios.post("/api/auth/signup", data);
+      const response = await signUpApi(data);
+      if (response.status == "error") {
+        throw new Error(response.message);
+      }
       sessionStorage.setItem("userEmail", data.email);
-      router.push("/signUp/otp");
+      router.push("/login/otp");
     } catch (error) {
-      console.log(error);
       const errorMessage =
-        error.response.data.errors[0].message ||
-        "Something went wrong!Try again later.";
+        error.message || "Something went wrong!Try again later.";
       toast.error(errorMessage, {
         position: "top-right",
         autoClose: 5000,

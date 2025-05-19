@@ -22,7 +22,6 @@ interface IUser {
   email: string;
   createdAt: string;
   purpleCoin: number;
-  goldCoin: number;
   biography: string;
   profilePicture: string;
 }

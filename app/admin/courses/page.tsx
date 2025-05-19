@@ -7,6 +7,7 @@ import AdminTable from "@/components/common/Table";
 import useAdminApi from "@/hooks/api/useAdminApi";
 import Link from "next/link";
 import { debounce } from "lodash";
+import useCourseApi from "@/hooks/api/useCourseApi";
 
 export interface ICourse {
   id: string;
@@ -26,14 +27,15 @@ export default function AdminCoursePage() {
   const [isLoading, setIsLoading] = useState(false);
   const [loadingId, setLoadingId] = useState<string | null>(null);
 
-  const { fetchCoursesApi, blockCourseApi } = useAdminApi();
+  const { fetchCoursesApi } = useAdminApi();
+  const { blockCourseApi } = useCourseApi();
 
   const fetchAllCourses = useMemo(
     () =>
       debounce(async (page: number) => {
         setIsLoading(true);
         try {
-          const response = await fetchCoursesApi({page});
+          const response = await fetchCoursesApi({ page });
           if (response.status == "error") {
             console.error("Error fetching courses:");
             return;

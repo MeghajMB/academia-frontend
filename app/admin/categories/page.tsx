@@ -9,7 +9,6 @@ import {
 } from "@heroui/react";
 import { EditIcon, SearchIcon } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import useAxiosPrivate from "@/hooks/useAxiosPrivate";
 
 interface ICategory {
   id: string;
@@ -20,6 +19,7 @@ interface ICategory {
 import CategoryModal from "@/features/course/components/admin/CategoryModal";
 import AdminTable from "@/components/common/Table";
 import useAdminApi from "@/hooks/api/useAdminApi";
+import useCategoryApi from "@/hooks/api/useCategoryApi";
 
 export default function AdminCategoriesPage() {
   const [categories, setCategories] = useState<ICategory[]>([]);
@@ -36,7 +36,7 @@ export default function AdminCategoriesPage() {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const { fetchCategoriesApi } = useAdminApi();
 
-  const axiosPrivate = useAxiosPrivate();
+  const {blockCategoryApi}=useCategoryApi()
 
   const fetchPaginatedCategories = useCallback(async (page: number) => {
     setIsLoading(true);
@@ -61,7 +61,10 @@ export default function AdminCategoriesPage() {
 
   async function handleBlockCategory(id: string) {
     try {
-      await axiosPrivate.put(`/api/admin/block-category/${id}`);
+      const response=await blockCategoryApi(id);
+      if(response.status=='error'){
+        throw new Error(response.message)
+      }
       setCategories((prevCategories) =>
         prevCategories.map((category) =>
           category.id == id

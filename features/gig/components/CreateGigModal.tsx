@@ -31,7 +31,7 @@ interface GigFormData {
   minBid: number;
   sessionDate: string;
   maxParticipants: number;
-  biddingAllowed:boolean;
+  biddingAllowed: boolean;
 }
 
 function CreateGigModal({
@@ -54,21 +54,24 @@ function CreateGigModal({
       minBid: 10,
       sessionDate: moment().format("YYYY-MM-DDTHH:mm"),
       maxParticipants: 1,
-      biddingAllowed:true
+      biddingAllowed: true,
     },
   });
   const [commonError, setCommonError] = useState<null | string>(null);
   const onSubmit = async (data: GigFormData) => {
     try {
       setCommonError(null);
-      await onGigCreated(data);
+      await onGigCreated({
+        ...data,
+        sessionDate: moment(data.sessionDate).utc().format("YYYY-MM-DDTHH:mm"),
+      });
       reset(); // Reset form after successful submission
       onClose();
     } catch (error) {
       if (Array.isArray(error)) {
         setCommonError(error[0]?.message || "An error occurred.");
       } else {
-        setCommonError("something happened");
+        setCommonError(error.message);
       }
     }
   };
@@ -127,7 +130,9 @@ function CreateGigModal({
                   <SelectItem key="90">1.5 hours</SelectItem>
                 </Select>
                 {errors.sessionDuration && (
-                  <p className="text-red-500">{errors.sessionDuration.message}</p>
+                  <p className="text-red-500">
+                    {errors.sessionDuration.message}
+                  </p>
                 )}
               </div>
 

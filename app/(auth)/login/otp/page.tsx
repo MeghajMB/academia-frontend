@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Timer from "@/components/common/Timer";
 import useAuthApi from "@/hooks/api/useAuthApi";
 import { toast } from "react-toastify";
+import { useAppSelector } from "@/store/hooks";
 
 const Page: React.FC = () => {
   const router = useRouter();
@@ -16,10 +17,13 @@ const Page: React.FC = () => {
   const [isClient, setIsClient] = useState(false);
   const email = useRef("");
   const { verifyOtpApi, resendOtpApi } = useAuthApi();
+  const { id } = useAppSelector((state) => state.auth.user);
 
   // Initialize refs array
   useEffect(() => {
-    console.log("Hello");
+    if (id) {
+      router.push("/home");
+    }
     inputRefs.current = inputRefs.current.slice(0, 6);
     setIsClient(true);
     const userEmail = sessionStorage.getItem("userEmail");
@@ -28,11 +32,7 @@ const Page: React.FC = () => {
     } else {
       email.current = userEmail;
     }
-    // Uncomment this code in production.In development as we are running on strictmode,unmounts the component twice
-    // return () => {
-    //   sessionStorage.removeItem("userEmail");
-    // };
-  }, [router]);
+  }, [id, router]);
   if (!isClient) {
     return null;
   }
@@ -79,13 +79,22 @@ const Page: React.FC = () => {
     }
 
     try {
-
       const response = await verifyOtpApi({
         otp: otpString,
         email: email.current,
       });
       if (response.status == "success") {
         sessionStorage.removeItem("userEmail");
+        toast("Successfully Registered!Login to continue", {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: true,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+        });
         router.push("/login");
       } else {
         setError(response.message);
@@ -122,7 +131,7 @@ const Page: React.FC = () => {
   }
 
   return (
-    <main className="min-h-screen bg-black text-white flex items-center justify-center px-4 pt-16">
+    <main className="min-h-screen bg-black text-white flex items-center justify-center px-4 -mt-20">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}

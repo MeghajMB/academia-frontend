@@ -42,13 +42,14 @@ function GigPage() {
     try {
       const response = await createGigApi(data);
       if (response.status == "error") {
-        console.log(response.message);
-        return;
+        throw new Error(response.message);
       }
-      setGigs((prevGigs) => [...prevGigs, response.data]);
+      setGigs((prevGigs) => [
+        ...prevGigs,
+        { ...response.data, currentBidder: null },
+      ]);
     } catch (error) {
-      console.log(error);
-    } finally {
+      throw new Error(error.message);
     }
   };
 
@@ -85,11 +86,13 @@ function GigPage() {
       )}
 
       {/* Create Gig Modal */}
-      <CreateGigModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onGigCreated={handleCreateGig}
-      />
+      {isModalOpen && (
+        <CreateGigModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          onGigCreated={handleCreateGig}
+        />
+      )}
     </div>
   );
 }

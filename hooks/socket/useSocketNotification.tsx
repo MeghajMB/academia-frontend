@@ -4,7 +4,7 @@ import {
   setNotifications,
 } from "@/store/features/notification/notificationSlice";
 import { useAppDispatch } from "@/store/hooks";
-import { getSocket } from "@/store/socket";
+import { getSocket } from "@/lib/socket";
 import { INotification } from "@/types/notification";
 import { useEffect } from "react";
 

@@ -44,14 +44,6 @@ export const ReviewDistributionChart = ({ data }: ReviewDistributionProps) => {
           <p className="text-sm">
             <span className="font-semibold">{payload[0].value}</span> reviews
           </p>
-          <p className="text-xs text-gray-500 dark:text-gray-400">
-            {(
-              (payload[0].value /
-                Object.values(data).reduce((a, b) => a + b, 0)) *
-              100
-            ).toFixed(1)}
-            % of total
-          </p>
         </div>
       );
     }

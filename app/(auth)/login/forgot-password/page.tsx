@@ -101,8 +101,7 @@ export default function Page() {
         token: token,
       });
       if (response.status == "error") {
-        setError(response.message);
-        return;
+        throw new Error(response.message)
       }
 
       toast.success("Password reset successfully!", {
@@ -116,7 +115,7 @@ export default function Page() {
         theme: "dark",
       });
     } catch (err) {
-      setError("Failed to reset password");
+      setError(err.message||"Failed to reset password");
     } finally {
       setLoading(false);
     }

@@ -1,6 +1,5 @@
 "use client";
 import InstructorDetail from "@/features/users/components/instructor/InstructorDetail";
-import ProtectedRoute from "@/hoc/ProtectedRoute";
 import useUserApi from "@/hooks/api/useUserApi";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -26,9 +25,5 @@ export default function Page() {
     return null;
   }
 
-  return (
-    <ProtectedRoute role={["instructor", "student"]}>
-      <InstructorDetail reviews={200} totalStudents={200} user={profile} />
-    </ProtectedRoute>
-  );
+  return <InstructorDetail reviews={200} totalStudents={200} user={profile} />;
 }

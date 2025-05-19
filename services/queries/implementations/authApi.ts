@@ -1,22 +1,12 @@
 import {
   ErrorResponseDTO,
-  ForgotPasswordResponseDTO,
-  ForgotPasswordResponseSchema,
-  RegisterInstructorResponseDTO,
-  RegisterInstructorResponseSchema,
-  ResendOtpResponseDTO,
-  ResendOtpResponseSchema,
-  ResetPasswordResponseDTO,
-  ResetPasswordResponseSchema,
+  NullResponseDTO,
+  NullResponseSchema,
   SignInResponseDTO,
   SignInResponseSchema,
-  SignOutResponseDTO,
-  SignOutResponseSchema,
-  VerifyOtpResponseDTO,
-  VerifyOtpResponseSchema,
   VerifyResetOtpResponseDTO,
   VerifyResetOtpResponseSchema,
-} from "@/shared/index";
+} from "@academia-dev/common";
 import axios, { AxiosInstance } from "axios";
 import {
   InstructorPayload,
@@ -25,13 +15,27 @@ import {
 } from "../types/auth.types";
 import { handleApiError } from "@/util/handle-api-error";
 
+const BASE_PATH = "/api/auth";
+
 const createAuthApi = (axiosInstance: AxiosInstance) => ({
+
+  signUpApi: async (
+    payload: {name:string,email:string,password:string}
+  ): Promise<NullResponseDTO | ErrorResponseDTO> => {
+    try {
+      const response = await axiosInstance.post(`${BASE_PATH}/signup`, payload);
+      const result = NullResponseSchema.parse(response.data);
+      return result;
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
 
   signInApi: async (
     payload: {email:string,password:string}
   ): Promise<SignInResponseDTO | ErrorResponseDTO> => {
     try {
-      const response = await axiosInstance.post("/api/auth/signin", payload);
+      const response = await axiosInstance.post(`${BASE_PATH}/signin`, payload);
       const result = SignInResponseSchema.parse(response.data);
       return result;
     } catch (error) {
@@ -40,10 +44,10 @@ const createAuthApi = (axiosInstance: AxiosInstance) => ({
   },
   verifyOtpApi: async (
     data: VerifyOtpPayload
-  ): Promise<VerifyOtpResponseDTO | ErrorResponseDTO> => {
+  ): Promise<NullResponseDTO | ErrorResponseDTO> => {
     try {
-      const response = await axiosInstance.post("/api/auth/verify-otp", data);
-      const result = VerifyOtpResponseSchema.parse(response.data);
+      const response = await axiosInstance.post(`${BASE_PATH}/verify-otp`, data);
+      const result = NullResponseSchema.parse(response.data);
       return result;
     } catch (error) {
       return handleApiError(error);
@@ -52,13 +56,13 @@ const createAuthApi = (axiosInstance: AxiosInstance) => ({
 
   registerInstructorApi: async (
     instructorData: InstructorPayload
-  ): Promise<RegisterInstructorResponseDTO | ErrorResponseDTO> => {
+  ): Promise<NullResponseDTO | ErrorResponseDTO> => {
     try {
       const response = await axiosInstance.post(
-        "/api/auth/register-instructor",
+        `${BASE_PATH}/register-instructor`,
         instructorData
       );
-      const result = RegisterInstructorResponseSchema.parse(response.data);
+      const result = NullResponseSchema.parse(response.data);
       return result;
     } catch (error) {
       return handleApiError(error);
@@ -67,12 +71,12 @@ const createAuthApi = (axiosInstance: AxiosInstance) => ({
 
   resendOtpApi: async (
     email: string
-  ): Promise<ResendOtpResponseDTO | ErrorResponseDTO> => {
+  ): Promise<NullResponseDTO | ErrorResponseDTO> => {
     try {
-      const response = await axiosInstance.post("/api/auth/resend-otp", {
+      const response = await axiosInstance.post(`${BASE_PATH}/resend-otp`, {
         email,
       });
-      const result = ResendOtpResponseSchema.parse(response.data);
+      const result = NullResponseSchema.parse(response.data);
       return result;
     } catch (error) {
       return handleApiError(error);
@@ -81,12 +85,12 @@ const createAuthApi = (axiosInstance: AxiosInstance) => ({
 
   forgotPasswordApi: async (
     email: string
-  ): Promise<ForgotPasswordResponseDTO | ErrorResponseDTO> => {
+  ): Promise<NullResponseDTO | ErrorResponseDTO> => {
     try {
-      const response = await axiosInstance.post("/api/auth/forgot-password", {
+      const response = await axiosInstance.post(`${BASE_PATH}/forgot-password`, {
         email,
       });
-      const result = ForgotPasswordResponseSchema.parse(response.data);
+      const result = NullResponseSchema.parse(response.data);
       return result;
     } catch (error) {
       return handleApiError(error);
@@ -99,7 +103,7 @@ const createAuthApi = (axiosInstance: AxiosInstance) => ({
   }): Promise<VerifyResetOtpResponseDTO | ErrorResponseDTO> => {
     try {
       const response = await axiosInstance.post(
-        "/api/auth/verify-reset-password",
+        `${BASE_PATH}/verify-reset-password`,
         data
       );
       const result = VerifyResetOtpResponseSchema.parse(response.data);
@@ -111,20 +115,20 @@ const createAuthApi = (axiosInstance: AxiosInstance) => ({
 
   resetPasswordApi: async (
     data: ResetPasswordPayload
-  ): Promise<ResetPasswordResponseDTO | ErrorResponseDTO> => {
+  ): Promise<NullResponseDTO | ErrorResponseDTO> => {
     try {
-      const response = await axios.post("/api/auth/reset-password", data);
-      const result = ResetPasswordResponseSchema.parse(response.data);
+      const response = await axios.post(`${BASE_PATH}/reset-password`, data);
+      const result = NullResponseSchema.parse(response.data);
       return result;
     } catch (error) {
       return handleApiError(error);
     }
   },
 
-  logoutApi: async (): Promise<SignOutResponseDTO | ErrorResponseDTO> => {
+  logoutApi: async (): Promise<NullResponseDTO | ErrorResponseDTO> => {
     try {
-      const response = await axiosInstance.post("/api/auth/signout");
-      const result = SignOutResponseSchema.parse(response.data);
+      const response = await axiosInstance.post(`${BASE_PATH}/signout`);
+      const result = NullResponseSchema.parse(response.data);
       return result;
     } catch (error) {
       return handleApiError(error);

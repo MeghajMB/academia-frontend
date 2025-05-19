@@ -1,6 +1,4 @@
 "use client";
-
-import { useForm } from "react-hook-form";
 import {
   Button,
   Modal,
@@ -9,7 +7,6 @@ import {
   ModalFooter,
   ModalHeader,
   Input,
-  PressEvent,
 } from "@heroui/react";
 import moment from "moment";
 import { useState } from "react";
@@ -17,17 +14,7 @@ import { useState } from "react";
 interface ScheduleCourseListModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onListCourse: (data: GigFormData) => Promise<void>;
-}
-
-interface GigFormData {
-  title: string;
-  description: string;
-  sessionDuration: number;
-  minBid: number;
-  sessionDate: string;
-  maxParticipants: number;
-  biddingAllowed: boolean;
+  onListCourse: (date:string) => void;
 }
 
 function ScheduleCourseListModal({
@@ -35,30 +22,16 @@ function ScheduleCourseListModal({
   onClose,
   onListCourse,
 }: ScheduleCourseListModalProps) {
-  const {
-    register,
-    handleSubmit,
-    reset,
-    setValue,
-    watch,
-    formState: { errors, isSubmitting },
-  } = useForm<GigFormData>({
-    defaultValues: {
-      title: "",
-      description: "",
-      sessionDuration: 60,
-      minBid: 10,
-      sessionDate: moment().format("YYYY-MM-DDTHH:mm"),
-      maxParticipants: 1,
-      biddingAllowed: true,
-    },
-  });
   const [commonError, setCommonError] = useState<null | string>(null);
-  const onSubmit = async (data: GigFormData) => {
+  const [date, setDate] = useState<string>(moment().format("YYYY-MM-DDTHH:mm"));
+  const [isLoading, setIsLoading] = useState(false);
+
+  async function handleSubmit() {
+    setIsLoading(true);
     try {
+      const utcDate=moment(date).utc().format("YYYY-MM-DDTHH:mm")
       setCommonError(null);
-      await onListCourse(data);
-      reset(); // Reset form after successful submission
+      await onListCourse(utcDate);
       onClose();
     } catch (error) {
       if (Array.isArray(error)) {
@@ -66,8 +39,10 @@ function ScheduleCourseListModal({
       } else {
         setCommonError("something happened");
       }
+    } finally {
+      setIsLoading(false);
     }
-  };
+  }
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="2xl">
@@ -76,53 +51,34 @@ function ScheduleCourseListModal({
           List Your Course
         </ModalHeader>
         <ModalBody>
-          <form className="grid gap-4" onSubmit={handleSubmit(onSubmit)}>
-            {commonError && <p className="text-red-500">{commonError}</p>}
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Input
-                  type="datetime-local"
-                  label="List Date"
-                  defaultValue={moment().format("YYYY-MM-DDTHH:mm")}
-                  variant="bordered"
-                  {...register("sessionDate", {
-                    required: "Service date is required",
-                  })}
-                />
-                {errors.sessionDate && (
-                  <p className="text-red-500">{errors.sessionDate.message}</p>
-                )}
-              </div>
+          {commonError && <p className="text-red-500">{commonError}</p>}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Input
+                type="datetime-local"
+                label="List Date"
+                defaultValue={date}
+                onChange={(e) => setDate(e.target.value)}
+                variant="bordered"
+              />
             </div>
-          </form>
+          </div>
         </ModalBody>
         <ModalFooter>
           <Button
             color="danger"
             variant="flat"
             onPress={onClose}
-            disabled={isSubmitting}
+            disabled={isLoading}
           >
             Cancel
           </Button>
           <Button
             color="secondary"
-            onPress={
-              handleSubmit(onSubmit) as unknown as (e: PressEvent) => void
-            }
-            isLoading={isSubmitting}
+            onPress={handleSubmit}
+            isLoading={isLoading}
           >
             Schedule course
-          </Button>
-          <Button
-            color="success"
-            onPress={
-              handleSubmit(onSubmit) as unknown as (e: PressEvent) => void
-            }
-            isLoading={isSubmitting}
-          >
-            List now
           </Button>
         </ModalFooter>
       </ModalContent>

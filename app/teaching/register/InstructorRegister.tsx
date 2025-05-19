@@ -6,16 +6,6 @@ import { Loader2, AlertCircle } from "lucide-react";
 import { useAppSelector } from "@/store/hooks";
 import useAuthApi from "@/hooks/api/useAuthApi";
 import useUserApi from "@/hooks/api/useUserApi";
-import {
-  Button,
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  Textarea,
-  useDisclosure,
-} from "@heroui/react";
 
 interface InstructorForm {
   headline: string;
@@ -51,7 +41,6 @@ const InstructorRegister = () => {
     website: "",
     agreement: false,
   });
-  const [rejectReason, setRejectReason] = useState();
 
   const [isClient, setIsClient] = useState(false);
 
@@ -60,12 +49,9 @@ const InstructorRegister = () => {
   const { registerInstructorApi } = useAuthApi();
   const { fetchUserProfileApi } = useUserApi();
 
-  const { isOpen, onOpen, onOpenChange } = useDisclosure();
-
   useEffect(() => {
     async function getProfile() {
       const userData = await fetchUserProfileApi(user.id!);
-      setRejectReason(userData.rejectedReason || "");
       setFormData({
         headline: userData.headline,
         biography: userData.biography,
@@ -170,32 +156,7 @@ const InstructorRegister = () => {
   };
 
   return (
-    <main className="pt-24 px-4">
-      <Modal isOpen={isOpen} onOpenChange={onOpenChange} placement="top-center">
-        <ModalContent>
-          {(onClose) => (
-            <>
-              <ModalHeader className="flex flex-col gap-1">
-                Reason for rejecting instructor request
-              </ModalHeader>
-              <ModalBody>
-                <Textarea
-                  name="rejectReason"
-                  label="Reason"
-                  variant="bordered"
-                  value={rejectReason}
-                  disabled
-                />
-              </ModalBody>
-              <ModalFooter>
-                <Button color="danger" variant="flat" onPress={onClose}>
-                  Close
-                </Button>
-              </ModalFooter>
-            </>
-          )}
-        </ModalContent>
-      </Modal>
+    <main className=" py-8 px-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -213,12 +174,6 @@ const InstructorRegister = () => {
             <AlertCircle className="w-5 h-5" />
             <p>{errors.general}</p>
           </div>
-        )}
-
-        {rejectReason && (
-          <button className="bg-red-600 p-1 rounded-lg" onClick={onOpen}>
-            Click to view Rejected Reason
-          </button>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-6" noValidate>

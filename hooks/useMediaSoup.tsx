@@ -1,5 +1,5 @@
 "use client";
-import { getSocket } from "@/store/socket";
+import { getSocket } from "@/lib/socket";
 import { useEffect, useCallback, useRef, useState } from "react";
 import * as mediasoupClient from "mediasoup-client";
 

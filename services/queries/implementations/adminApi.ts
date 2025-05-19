@@ -1,12 +1,6 @@
 // src/services/queries/adminApi.ts
 import { AxiosInstance } from "axios";
 import {
-  BlockResponseDTO,
-  BlockResponseSchema,
-  CategoryResponseDTO,
-  CategoryResponseSchema,
-  CourseReviewRequestResponseDTO,
-  CourseReviewRequestResponseSchema,
   ErrorResponseDTO,
   GetAdminCoursesResponseDTO,
   GetAdminCoursesResponseSchema,
@@ -18,12 +12,15 @@ import {
   GetInstructorVerificationRequestsResponseSchema,
   GetUsersResponseDTO,
   GetUsersResponseSchema,
-  VerificationRequestResponseDTO,
-  VerificationRequestResponseSchema,
-} from "@/shared/index";
+  NullResponseDTO,
+  NullResponseSchema,
+} from "@academia-dev/common";
 import { handleApiError } from "@/util/handle-api-error";
 
+const BASE_PATH = "/api/admin";
+
 const createAdminApi = (axiosInstance: AxiosInstance) => ({
+
   fetchUsersApi: async ({
     role,
     page,
@@ -34,7 +31,7 @@ const createAdminApi = (axiosInstance: AxiosInstance) => ({
     search?: string;
   }): Promise<GetUsersResponseDTO | ErrorResponseDTO> => {
     try {
-      const response = await axiosInstance.get("/api/admin/get-users", {
+      const response = await axiosInstance.get(`${BASE_PATH}/get-users`, {
         params: { role, page, search },
       });
       const result = GetUsersResponseSchema.parse(response.data);
@@ -52,7 +49,7 @@ const createAdminApi = (axiosInstance: AxiosInstance) => ({
     search?: string;
   }): Promise<GetAdminCoursesResponseDTO | ErrorResponseDTO> => {
     try {
-      const response = await axiosInstance.get("/api/admin/get-courses", {
+      const response = await axiosInstance.get(`${BASE_PATH}/get-courses`, {
         params: { page, search },
       });
       const result = GetAdminCoursesResponseSchema.parse(response.data);
@@ -62,47 +59,19 @@ const createAdminApi = (axiosInstance: AxiosInstance) => ({
     }
   },
 
-  blockCourseApi: async (
-    courseId: string
-  ): Promise<BlockResponseDTO | ErrorResponseDTO> => {
-    try {
-      const response = await axiosInstance.put(
-        `/api/admin/block-course/${courseId}`
-      );
-      const result = BlockResponseSchema.parse(response.data);
-      return result;
-    } catch (error) {
-      return handleApiError(error);
-    }
-  },
-
-  blockUserApi: async (
-    userId: string
-  ): Promise<BlockResponseDTO | ErrorResponseDTO> => {
-    try {
-      const response = await axiosInstance.put(
-        `/api/admin/block-user/${userId}`
-      );
-      const result = BlockResponseSchema.parse(response.data);
-      return result;
-    } catch (error) {
-      return handleApiError(error);
-    }
-  },
-
   rejectInstructorRequestApi: async (
     rejectReason: string,
     userId: string
-  ): Promise<VerificationRequestResponseDTO | ErrorResponseDTO> => {
+  ): Promise<NullResponseDTO | ErrorResponseDTO> => {
     try {
       const response = await axiosInstance.post(
-        `/api/admin/instructor-request/reject`,
+        `${BASE_PATH}/instructor-request/reject`,
         {
           rejectReason,
           userId,
         }
       );
-      const result = VerificationRequestResponseSchema.parse(response.data);
+      const result = NullResponseSchema.parse(response.data);
       return result;
     } catch (error) {
       return handleApiError(error);
@@ -111,15 +80,15 @@ const createAdminApi = (axiosInstance: AxiosInstance) => ({
 
   approveInstructorRequestApi: async (
     userId: string
-  ): Promise<VerificationRequestResponseDTO | ErrorResponseDTO> => {
+  ): Promise<NullResponseDTO | ErrorResponseDTO> => {
     try {
       const response = await axiosInstance.put(
-        `/api/admin/instructor-request/approve`,
+        `${BASE_PATH}/instructor-request/approve`,
         {
           userId,
         }
       );
-      const result = VerificationRequestResponseSchema.parse(response.data);
+      const result = NullResponseSchema.parse(response.data);
       return result;
     } catch (error) {
       return handleApiError(error);
@@ -131,7 +100,7 @@ const createAdminApi = (axiosInstance: AxiosInstance) => ({
   ): Promise<GetInstructorVerificationRequestsResponseDTO | ErrorResponseDTO> => {
     try {
       const response = await axiosInstance.get(
-        `/api/admin/instructor-requests`,
+        `${BASE_PATH}/instructor-requests`,
         {
           params: { page },
         }
@@ -147,44 +116,10 @@ const createAdminApi = (axiosInstance: AxiosInstance) => ({
     page: number
   ): Promise<GetCategoriesResponseDTO | ErrorResponseDTO> => {
     try {
-      const response = await axiosInstance.get(`/api/admin/get-categories`, {
+      const response = await axiosInstance.get(`${BASE_PATH}/get-categories`, {
         params: { page },
       });
       const result = GetCategoriesResponseSchema.parse(response.data);
-      return result;
-    } catch (error) {
-      return handleApiError(error);
-    }
-  },
-
-  createCategoryApi: async (category: {
-    name: string;
-    description: string;
-  }): Promise<CategoryResponseDTO | ErrorResponseDTO> => {
-    try {
-      const response = await axiosInstance.post(
-        "/api/admin/create-category",
-        category
-      );
-      console.log('inside the response')
-      const result = CategoryResponseSchema.parse(response.data);
-      return result;
-    } catch (error) {
-      console.log("inside the error block")
-      return handleApiError(error);
-    }
-  },
-
-  editCategoryApi: async (
-    category: { name: string; description: string },
-    categoryId: string
-  ): Promise<CategoryResponseDTO | ErrorResponseDTO> => {
-    try {
-      const response = await axiosInstance.post("/api/admin/edit-category", {
-        category,
-        categoryId,
-      });
-      const result = CategoryResponseSchema.parse(response.data);
       return result;
     } catch (error) {
       return handleApiError(error);
@@ -196,7 +131,7 @@ const createAdminApi = (axiosInstance: AxiosInstance) => ({
   ): Promise<GetCourseReviewRequestsResponseDTO | ErrorResponseDTO> => {
     try {
       const response = await axiosInstance.get(
-        `/api/admin/course-review-requests`,
+        `${BASE_PATH}/course-review-requests`,
         {
           params: { page },
         }
@@ -211,16 +146,16 @@ const createAdminApi = (axiosInstance: AxiosInstance) => ({
   rejectCourseRequestApi: async (
     rejectReason: string,
     courseId: string
-  ): Promise<CourseReviewRequestResponseDTO | ErrorResponseDTO> => {
+  ): Promise<NullResponseDTO | ErrorResponseDTO> => {
     try {
       const response = await axiosInstance.put(
-        `/api/admin/course-review-requests/reject`,
+        `${BASE_PATH}/course-review-requests/reject`,
         {
           rejectReason,
           courseId,
         }
       );
-      const result = CourseReviewRequestResponseSchema.parse(response.data);
+      const result = NullResponseSchema.parse(response.data);
       return result;
     } catch (error) {
       return handleApiError(error);
@@ -229,15 +164,15 @@ const createAdminApi = (axiosInstance: AxiosInstance) => ({
 
   approveCourseRequestApi: async (
     courseId: string
-  ): Promise<CourseReviewRequestResponseDTO | ErrorResponseDTO> => {
+  ): Promise<NullResponseDTO | ErrorResponseDTO> => {
     try {
       const response = await axiosInstance.put(
-        `/api/admin/course-review-requests/approve`,
+        `${BASE_PATH}/course-review-requests/approve`,
         {
           courseId,
         }
       );
-      const result = CourseReviewRequestResponseSchema.parse(response.data);
+      const result = NullResponseSchema.parse(response.data);
       return result;
     } catch (error) {
       return handleApiError(error);

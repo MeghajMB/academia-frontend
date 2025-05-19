@@ -16,7 +16,7 @@ import { toast } from "react-toastify";
 interface CoinData {
   id: string;
   goldToINRRatio: number;
-  redeemCoinToGoldRatio: number;
+  redeemPointsToGoldRatio: number;
   packages: {
     id: string;
     coinAmount: number;
@@ -32,7 +32,7 @@ export default function CoinAdminPage() {
   // State for editing ratios
   const [editingRatios, setEditingRatios] = useState(false);
   const [goldToINRRatio, setGoldToINRRatio] = useState(0);
-  const [redeemCoinToGoldRatio, setRedeemCoinToGoldRatio] = useState(0);
+  const [redeemPointsToGoldRatio, setRedeemPointsToGoldRatio] = useState(0);
 
   // State for package modal
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -55,11 +55,11 @@ export default function CoinAdminPage() {
   const [packageToDelete, setPackageToDelete] = useState<string | null>(null);
 
   const {
-    fetchCoinConfig,
-    createCoinPackage,
-    updateCoinRatio,
-    deleteCoinPackage,
-    updateCoinPackage,
+    fetchCoinConfigApi,
+    createCoinPackageApi,
+    updateCoinRatioApi,
+    deleteCoinPackageApi,
+    updateCoinPackageApi,
   } = useCoinApi();
 
   const [isLoading, setIsLoading] = useState(true);
@@ -69,11 +69,11 @@ export default function CoinAdminPage() {
   useEffect(() => {
     async function fetchFunction() {
       try {
-        const response = await fetchCoinConfig();
+        const response = await fetchCoinConfigApi();
         if (response.status == "error") return;
         console.log(response.data);
         setCoinData(response.data);
-        setRedeemCoinToGoldRatio(response.data.redeemCoinToGoldRatio);
+        setRedeemPointsToGoldRatio(response.data.redeemPointsToGoldRatio);
         setGoldToINRRatio(response.data.goldToINRRatio);
       } catch (error) {
         console.log(error);
@@ -96,9 +96,9 @@ export default function CoinAdminPage() {
   // Handle saving ratio changes
   const handleSaveRatios = async () => {
     try {
-      const response = await updateCoinRatio({
+      const response = await updateCoinRatioApi({
         goldToINRRatio,
-        redeemCoinToGoldRatio,
+        redeemPointsToGoldRatio,
       });
       if (response.status == "error") {
         throw new Error("Something happened");
@@ -143,7 +143,7 @@ export default function CoinAdminPage() {
       if (!coinData) return;
       if (isNewPackage) {
         // Add new package
-        const response = await createCoinPackage(currentPackage);
+        const response = await createCoinPackageApi(currentPackage);
         if (response.status == "error") {
           return;
         }
@@ -159,7 +159,7 @@ export default function CoinAdminPage() {
         });
       } else {
         if (!currentPackage?.id) return;
-        const response = await updateCoinPackage({
+        const response = await updateCoinPackageApi({
           id: currentPackage.id,
           coinAmount: currentPackage.coinAmount,
           priceInINR: currentPackage.priceInINR,
@@ -192,7 +192,7 @@ export default function CoinAdminPage() {
   const handleConfirmDelete = async () => {
     if (packageToDelete && coinData) {
       try {
-        const response = await deleteCoinPackage(packageToDelete);
+        const response = await deleteCoinPackageApi(packageToDelete);
         if (response.status == "error") {
           throw new Error("something happened");
         }
@@ -293,8 +293,8 @@ export default function CoinAdminPage() {
               setEditingRatios={setEditingRatios}
               goldToINRRatio={goldToINRRatio}
               setGoldToINRRatio={setGoldToINRRatio}
-              redeemCoinToGoldRatio={redeemCoinToGoldRatio}
-              setRedeemCoinToGoldRatio={setRedeemCoinToGoldRatio}
+              redeemPointsToGoldRatio={redeemPointsToGoldRatio}
+              setRedeemPointsToGoldRatio={setRedeemPointsToGoldRatio}
             />
           </Skeleton>
           <Skeleton isLoaded={!isLoading}>

@@ -4,10 +4,12 @@ import { Button } from "@heroui/react";
 import { ShieldAlert, Lock, ArrowLeft } from "lucide-react";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function Unauthorized() {
+  const router = useRouter();
   return (
-    <div className=" bg-gray-950 flex flex-col items-center justify-center px-4 py-12">
+    <div className="flex flex-col items-center justify-center px-4 py-12">
       <div className="max-w-lg w-full">
         {/* Animated Shield Icon */}
         <motion.div
@@ -54,7 +56,7 @@ export default function Unauthorized() {
         >
           <Button
             as="button"
-            onClick={() => window.history.back()}
+            onClick={router.back}
             color="secondary"
             variant="shadow"
             size="lg"

@@ -12,6 +12,7 @@ import { EyeIcon, SearchIcon } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import useAdminApi from "@/hooks/api/useAdminApi";
 import { debounce } from "lodash";
+import useUserApi from "@/hooks/api/useUserApi";
 
 interface IUser {
   id: string;
@@ -34,15 +35,16 @@ export default function UsersTable({
   const [isLoading, setIsLoading] = useState(false);
   const [loadingId, setLoadingId] = useState<string | null>(null);
 
-  const { fetchUsersApi, blockUserApi } = useAdminApi();
+  const { fetchUsersApi } = useAdminApi();
+  const { blockUserApi } = useUserApi();
 
   const fetchPaginatedUsers = debounce(async (page: number) => {
     setIsLoading(true);
     try {
-      const response = await fetchUsersApi({role, page, search:filterValue});
-      if(response.status=='error'){
+      const response = await fetchUsersApi({ role, page, search: filterValue });
+      if (response.status == "error") {
         console.log(response.message);
-        return
+        return;
       }
       setUsers(response.data.users);
       setTotalPages(response.data.pagination.totalPages);

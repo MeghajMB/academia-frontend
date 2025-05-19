@@ -30,7 +30,7 @@ export interface ICourse {
   totalLectures: number;
   totalSections: number;
   isBlocked: boolean;
-  status: "pending" | "accepted" | "rejected" | "draft" | "listed";
+  status: "pending" | "accepted" | "rejected" | "draft" | "listed"|"scheduled";
   rejectedReason: string;
   imageThumbnail: string;
   promotionalVideo: string;

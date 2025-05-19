@@ -25,7 +25,6 @@ import {
   Badge,
   User,
 } from "@heroui/react";
-import InstructorSvg from "../svg/InstructorSvg";
 import {
   Bell,
   LogOut,
@@ -36,6 +35,7 @@ import {
   Briefcase,
   ChevronDown,
   Wallet,
+  GraduationCap,
 } from "lucide-react";
 import ProfilePicture from "@/public/images/blankUserProfile.jpeg";
 import useNotification from "@/hooks/socket/useSocketNotification";
@@ -54,9 +54,9 @@ const UserNavbar: React.FC = () => {
   const path = usePathname();
 
   useEffect(() => {
-    if(user.role!=='admin'){
+    if (user.role !== "admin") {
       setIsClient(true);
-    }else{
+    } else {
       setIsClient(false);
     }
   }, [user.role]);
@@ -79,21 +79,18 @@ const UserNavbar: React.FC = () => {
   let instructorRoute;
   if (user?.role === "student") {
     instructorRoute = {
-      path: "/home/teaching",
+      path: "/teaching",
       label: "Become an Instructor",
-      icon: <InstructorSvg />,
     };
   } else {
     instructorRoute = {
       path: "/instructor",
       label: "Instructor",
-      icon: <InstructorSvg />,
     };
   }
 
   const navigationItems = [
     { path: "/home", label: "Home", icon: <Home size={18} /> },
-    instructorRoute,
     { path: "/home/courses", label: "Courses", icon: <BookOpen size={18} /> },
     {
       path: "/home/gigs",
@@ -118,7 +115,7 @@ const UserNavbar: React.FC = () => {
       <Navbar className="bg-black">
         <NavbarContent>
           <NavbarBrand>
-          <div className="w-8 h-8 bg-primary rounded relative">
+            <div className="w-8 h-8 bg-primary rounded relative">
               <Image src={AcademiaLogo.src} alt="logo" fill />
             </div>
             <p className="font-bold text-inherit ml-2">Academia</p>
@@ -133,8 +130,7 @@ const UserNavbar: React.FC = () => {
       maxWidth="xl"
       isMenuOpen={isMenuOpen}
       onMenuOpenChange={setIsMenuOpen}
-      className="bg-black border-b border-divider"
-      isBordered
+      className="bg-black"
       isBlurred={false}
     >
       <NavbarContent>
@@ -277,6 +273,14 @@ const UserNavbar: React.FC = () => {
                   href="/home/profile"
                 >
                   My Profile
+                </DropdownItem>
+                <DropdownItem
+                  key={instructorRoute.path}
+                  startContent={<GraduationCap size={16} />}
+                  textValue={instructorRoute.label}
+                  href={instructorRoute.path}
+                >
+                  {instructorRoute.label}
                 </DropdownItem>
                 <DropdownItem
                   key="wallet"

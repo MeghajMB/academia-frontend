@@ -171,7 +171,7 @@ export default function Page() {
           <Tooltip content="View">
             <Link
               className="inline-flex items-center justify-center cursor-pointer active:opacity-50"
-              href={``}
+              href={`/admin/review-courses/curriculum/${request.id}`}
             >
               <EyeIcon className="w-5 h-5" />
             </Link>

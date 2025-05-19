@@ -74,9 +74,6 @@ export default function CourseCreation({
   const {
     register,
     handleSubmit,
-    setValue,
-    getValues,
-    watch,
     reset,
     formState: { errors },
   } = useForm<CourseFormData>();
@@ -249,6 +246,7 @@ export default function CourseCreation({
       setIsLoading(true);
       let videoKey = null,
         thumbnailKey = null;
+        
       if (videoFile) {
         if (videoFile.type !== "video/mp4" && videoFile.type !== "video/webm") {
           toast.error("Only MP4 and WebM video formats are allowed", {
@@ -295,6 +293,7 @@ export default function CourseCreation({
           headers: { "Content-Type": videoContentType },
         });
       }
+
       if (imageFile) {
         if (
           imageFile &&
@@ -332,6 +331,7 @@ export default function CourseCreation({
           headers: { "Content-Type": thumbnailContentType },
         });
       }
+
       const sanitizedDescription = DOMPurify.sanitize(formData.description);
       const payload = {
         title: formData.title,

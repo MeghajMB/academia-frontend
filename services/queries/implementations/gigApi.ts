@@ -10,21 +10,21 @@ import {
   GetGigByIdResponseSchema,
   GetGigsOfInstructorResponseDTO,
   GetGigsOfInstructorResponseSchema,
-} from "@/shared";
-import {
   GetSessionsOfUserResponseDTO,
   GetSessionsOfUserResponseSchema,
-} from "@/shared/shared-dtos/session.dto";
+} from "@academia-dev/common";
 import { ICreateGigDTO } from "@/types/gig";
 import { handleApiError } from "@/util/handle-api-error";
 import { AxiosInstance } from "axios";
+
+const BASE_PATH = "/api/gig";
 
 const createGigApi = (axiosInstance: AxiosInstance) => ({
   createGigApi: async (
     data: ICreateGigDTO
   ): Promise<CreateGigResponseDTO | ErrorResponseDTO> => {
     try {
-      const response = await axiosInstance.post("/api/gig/create", data);
+      const response = await axiosInstance.post(`${BASE_PATH}/create`, data);
       const result = CreateGigResponseSchema.parse(response.data);
       return result;
     } catch (error) {
@@ -36,18 +36,19 @@ const createGigApi = (axiosInstance: AxiosInstance) => ({
     GetActiveGigsResponseDTO | ErrorResponseDTO
   > => {
     try {
-      const response = await axiosInstance.get("/api/gig/active");
+      const response = await axiosInstance.get(`${BASE_PATH}/active`);
       const result = GetActiveGigsResponseSchema.parse(response.data);
       return result;
     } catch (error) {
       return handleApiError(error);
     }
   },
+
   getGigByIdApi: async (
     gigId: string
   ): Promise<GetGigByIdResponseDTO | ErrorResponseDTO> => {
     try {
-      const response = await axiosInstance.get(`/api/gig/id/${gigId}`);
+      const response = await axiosInstance.get(`${BASE_PATH}/id/${gigId}`);
       const result = GetGigByIdResponseSchema.parse(response.data);
       return result;
     } catch (error) {
@@ -60,7 +61,7 @@ const createGigApi = (axiosInstance: AxiosInstance) => ({
   ): Promise<GetActiveGigsOfInstructorResponseDTO | ErrorResponseDTO> => {
     try {
       const response = await axiosInstance.get(
-        `/api/gig/active/${instructorId}`
+        `${BASE_PATH}/active/${instructorId}`
       );
       const result = GetActiveGigsOfInstructorResponseSchema.parse(
         response.data
@@ -83,7 +84,7 @@ const createGigApi = (axiosInstance: AxiosInstance) => ({
     search?: string;
   }): Promise<GetGigsOfInstructorResponseDTO | ErrorResponseDTO> => {
     try {
-      const response = await axiosInstance.get(`/api/gig/all`, {
+      const response = await axiosInstance.get(`${BASE_PATH}/all`, {
         params: { sort, status, page, search },
       });
       const result = GetGigsOfInstructorResponseSchema.parse(response.data);
@@ -103,7 +104,7 @@ const createGigApi = (axiosInstance: AxiosInstance) => ({
     search?: string;
   }): Promise<GetSessionsOfUserResponseDTO | ErrorResponseDTO> => {
     try {
-      const response = await axiosInstance.get(`/api/gig/session/all`, {
+      const response = await axiosInstance.get(`${BASE_PATH}/session/all`, {
         params: { status, page, search },
       });
       const result = GetSessionsOfUserResponseSchema.parse(response.data);
