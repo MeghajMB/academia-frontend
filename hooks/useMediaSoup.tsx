@@ -28,7 +28,7 @@ function useMediaSoup() {
       stream: MediaStream;
       kind: "audio" | "video";
       type: "camera" | "screen" | "mic";
-      profilePicture:string;
+      profilePicture: string;
       userName: string;
       paused: boolean;
     }[];
@@ -291,6 +291,8 @@ function useMediaSoup() {
             userName: string;
           }[];
         }) => {
+          console.log("These are the producer Ids");
+          console.log(producerIds);
           setProducerIds(
             producerIds.map((producerData) => ({
               producerId: producerData.producerId,
@@ -351,15 +353,17 @@ function useMediaSoup() {
           consumerData: IConsumerInfo & {
             userId: string;
             userName: string;
-            profilePicture:string;
+            profilePicture: string;
             type: "camera" | "screen" | "mic";
-            pause:boolean
+            pause: boolean;
           };
         }) => {
           if (status === "error") {
             console.error("Consume error:");
             return;
           }
+          console.log("This is the consumer data");
+          console.log(consumerData);
           const consumer = await consumerTransport.consume({
             id: consumerData.id,
             producerId: consumerData.producerId,
@@ -381,7 +385,7 @@ function useMediaSoup() {
                   producerId: consumerData.producerId,
                   type: consumerData.type,
                   userName: consumerData.userName,
-                  profilePicture:consumerData.profilePicture,
+                  profilePicture: consumerData.profilePicture,
                   paused: consumerData.pause,
                 });
               }
@@ -394,7 +398,7 @@ function useMediaSoup() {
                   type: consumerData.type,
                   userName: consumerData.userName,
                   paused: consumerData.pause,
-                  profilePicture:consumerData.profilePicture
+                  profilePicture: consumerData.profilePicture,
                 },
               ];
             }
@@ -528,10 +532,10 @@ function useMediaSoup() {
           videoProd.pause();
         }
         if (initialMicPaused) {
-          audioProd.pause()
+          audioProd.pause();
         }
-        setIsVideoPaused(initialVideoPaused)
-        setIsAudioMuted(initialMicPaused)
+        setIsVideoPaused(initialVideoPaused);
+        setIsAudioMuted(initialMicPaused);
         videoProd.on("trackended", () => console.log("Video track ended"));
         videoProd.on("transportclose", () =>
           console.log("Video transport closed")
