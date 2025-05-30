@@ -481,6 +481,7 @@ function useMediaSoup() {
   }, [socket]);
   /* Cleanup useEffect */
   useEffect(() => {
+    console.log("cleanup triggered")
     return () => {
       videoProducer?.close();
       audioProducer?.close();
