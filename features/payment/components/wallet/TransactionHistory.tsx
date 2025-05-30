@@ -64,7 +64,7 @@ export const TransactionHistory = () => {
       }
     }
     fetchTransactionHistory();
-  }, [purchaseTypeFilter,typeFilter,currentPage]);
+  }, [purchaseTypeFilter, typeFilter, currentPage]);
   if (isLoading) {
     return <Spinner />;
   }
@@ -85,7 +85,15 @@ export const TransactionHistory = () => {
                 placeholder="Select a type"
                 selectedKeys={[purchaseTypeFilter]}
                 variant="bordered"
-                onChange={(e) => setpurchaseTypeFilter(e.target.value)}
+                onChange={(e) =>
+                  setpurchaseTypeFilter(
+                    e.target.value as unknown as
+                      | "all"
+                      | "course"
+                      | "coins"
+                      | "conversion"
+                  )
+                }
               >
                 {PURCHASE_OPTIONS.map((purchase) => (
                   <SelectItem key={purchase}>{purchase}</SelectItem>
@@ -97,7 +105,11 @@ export const TransactionHistory = () => {
                 placeholder="Select a type"
                 selectedKeys={[typeFilter]}
                 variant="bordered"
-                onChange={(e) => setTypeFilter(e.target.value)}
+                onChange={(e) =>
+                  setTypeFilter(
+                    e.target.value as unknown as "all" | "debit" | "credit"
+                  )
+                }
               >
                 {TYPE_OPTIONS.map((purchase) => (
                   <SelectItem key={purchase}>{purchase}</SelectItem>

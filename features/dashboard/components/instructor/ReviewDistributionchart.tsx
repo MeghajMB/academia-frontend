@@ -12,6 +12,7 @@ import { motion } from "framer-motion";
 import { useEffect, useRef } from "react";
 
 type ReviewDistributionProps = {
+  isLoading:boolean
   data: {
     1: number;
     2: number;
@@ -21,7 +22,7 @@ type ReviewDistributionProps = {
   };
 };
 
-export const ReviewDistributionChart = ({ data }: ReviewDistributionProps) => {
+export const ReviewDistributionChart = ({ data,isLoading }: ReviewDistributionProps) => {
   const chartData = [
     { name: "1 Star", value: data[1], color: "#0088FE" },
     { name: "2 Stars", value: data[2], color: "#00C49F" },

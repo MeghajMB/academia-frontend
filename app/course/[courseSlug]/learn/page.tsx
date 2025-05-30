@@ -22,18 +22,18 @@ export default function LearnPage() {
       try {
         if (courseSlug && typeof courseSlug == "string") {
           const response = await fetchCurriculum(courseSlug, "student");
-          if(response.status=='error'){
+          if (response.status == "error") {
             setError(true);
-            return
+            return;
           }
           setSections(response.data);
-          // ✅ Find the first incomplete lecture
+
           const firstIncompleteLecture = response.data
-            .flatMap((section:ISection) => section.lectures)
-            .find((lecture:ILecture) => lecture.progress !== "completed");
+            .flatMap((section: ISection) => section.lectures)
+            .find((lecture: ILecture) => lecture.progress !== "completed");
 
           setActiveLecture(
-            firstIncompleteLecture || response.data[0]?.lectures[0] 
+            firstIncompleteLecture || response.data[0]?.lectures[0]
           );
           //
           setIsClient(true);
@@ -49,10 +49,24 @@ export default function LearnPage() {
   const handleLectureComplete = useCallback(async () => {
     try {
       if (!activeLecture) return;
-      const response=await markLectureCompleted(courseSlug as string, activeLecture.id);
-      if(response.status=='error'){
-        console.log(response.message)
+      const response = await markLectureCompleted(
+        courseSlug as string,
+        activeLecture.id
+      );
+      if (response.status == "error") {
+        throw new Error(response.message);
       }
+      setSections((prev) => {
+        return prev.map((section) => {
+          const updatedLectures = section.lectures.map((lecture) => {
+            if (lecture.id == activeLecture.id) {
+              return { ...lecture, progress: "completed" } as ILecture;
+            }
+            return lecture;
+          });
+          return { ...section, lectures: updatedLectures };
+        });
+      });
     } catch (error) {
       console.log(error);
     }
@@ -67,7 +81,7 @@ export default function LearnPage() {
   }
   return (
     <>
-      <div className="flex flex-col lg:flex-row w-full min-h-screen text-white pt-24 px-7">
+      <div className="flex flex-col lg:flex-row w-full min-h-screen text-white pt-10 px-7">
         {/* Left Section */}
         <div
           className={`w-full ${

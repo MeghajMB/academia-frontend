@@ -23,7 +23,7 @@ const CoursesPage = () => {
         setIsLoading(true);
         const response = await fetchCoursesOfInstructorWithStatus(id!, "all");
         if (response.status == "error") {
-          return;
+          throw new Error(response.message)
         }
         setCourses(response.data);
       } catch (error) {
@@ -34,7 +34,7 @@ const CoursesPage = () => {
       }
     }
     fetchAllCourses();
-  }, [id]);
+  }, []);
 
   const handleListCourse = async (courseId: string, date: string) => {
     try {

@@ -31,6 +31,7 @@ const SignupPage = ({
     register,
     handleSubmit,
     watch,
+    setError,
     formState: { errors },
   } = useForm<FormInputs>({ mode: "onChange" });
 
@@ -41,13 +42,33 @@ const SignupPage = ({
     try {
       const response = await signUpApi(data);
       if (response.status == "error") {
-        throw new Error(response.message);
+        if (response.errors) {
+          response.errors.forEach((error) => {
+            if (
+              error.field &&
+              ["name", "email", "password", "confirmPassword"].includes(
+                error.field
+              )
+            )
+              setError(error.field as unknown as "name", {
+                type: "manual",
+                message: error.message,
+              });
+          });
+          return;
+        } else {
+          throw new Error(response.message);
+        }
       }
       sessionStorage.setItem("userEmail", data.email);
       router.push("/login/otp");
     } catch (error) {
-      const errorMessage =
-        error.message || "Something went wrong!Try again later.";
+      let errorMessage;
+      if (error instanceof Error) {
+        errorMessage = error.message || "Something went wrong!Try again later.";
+      } else {
+        errorMessage = "Something went wrong!Try again later.";
+      }
       toast.error(errorMessage, {
         position: "top-right",
         autoClose: 5000,

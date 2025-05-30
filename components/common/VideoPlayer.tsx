@@ -2,7 +2,31 @@ import React from "react";
 import VideoJS from "@/components/common/VideoJS";
 import videojs from "video.js";
 
-export default function VideoPlayer({ videoLink,onEnded }: { videoLink: string,onEnded?:()=>void }) {
+export interface VideoJsOptionsTypes {
+  autoplay: boolean;
+  controls: boolean;
+  responsive: boolean;
+  fluid: boolean;
+  preload: string;
+  sources: {
+    src: string;
+    type: string;
+    withCredentials: boolean;
+  }[];
+  html5: {
+    nativeAudioTracks: boolean;
+    nativeVideoTracks: boolean;
+    nativeTextTracks: boolean;
+  };
+}
+
+export default function VideoPlayer({
+  videoLink,
+  onEnded,
+}: {
+  videoLink: string;
+  onEnded?: () => void;
+}) {
   const playerRef = React.useRef(null);
 
   const videoJsOptions = {
@@ -10,22 +34,23 @@ export default function VideoPlayer({ videoLink,onEnded }: { videoLink: string,o
     controls: true,
     responsive: true,
     fluid: true,
-    preload:'auto',
+    preload: "auto",
     sources: [
       {
         src: videoLink,
         type: "application/x-mpegURL", // HLS format
-        withCredentials: true
+        withCredentials: true,
       },
     ],
     html5: {
       nativeAudioTracks: true,
       nativeVideoTracks: true,
-      nativeTextTracks: true
-    }
+      nativeTextTracks: true,
+    },
   };
 
-  const handlePlayerReady = (player) => {
+  const handlePlayerReady = (player:any) => {
+
     playerRef.current = player;
 
     player.on("waiting", () => {
@@ -37,11 +62,10 @@ export default function VideoPlayer({ videoLink,onEnded }: { videoLink: string,o
     });
 
     player.on("ended", () => {
-      if(onEnded){
-        onEnded()
+      if (onEnded) {
+        onEnded();
       }
     });
-
   };
 
   return <VideoJS options={videoJsOptions} onReady={handlePlayerReady} />;

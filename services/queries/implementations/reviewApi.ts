@@ -1,4 +1,6 @@
 import {
+  AddReviewResponseDTO,
+  AddReviewResponseSchema,
   ErrorResponseDTO,
   GetReviewsOfCourseResponseDTO,
   GetReviewsOfCourseResponseSchema,
@@ -16,7 +18,9 @@ const createReviewApi = (axiosInstance: AxiosInstance) => ({
     courseId: string
   ): Promise<GetReviewsOfCourseResponseDTO | ErrorResponseDTO> => {
     try {
-      const response = await axiosInstance.get(`${BASE_PATH}/course/${courseId}`);
+      const response = await axiosInstance.get(
+        `${BASE_PATH}/course/${courseId}`
+      );
       const result = GetReviewsOfCourseResponseSchema.parse(response.data);
       return result;
     } catch (error) {
@@ -43,7 +47,7 @@ const createReviewApi = (axiosInstance: AxiosInstance) => ({
     rating: number;
   }): Promise<GetReviewsOfCourseResponseDTO | ErrorResponseDTO> => {
     try {
-      const {reviewId,...data}=reviewData;
+      const { reviewId, ...data } = reviewData;
       const response = await axiosInstance.put(
         `${BASE_PATH}/${reviewId}`,
         data
@@ -57,9 +61,7 @@ const createReviewApi = (axiosInstance: AxiosInstance) => ({
     reviewId: string
   ): Promise<NullResponseDTO | ErrorResponseDTO> => {
     try {
-      const response = await axiosInstance.delete(
-        `${BASE_PATH}/delete/${reviewId}`
-      );
+      const response = await axiosInstance.delete(`${BASE_PATH}/${reviewId}`);
       const result = NullResponseSchema.parse(response.data);
       return result;
     } catch (error) {
@@ -72,14 +74,15 @@ const createReviewApi = (axiosInstance: AxiosInstance) => ({
     courseId: string,
     rating: number,
     comment?: string
-  ): Promise<GetReviewsOfCourseResponseDTO | ErrorResponseDTO> => {
+  ): Promise<AddReviewResponseDTO | ErrorResponseDTO> => {
     try {
       const response = await axiosInstance.post(`${BASE_PATH}/add-review`, {
         courseId,
         rating,
         comment,
       });
-      return response.data;
+      const result = AddReviewResponseSchema.parse(response.data);
+      return result;
     } catch (error) {
       return handleApiError(error);
     }

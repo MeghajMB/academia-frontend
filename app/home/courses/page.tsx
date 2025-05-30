@@ -73,16 +73,11 @@ export default function CourseListingPage() {
         <h1 className="text-3xl font-bold text-white mb-6">Explore Courses</h1>
         <div className="flex flex-col md:flex-row gap-4">
           <Input
-            classNames={{
-              base: "max-w-full md:max-w-md",
-              inputWrapper: "bg-gray-800 border-purple-500/20 border",
-            }}
             placeholder="Search by course or instructor name..."
             startContent={<Search className="text-white" size={18} />}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            color="secondary"
-            variant="bordered"
+            variant="underlined"
           />
 
           <div className="flex gap-2 ml-auto">
@@ -93,18 +88,12 @@ export default function CourseListingPage() {
 
             <Dropdown>
               <DropdownTrigger>
-                <Button
-                  variant="bordered"
-                  color="secondary"
-                  className="bg-gray-800 border-purple-500/20 border"
-                  endContent={<ChevronDown size={16} />}
-                >
+                <Button color="default" endContent={<ChevronDown size={16} />}>
                   {sortBy}
                 </Button>
               </DropdownTrigger>
               <DropdownMenu
                 aria-label="Sort options"
-                className="bg-gray-800 border-purple-500/20 border"
                 onAction={(key) => setSortBy(key as string)}
               >
                 {SORT_OPTIONS.map((option) => (
@@ -137,7 +126,6 @@ export default function CourseListingPage() {
               <Spinner />
             )}
 
-            {/* Pagination */}
           </>
         )}
         {totalPages > 1 && (

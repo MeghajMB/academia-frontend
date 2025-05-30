@@ -2,6 +2,8 @@
 import { AxiosInstance } from "axios";
 import {
   ErrorResponseDTO,
+  GetAdminAnalyticsResponseDTO,
+  GetAdminAnalyticsResponseSchema,
   GetAdminCoursesResponseDTO,
   GetAdminCoursesResponseSchema,
   GetCategoriesResponseDTO,
@@ -20,6 +22,25 @@ import { handleApiError } from "@/util/handle-api-error";
 const BASE_PATH = "/api/admin";
 
 const createAdminApi = (axiosInstance: AxiosInstance) => ({
+  getAdminAnalytics: async ({
+    filter,
+    endDate,
+    startDate,
+  }: {
+    filter: "quarter" | "month" | "year" | "custom";
+    endDate: string | undefined;
+    startDate: string | undefined;
+  }): Promise<GetAdminAnalyticsResponseDTO | ErrorResponseDTO> => {
+    try {
+      const response = await axiosInstance.get(`${BASE_PATH}/analytics`, {
+        params: { filter, endDate, startDate },
+      });
+      const result = GetAdminAnalyticsResponseSchema.parse(response.data);
+      return result;
+    } catch (error) {
+      return handleApiError(error);
+    }
+  },
 
   fetchUsersApi: async ({
     role,
@@ -97,7 +118,9 @@ const createAdminApi = (axiosInstance: AxiosInstance) => ({
 
   fetchInstructorRequestsApi: async (
     page: number
-  ): Promise<GetInstructorVerificationRequestsResponseDTO | ErrorResponseDTO> => {
+  ): Promise<
+    GetInstructorVerificationRequestsResponseDTO | ErrorResponseDTO
+  > => {
     try {
       const response = await axiosInstance.get(
         `${BASE_PATH}/instructor-requests`,
@@ -105,7 +128,9 @@ const createAdminApi = (axiosInstance: AxiosInstance) => ({
           params: { page },
         }
       );
-      const result = GetInstructorVerificationRequestsResponseSchema.parse(response.data);
+      const result = GetInstructorVerificationRequestsResponseSchema.parse(
+        response.data
+      );
       return result;
     } catch (error) {
       return handleApiError(error);

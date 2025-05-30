@@ -15,7 +15,7 @@ export interface ICourse {
   price: number;
   title: string;
   isBlocked: boolean;
-  status: "pending" | "accepted" | "rejected" | "draft" | "listed";
+  status: "pending" | "accepted" | "rejected" | "draft" | "listed"|"scheduled";
 }
 
 export default function AdminCoursePage() {

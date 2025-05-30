@@ -17,7 +17,6 @@ interface ICourseDetails {
   price: number;
   subtitle: string;
   description: string;
-  rejectedReason: string;
   canSubmitReview: boolean;
 }
 

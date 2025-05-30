@@ -1,11 +1,11 @@
 export interface ICreateGigDTO {
-  title: string;
+  sessionDate: string;
   description: string;
-  price: number;
   biddingAllowed: boolean;
-  duration: string;
+  sessionDuration: number;
   maxParticipants: number;
-  date: string; // Received as a string
+  minBid: number;
+  title: string;
 }
 
 export interface IGig {

@@ -31,7 +31,6 @@ export interface ICourse {
   totalSections: number;
   isBlocked: boolean;
   status: "pending" | "accepted" | "rejected" | "draft" | "listed"|"scheduled";
-  rejectedReason: string;
   imageThumbnail: string;
   promotionalVideo: string;
   createdAt: string;

@@ -3,15 +3,19 @@
 import useGigApi from "@/hooks/api/useGigApi";
 import type React from "react";
 import { useEffect, useState } from "react";
-import { Button } from "@heroui/react";
+import { Button, Pagination, Select, SelectItem } from "@heroui/react";
 import { PlusIcon } from "lucide-react";
 import { GigCard } from "@/features/gig/components/GigCard";
-import { IGig } from "@/types/gig";
+import { ICreateGigDTO, IGig } from "@/types/gig";
 import CreateGigModal from "@/features/gig/components/CreateGigModal";
 
 function GigPage() {
   const { getGigsOfInstructorApi, createGigApi } = useGigApi();
   const [gigs, setGigs] = useState<IGig[]>([]);
+  const [gigStatus, setGigStatus] = useState<
+    "active" | "expired" | "completed" | "no-bids" | "missed"
+  >("active");
+  const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -20,8 +24,8 @@ function GigPage() {
       try {
         setIsLoading(true);
         const response = await getGigsOfInstructorApi({
-          page: 1,
-          status: "active",
+          page: currentPage,
+          status: gigStatus,
         });
         if (response.status == "error") {
           console.error("Error fetching gigs:", response.message);
@@ -36,9 +40,9 @@ function GigPage() {
       }
     }
     fetchData();
-  }, []);
+  }, [gigStatus, currentPage]);
 
-  const handleCreateGig = async (data) => {
+  const handleCreateGig = async (data: ICreateGigDTO) => {
     try {
       const response = await createGigApi(data);
       if (response.status == "error") {
@@ -49,7 +53,7 @@ function GigPage() {
         { ...response.data, currentBidder: null },
       ]);
     } catch (error) {
-      throw new Error(error.message);
+      if (error instanceof Error) throw new Error(error.message);
     }
   };
 
@@ -57,13 +61,38 @@ function GigPage() {
     <div className="container mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-2xl font-bold">My Gigs</h1>
-        <Button
-          color="primary"
-          startContent={<PlusIcon size={16} />}
-          onPress={() => setIsModalOpen(true)}
-        >
-          Create Gig
-        </Button>
+        <div className="flex space-x-2 items-center">
+          <Button
+            color="primary"
+            startContent={<PlusIcon size={16} />}
+            onPress={() => setIsModalOpen(true)}
+          >
+            Create Gig
+          </Button>
+          <Select
+            className="max-w-48"
+            label="Purchase Type"
+            placeholder="Select a type"
+            selectedKeys={[gigStatus]}
+            variant="bordered"
+            onChange={(e) =>
+              setGigStatus(
+                e.target.value as unknown as
+                  | "active"
+                  | "expired"
+                  | "completed"
+                  | "no-bids"
+                  | "missed"
+              )
+            }
+          >
+            {["active", "expired", "completed", "no-bids", "missed"].map(
+              (status) => (
+                <SelectItem key={status}>{status}</SelectItem>
+              )
+            )}
+          </Select>
+        </div>
       </div>
 
       {isLoading ? (
@@ -78,10 +107,26 @@ function GigPage() {
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {gigs.map((gig) => (
-            <GigCard key={gig.id} gig={gig} />
-          ))}
+        <div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {gigs.map((gig) => (
+              <GigCard key={gig.id} gig={gig} />
+            ))}
+          </div>
+          <Pagination
+            isCompact
+            showControls
+            showShadow
+            classNames={{
+              cursor: "bg-foreground text-background",
+            }}
+            color="secondary"
+            isDisabled={false}
+            page={currentPage}
+            total={1}
+            variant="light"
+            onChange={(page) => setCurrentPage(page)}
+          />
         </div>
       )}
 

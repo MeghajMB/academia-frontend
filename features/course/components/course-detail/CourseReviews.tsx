@@ -5,15 +5,10 @@ import { ReviewForm } from "./ReviewForm";
 import { ReviewStatistics } from "./ReviewStatistics";
 import { Review, IReviewStats } from "@/types/review";
 import useReviewApi from "@/hooks/api/useReviewApi";
+import { toast } from "react-toastify";
 
 interface CourseReviewsProps {
   currentUserId?: string;
-  onEditReview: (review: {
-    comment: string;
-    id: string;
-    rating: number;
-  }) => void;
-  onDeleteReview: (reviewId: string) => void;
   canReview: boolean;
   hasReviewed: boolean;
   courseId: string;
@@ -21,8 +16,6 @@ interface CourseReviewsProps {
 
 function CourseReviews({
   currentUserId,
-  onEditReview,
-  onDeleteReview,
   canReview,
   courseId,
   hasReviewed,
@@ -41,7 +34,12 @@ function CourseReviews({
   });
   const [editingReviewId, setEditingReviewId] = useState<string | null>(null);
   const [isAddingReview, setIsAddingReview] = useState(false);
-  const { fetchCourseReviewsApi, addReviewApi } = useReviewApi();
+  const {
+    fetchCourseReviewsApi,
+    addReviewApi,
+    editReviewApi,
+    deleteReviewApi,
+  } = useReviewApi();
   useEffect(() => {
     fetchReviews();
   }, []);
@@ -61,21 +59,75 @@ function CourseReviews({
   };
 
   const handleAddReview = async (review: Partial<Review>) => {
-    await addReviewApi(courseId, Number(review.rating), review.comment);
-    setIsAddingReview(false);
+    try {
+      const response = await addReviewApi(
+        courseId,
+        Number(review.rating),
+        review.comment
+      );
+      if (response.status == "error") throw new Error(response.message);
+      setIsAddingReview(false);
+    } catch (error) {
+      console.log(error);
+    }
   };
-
-  const handleEditReview = (review: Partial<Review>) => {
-    console.log(review);
-    onEditReview(
-      review as unknown as {
-        comment: string;
-        id: string;
-        rating: number;
+  async function handleEditReview(review: {
+    comment: string;
+    id: string;
+    rating: number;
+  }) {
+    try {
+      const { id: reviewId, ...rest } = review;
+      const updatedDetails = { ...rest, reviewId, courseId };
+      const response = await editReviewApi(updatedDetails);
+      if (response.status == "error") {
+        throw new Error(response.message);
       }
-    );
-    setEditingReviewId(null);
-  };
+      setReviews((prevReviews) => {
+        return prevReviews.map((prevReview) => {
+          if (prevReview.id == review.id) {
+            prevReview.comment = review.comment;
+            prevReview.rating = review.rating;
+          }
+          return prevReview;
+        });
+      });
+      toast("Successfully Edited Your Review!", {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: true,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+      });
+      setEditingReviewId(null);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  async function handleDeleteReview(reviewId: string) {
+    try {
+      const response = await deleteReviewApi(reviewId);
+      if (response.status == "error") throw new Error(response.message);
+      setReviews((prevReviews) => {
+        return prevReviews.filter((prevReview) => prevReview.id !== reviewId);
+      });
+      toast("Successfully deleted Your Review!", {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: true,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   return (
     <div className="space-y-6">
@@ -147,7 +199,7 @@ function CourseReviews({
                               variant="light"
                               size="sm"
                               color="danger"
-                              onPress={() => onDeleteReview(review.id)}
+                              onPress={() => handleDeleteReview(review.id)}
                             >
                               <Trash2 size={16} />
                             </Button>

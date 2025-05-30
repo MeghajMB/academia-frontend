@@ -2,8 +2,14 @@ import React from "react";
 import videojs from "video.js";
 import "video.js/dist/video-js.css";
 import "videojs-hls-quality-selector";
+import { VideoJsOptionsTypes } from "./VideoPlayer";
 
-export const VideoJS = (props) => {
+interface VideoJsProps{
+  options:VideoJsOptionsTypes,
+  onReady:(player: any) => void
+}
+
+export const VideoJS = (props:VideoJsProps) => {
   const videoRef = React.useRef(null);
   const playerRef = React.useRef(null);
   const { options, onReady } = props;

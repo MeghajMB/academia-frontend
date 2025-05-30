@@ -37,10 +37,11 @@ export default function CoinAdminPage() {
   // State for package modal
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [currentPackage, setCurrentPackage] = useState<{
-    id?: string;
+    id: string;
     coinAmount: number;
     priceInINR: number;
   }>({
+    id: Math.random() + "",
     coinAmount: 0,
     priceInINR: 0,
   });
@@ -104,6 +105,7 @@ export default function CoinAdminPage() {
         throw new Error("Something happened");
       }
     } catch (error) {
+      console.log(error);
       toast.error("Something happened.Refresh the page.", {
         position: "top-right",
         autoClose: 5000,
@@ -132,7 +134,7 @@ export default function CoinAdminPage() {
 
   // Handle opening package modal for creating
   const handleAddPackage = () => {
-    setCurrentPackage({ coinAmount: 0, priceInINR: 0 });
+    setCurrentPackage({ coinAmount: 0, priceInINR: 0, id: Math.random() + "" });
     setIsNewPackage(true);
     onOpen();
   };
@@ -204,6 +206,7 @@ export default function CoinAdminPage() {
           }),
         });
       } catch (error) {
+        console.log(error);
         toast.error("Failed to delete the package", {
           position: "top-right",
           autoClose: 5000,
@@ -218,8 +221,8 @@ export default function CoinAdminPage() {
     }
   };
 
-  const renderCell = (pkg: any, columnKey: React.Key) => {
-    const cellValue = pkg[columnKey as keyof any];
+  const renderCell = (pkg: CoinData["packages"][0], columnKey: React.Key) => {
+    const cellValue = pkg[columnKey as keyof CoinData["packages"][0]];
     switch (columnKey) {
       case "coin-amount":
         return (
@@ -251,7 +254,7 @@ export default function CoinAdminPage() {
                 size="sm"
                 variant="light"
                 color="danger"
-                onClick={() => handleDeleteClick(pkg.id)}
+                onClick={() => handleDeleteClick(pkg.id!)}
               >
                 <Trash2 className="w-4 h-4" />
               </Button>

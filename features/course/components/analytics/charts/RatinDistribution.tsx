@@ -41,7 +41,7 @@ export const RatingDistribution = ({ data }: RatingDistributionProps) => {
             <StarIcon
               key={star}
               size={20}
-              className={Number.parseFloat(data.average) >= star ? "text-amber-500 fill-amber-500" : "text-gray-300"}
+              className={Number.parseFloat(data.average+"") >= star ? "text-amber-500 fill-amber-500" : "text-gray-300"}
             />
           ))}
         </div>

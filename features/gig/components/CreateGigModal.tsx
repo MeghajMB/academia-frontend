@@ -17,11 +17,12 @@ import {
 } from "@heroui/react";
 import moment from "moment";
 import { useState } from "react";
+import { ICreateGigDTO } from "@/types/gig";
 
 interface CreateGigModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onGigCreated: (data: GigFormData) => Promise<void>;
+  onGigCreated: (data: ICreateGigDTO) => Promise<void>;
 }
 
 interface GigFormData {
@@ -43,8 +44,6 @@ function CreateGigModal({
     register,
     handleSubmit,
     reset,
-    setValue,
-    watch,
     formState: { errors, isSubmitting },
   } = useForm<GigFormData>({
     defaultValues: {
@@ -68,11 +67,8 @@ function CreateGigModal({
       reset(); // Reset form after successful submission
       onClose();
     } catch (error) {
-      if (Array.isArray(error)) {
-        setCommonError(error[0]?.message || "An error occurred.");
-      } else {
-        setCommonError(error.message);
-      }
+      if (error instanceof Error) setCommonError(error.message);
+      else setCommonError("Something happened");
     }
   };
 

@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { Button, Card, CardBody, CardFooter } from "@heroui/react";
-import { Calendar, Clock, ExternalLink } from "lucide-react";
+import { Calendar, Clock } from "lucide-react";
 import StatusBadge from "./StatusBadge";
 
 type Session = {

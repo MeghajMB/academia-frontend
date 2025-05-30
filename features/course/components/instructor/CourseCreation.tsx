@@ -51,7 +51,6 @@ interface ICourseDetails {
   price: number;
   subtitle: string;
   description: string;
-  rejectedReason: string;
   canSubmitReview: boolean;
 }
 
@@ -87,14 +86,13 @@ export default function CourseCreation({
       try {
         const response = await fetchCategoriesApi();
         if (response.status == "error") {
-          console.log(response.message);
-          setError(true)
-          return;
+          throw new Error(response.message);
         }
         setCategories(response.data);
-        setError(false)
+        setError(false);
       } catch (error) {
-        setError(true)
+        if (error instanceof Error) console.log(error.message);
+        setError(true);
       } finally {
         setIsClient(true);
       }
@@ -111,7 +109,7 @@ export default function CourseCreation({
       setVideoPreview(courseDetails.promotionalVideo);
     }
     getCategories();
-  }, [courseDetails,isEditMode]);
+  }, [courseDetails, isEditMode]);
 
   useEffect(() => {
     return () => {
@@ -121,8 +119,8 @@ export default function CourseCreation({
   }, [imagePreview, videoPreview]);
 
   if (!isClient) return <LoadingPage />;
-  if(error){
-    return <ErrorState />
+  if (error) {
+    return <ErrorState />;
   }
 
   const handleCreateCourse = async (formData: CourseFormData) => {
@@ -246,7 +244,7 @@ export default function CourseCreation({
       setIsLoading(true);
       let videoKey = null,
         thumbnailKey = null;
-        
+
       if (videoFile) {
         if (videoFile.type !== "video/mp4" && videoFile.type !== "video/webm") {
           toast.error("Only MP4 and WebM video formats are allowed", {

@@ -10,20 +10,24 @@ import moment from "moment";
 import InstructorHeaderSection from "./InstructorHeaderSection";
 
 interface IInstructorDetail {
+  id: string;
   name: string;
-  headline: string;
-  totalStudents: number;
-  reviews: number;
-  links: {
-    website: string;
-    twitter: string;
-    linkedin: string;
-    facebook: string;
-  };
-  purpleCoin: number;
-  biography: string;
+  email: string;
   profilePicture: string;
+  verified: "pending" | "rejected" | "verified" | "notRequested";
+  role: "instructor" | "student";
   createdAt: string;
+  purpleCoin: number;
+  headline?: string | undefined;
+  biography?: string | undefined;
+  links?:
+    | {
+        facebook?: string | undefined;
+        linkedin?: string | undefined;
+        twitter?: string | undefined;
+        website?: string | undefined;
+      }
+    | undefined;
 }
 
 export default function InstructorDetail({
@@ -43,9 +47,9 @@ export default function InstructorDetail({
           <div className="flex flex-col lg:flex-row items-center gap-12">
             <InstructorHeaderSection
               profilePicture={user!.profilePicture}
-              name={user!.name}
-              headline={user!.headline}
-              biography={user!.biography}
+              name={user.name}
+              headline={user.headline || ""}
+              biography={user.biography || ""}
               students={totalStudents}
               reviewRating={reviews}
               coins={reviews}
@@ -94,9 +98,9 @@ export default function InstructorDetail({
             <div className="space-y-4">
               <a
                 href={
-                  user?.links.facebook?.startsWith("http://")
+                  user.links?.facebook?.startsWith("http://")
                     ? user.links.facebook
-                    : `https://${user?.links.facebook}`
+                    : `https://${user.links?.facebook || ""}`
                 }
                 target="_blank"
                 rel="noopener noreferrer"
@@ -110,9 +114,9 @@ export default function InstructorDetail({
 
               <a
                 href={
-                  user?.links.twitter?.startsWith("http")
-                    ? user.links.twitter
-                    : `https://${user?.links.twitter}`
+                  user.links?.twitter?.startsWith("http")
+                    ? user.links?.twitter
+                    : `https://${user.links?.twitter || ""}`
                 }
                 target="_blank"
                 rel="noopener noreferrer"
@@ -126,9 +130,9 @@ export default function InstructorDetail({
 
               <a
                 href={
-                  user?.links.linkedin?.startsWith("http")
+                  user.links?.linkedin?.startsWith("http")
                     ? user.links.linkedin
-                    : `https://${user?.links.linkedin}`
+                    : `https://${user.links?.linkedin || ""}`
                 }
                 target="_blank"
                 rel="noopener noreferrer"
@@ -142,9 +146,9 @@ export default function InstructorDetail({
 
               <a
                 href={
-                  user?.links.website?.startsWith("http")
+                  user.links?.website?.startsWith("http")
                     ? user.links.website
-                    : `https://${user?.links.website}`
+                    : `https://${user.links?.website || ""}`
                 }
                 target="_blank"
                 rel="noopener noreferrer"

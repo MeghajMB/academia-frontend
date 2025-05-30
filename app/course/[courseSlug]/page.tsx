@@ -8,9 +8,9 @@ import LoadingPage from "@/app/loading";
 import useCourseApi from "@/hooks/api/useCourseApi";
 import { toast } from "react-toastify";
 import { ICourseDetails } from "@/types/course";
-import { Tab, Tabs } from "@heroui/react";
-import RenderRazorpay from "@/features/payment/components/RenderRazorpay";
+import { Button, Tab, Tabs } from "@heroui/react";
 import CourseTabs from "@/features/course/components/course-detail/CourseTabs";
+import useRazorpayPayment from "@/hooks/useRazorPayment";
 
 export default function Page() {
   const [courseDetails, setCourseDetails] = useState<ICourseDetails>({
@@ -46,6 +46,7 @@ export default function Page() {
   const [isClient, setIsClient] = useState(false);
   const { courseSlug } = useParams();
   const { fetchDetailsOfListedCourseApi } = useCourseApi();
+
   useEffect(() => {
     async function fetchCourseDetails() {
       try {
@@ -132,6 +133,7 @@ const CourseCard = ({ course }: { course: ICourseDetails }) => {
 };
 
 const CourseDetails = ({ course }: { course: ICourseDetails }) => {
+  const { handlePurchase } = useRazorpayPayment();
   return (
     <>
       <div>
@@ -152,13 +154,21 @@ const CourseDetails = ({ course }: { course: ICourseDetails }) => {
           <p className="mt-4 text-3xl font-bold">₹{course.price}</p>
           <div className="mt-4 flex gap-4">
             {course.enrollmentStatus == "not enrolled" && (
-              <RenderRazorpay courseId={course.courseId} type="course" />
+              <Button
+                className={`w-full font-semibold bg-gradient-to-r from-amber-500 to-amber-600`}
+                onClick={() => handlePurchase(course.courseId, "course")}
+              >
+                Purchase Course
+              </Button>
             )}
+
             {course.enrollmentStatus == "instructor" && (
               <Link
                 href={`/instructor/courses/create/${course.courseId}`}
                 className="w-full text-center flex items-center justify-center bg-purple-500 h-10 rounded-md"
-              >Go To Course Management</Link>
+              >
+                Go To Course Management
+              </Link>
             )}
             {course.enrollmentStatus == "enrolled" && (
               <Link

@@ -58,14 +58,16 @@ export default function Page() {
 
       const response = await verifyResetPasswordApi({ email, otp: otpValue });
       if (response.status == "error") {
-        setError(response.message);
-        return;
+        throw new Error(response.message);
       }
       setToken(response.data.resetToken);
       setShowPasswordFields(true);
       console.log("OTP verified successfully");
     } catch (err) {
-      setError("Failed to verify OTP");
+      if (err instanceof Error) setError(err.message);
+      else {
+        setError("Something unexpected Happened");
+      }
     } finally {
       setLoading(false);
     }
@@ -101,7 +103,7 @@ export default function Page() {
         token: token,
       });
       if (response.status == "error") {
-        throw new Error(response.message)
+        throw new Error(response.message);
       }
 
       toast.success("Password reset successfully!", {
@@ -115,7 +117,11 @@ export default function Page() {
         theme: "dark",
       });
     } catch (err) {
-      setError(err.message||"Failed to reset password");
+      if (err instanceof Error)
+        setError(err.message || "Failed to reset password");
+      else {
+        setError("Something happened");
+      }
     } finally {
       setLoading(false);
     }

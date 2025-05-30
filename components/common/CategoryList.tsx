@@ -38,14 +38,9 @@ function CategoryList({
       <Select
         placeholder="Category"
         className="max-w-xs"
-        startContent={<Filter className="text-purple-400" size={18} />}
+        startContent={<Filter size={18} />}
         value={selectedCategory}
         onChange={(e) => setSelectedCategory(e.target.value)}
-        classNames={{
-          trigger: "bg-gray-800 border-purple-500/20 border",
-        }}
-        color="secondary"
-        variant="bordered"
       >
         {categories.map((category) => (
           <SelectItem key={category.id}>{category.name}</SelectItem>

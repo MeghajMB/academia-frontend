@@ -101,7 +101,10 @@ function Page() {
       setBid("");
       onClose();
     } catch (error) {
-      setError(error.message || "Failed to place bid. Please try again.");
+      if (error instanceof Error) setError(error.message);
+      else {
+        setError("Failed to place bid. Please try again.");
+      }
     } finally {
       setIsLoading(false);
     }

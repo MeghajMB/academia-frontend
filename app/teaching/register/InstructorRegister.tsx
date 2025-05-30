@@ -51,14 +51,17 @@ const InstructorRegister = () => {
 
   useEffect(() => {
     async function getProfile() {
-      const userData = await fetchUserProfileApi(user.id!);
+      const response = await fetchUserProfileApi(user.id!);
+      if (response.status == "error") {
+        throw new Error(response.message);
+      }
       setFormData({
-        headline: userData.headline,
-        biography: userData.biography,
-        facebook: userData.links.facebook,
-        linkedin: userData.links.linkedin,
-        twitter: userData.links.twitter,
-        website: userData.links.website,
+        headline: response.data.headline || "",
+        biography: response.data.biography || "",
+        facebook: response.data.links?.facebook || "",
+        linkedin: response.data.links?.linkedin || "",
+        twitter: response.data.links?.twitter || "",
+        website: response.data.links?.website || "",
         agreement: true,
       });
 
@@ -130,15 +133,17 @@ const InstructorRegister = () => {
       if (response.status == "success") {
         window.location.reload();
       } else {
-        setErrors({
-          general: response.message,
-        });
+        throw new Error(response.message);
       }
-    } catch (error: any) {
-      console.error(error);
-      setErrors({
-        general: "An unexpected error occurred. Please try again.",
-      });
+    } catch (error) {
+      if (error instanceof Error)
+        setErrors({
+          general: error.message,
+        });
+      else
+        setErrors({
+          general: "An unexpected error occurred. Please try again.",
+        });
     } finally {
       setLoading(false);
     }

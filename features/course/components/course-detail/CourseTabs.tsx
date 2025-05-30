@@ -3,8 +3,6 @@ import { Accordion, AccordionItem, Tab, Tabs } from "@heroui/react";
 import React from "react";
 import CourseReviews from "./CourseReviews";
 import { useAppSelector } from "@/store/hooks";
-import useReviewApi from "@/hooks/api/useReviewApi";
-import { toast } from "react-toastify";
 
 function CourseTabs({
   canReview,
@@ -27,50 +25,6 @@ function CourseTabs({
   }[];
 }) {
   const { id } = useAppSelector((state) => state.auth.user);
-  const { editReviewApi, deleteReviewApi } = useReviewApi();
-  async function handleEditReview(review: {
-    comment: string;
-    id: string;
-    rating: number;
-  }) {
-    try {
-      const { id: reviewId, ...rest } = review;
-      const updatedDetails = { ...rest, reviewId, courseId };
-      const response=await editReviewApi(updatedDetails);
-      if(response.status=="error"){
-        return
-      }
-      toast("Successfully Edited Your Review!", {
-        position: "top-right",
-        autoClose: 5000,
-        hideProgressBar: true,
-        closeOnClick: false,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "dark",
-      });
-    } catch (error) {
-      console.log(error);
-    }
-  }
-  async function handleDeleteReview(reviewId: string) {
-    try {
-      await deleteReviewApi(reviewId);
-      toast("Successfully deleted Your Review!", {
-        position: "top-right",
-        autoClose: 5000,
-        hideProgressBar: true,
-        closeOnClick: false,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "dark",
-      });
-    } catch (error) {
-      console.log(error);
-    }
-  }
 
   return (
     <div className="my-10">
@@ -96,8 +50,6 @@ function CourseTabs({
           <div className="space-y-6 p-4">
             <CourseReviews
               currentUserId={id!} // In real app, get from auth
-              onEditReview={handleEditReview}
-              onDeleteReview={handleDeleteReview}
               canReview={canReview}
               hasReviewed={hasReviewed}
               courseId={courseId}

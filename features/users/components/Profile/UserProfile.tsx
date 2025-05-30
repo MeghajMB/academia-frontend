@@ -9,21 +9,26 @@ import { useAppSelector } from "@/store/hooks";
 import UserProfileHeader from "./UserProfileHeader";
 
 interface IUser {
+  id: string;
   name: string;
-  headline: string;
-  totalStudents: number;
-  reviews: number;
-  links: {
-    website?: string;
-    twitter?: string;
-    linkedin?: string;
-    facebook?: string;
-  };
   email: string;
+  profilePicture: string;
+  isBlocked: boolean;
+  verified: "pending" | "rejected" | "verified" | "notRequested";
+  role: "instructor" | "student";
   createdAt: string;
   purpleCoin: number;
-  biography: string;
-  profilePicture: string;
+  headline?: string | undefined;
+  biography?: string | undefined;
+  links?:
+    | {
+        facebook?: string | undefined;
+        linkedin?: string | undefined;
+        twitter?: string | undefined;
+        website?: string | undefined;
+      }
+    | undefined;
+  phoneNo?: number | undefined;
 }
 
 export default function ProfilePage() {
@@ -35,7 +40,10 @@ export default function ProfilePage() {
     async function fetchProfile() {
       try {
         const response = await fetchUserProfileApi(id!);
-        setUser(response);
+        if (response.status == "error") {
+          throw new Error(response.message);
+        }
+        setUser(response.data);
       } catch (error) {
         console.log(error);
       }
@@ -48,9 +56,9 @@ export default function ProfilePage() {
       <div className="max-w-6xl mx-auto">
         {/* Header Section */}
         <UserProfileHeader
-          profilePicture={user?.profilePicture}
-          headline={user?.headline}
-          name={user?.name}
+          profilePicture={user.profilePicture}
+          headline={user.headline || ""}
+          name={user.name}
         />
 
         {/* Main Content */}
