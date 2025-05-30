@@ -1,4 +1,4 @@
-import createNotificationApi from "@/services/notificationApi";
+import createNotificationApi from "@/services/queries/implementations/notificationApi";
 import useAxiosPrivate from "../useAxiosPrivate";
 
 export default function useNotificationApi() {

@@ -1,10 +1,11 @@
 "use client";
 
-import FacebookSvg from "@/components/icons/FacebookSvg";
-import LinkedinSvg from "@/components/icons/LinkedinSvg";
-import TwitterSvg from "@/components/icons/TwitterSvg";
-import InstructorHeaderSection from "@/components/instructor/InstructorHeaderSection";
+import FacebookSvg from "@/components/svg/FacebookSvg";
+import LinkedinSvg from "@/components/svg/LinkedinSvg";
+import TwitterSvg from "@/components/svg/TwitterSvg";
+import InstructorHeaderSection from "@/features/users/components/instructor/InstructorHeaderSection";
 import useUserApi from "@/hooks/api/useUserApi";
+import { GetProfileResponseDTO } from "@academia-dev/common";
 import { Calendar, Globe, GraduationCap } from "lucide-react";
 import moment from "moment";
 import { useParams } from "next/navigation";
@@ -13,7 +14,9 @@ import React, { useEffect, useState } from "react";
 export default function Page() {
   const { instructorSlug } = useParams();
   const { fetchUserProfileApi } = useUserApi();
-  const [profile, setProfile] = useState();
+  const [profile, setProfile] = useState<GetProfileResponseDTO["data"] | null>(
+    null
+  );
   useEffect(() => {
     async function getProfile() {
       try {
@@ -21,7 +24,8 @@ export default function Page() {
           return;
         }
         const profile = await fetchUserProfileApi(instructorSlug);
-        setProfile(profile);
+        if (profile.status == "error") throw new Error(profile.message);
+        setProfile(profile.data);
       } catch (error) {
         console.log(error);
       }
@@ -33,16 +37,17 @@ export default function Page() {
   if (!profile) {
     return null;
   }
+
   return (
     <>
       <div className="bg-gray-950 py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col lg:flex-row items-center gap-12">
             <InstructorHeaderSection
-              profilePicture={profile!.profilePicture}
-              name={profile!.name}
-              headline={profile!.headline}
-              biography={profile!.biography}
+              profilePicture={profile.profilePicture}
+              name={profile.name}
+              headline={profile.headline || "User"}
+              biography={profile.biography || "User"}
               students={0}
               reviewRating={0}
               coins={0}
@@ -92,7 +97,7 @@ export default function Page() {
 
               <div className="space-y-4">
                 <a
-                  href={profile?.links.facebook}
+                  href={profile.links?.facebook || ""}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-2 text-gray-300 hover:text-purple-400 transition-colors group"
@@ -104,7 +109,7 @@ export default function Page() {
                 </a>
 
                 <a
-                  href={profile?.links.twitter}
+                  href={profile.links?.twitter || ""}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-2 text-gray-300 hover:text-purple-400 transition-colors group"
@@ -116,7 +121,7 @@ export default function Page() {
                 </a>
 
                 <a
-                  href={profile?.links.linkedin}
+                  href={profile.links?.linkedin || ""}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-2 text-gray-300 hover:text-purple-400 transition-colors group"
@@ -128,7 +133,7 @@ export default function Page() {
                 </a>
 
                 <a
-                  href={profile?.links.website}
+                  href={profile.links?.website || ""}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-2 text-gray-300 hover:text-purple-400 transition-colors group"

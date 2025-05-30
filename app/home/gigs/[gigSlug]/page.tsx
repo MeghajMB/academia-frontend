@@ -16,13 +16,14 @@ import {
   ModalFooter,
   useDisclosure,
   Chip,
-  Progress,
 } from "@heroui/react";
 import { Calendar, Clock, Coins, Info, Award } from "lucide-react";
-import PageNotFound from "@/components/PageNotFound";
-import TopBidders from "@/components/gigs/TopBidders";
+import PageNotFound from "@/components/common/PageNotFound";
+import TopBidders from "@/features/gig/components/TopBidders";
 import useGigApi from "@/hooks/api/useGigApi";
-import CountDownTimer from "@/components/CountDownTimer";
+import CountDownTimer from "@/components/common/CountDownTimer";
+import useBidApi from "@/hooks/api/useBidApi";
+import GigDetailCardSection from "@/features/gig/components/GigDetailCardSection";
 
 interface IGigDetails {
   id: string;
@@ -33,16 +34,16 @@ interface IGigDetails {
   minBid: number;
   currentBid: number;
   currentBidder: string | null;
-  status: "active" | "expired";
-  biddingExpiresAt: Date;
-  sessionDate: Date;
-  createdAt: Date;
-  updatedAt: Date;
+  status: "active" | "expired" | "completed" | "no-bids" | "missed";
+  biddingExpiresAt: string;
+  sessionDate: string;
+  createdAt: string;
 }
 
 function Page() {
   const { gigSlug } = useParams();
-  const { getGigByIdApi, CreateBidApi } = useGigApi();
+  const { getGigByIdApi } = useGigApi();
+  const { CreateBidApi } = useBidApi();
   const [gigDetails, setGigDetails] = useState<IGigDetails | null>(null);
   const [bid, setBid] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -52,8 +53,12 @@ function Page() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const data = await getGigByIdApi(gigSlug as string);
-        setGigDetails(data);
+        const response = await getGigByIdApi(gigSlug as string);
+        if (response.status == "error") {
+          console.log(response.message);
+          return;
+        }
+        setGigDetails(response.data);
       } catch (error) {
         console.error("Failed to fetch gig details:", error);
       }
@@ -66,12 +71,6 @@ function Page() {
   }
 
   const isExpired = new Date(gigDetails.biddingExpiresAt) < new Date();
-  const bidPercentage = gigDetails.currentBid
-    ? Math.min(
-        Math.round((gigDetails.currentBid / gigDetails.minBid) * 100),
-        200
-      )
-    : 100;
 
   async function handleSubmitBid() {
     setError("");
@@ -95,22 +94,24 @@ function Page() {
 
     try {
       setIsLoading(true);
-      await CreateBidApi(gigSlug as string, Number(bid));
-      onClose();
-      // Refresh gig details after successful bid
-      const updatedData = await getGigByIdApi(gigSlug as string);
-      setGigDetails(updatedData);
+      const response = await CreateBidApi(gigSlug as string, Number(bid));
+      if (response.status == "error") {
+        throw new Error(response.message);
+      }
       setBid("");
+      onClose();
     } catch (error) {
-      console.error(error);
-      setError("Failed to place bid. Please try again.");
+      if (error instanceof Error) setError(error.message);
+      else {
+        setError("Failed to place bid. Please try again.");
+      }
     } finally {
       setIsLoading(false);
     }
   }
 
   return (
-    <div className="max-w-6xl mx-auto p-4 pt-24">
+    <div className="max-w-6xl mx-auto p-4 ">
       <Card className="bg-content1 shadow-lg">
         <CardHeader className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 p-6">
           <div>
@@ -125,9 +126,7 @@ function Page() {
               {!isExpired && (
                 <Chip color="warning" variant="dot">
                   <span className="font-semibold">Ends in:</span>{" "}
-                  <CountDownTimer
-                    targetDate={gigDetails.biddingExpiresAt.toString()}
-                  />
+                  <CountDownTimer targetDate={gigDetails.biddingExpiresAt} />
                 </Chip>
               )}
             </div>
@@ -160,82 +159,31 @@ function Page() {
             <div>
               <h2 className="text-xl font-semibold mb-3">Session Details</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <Card className="bg-content2">
-                  <CardBody className="p-4 flex items-center gap-3">
-                    <Clock className="w-6 h-6 text-primary" />
-                    <div>
-                      <p className="text-sm text-default-500">Duration</p>
-                      <p className="font-semibold">
-                        {gigDetails.sessionDuration} minutes
-                      </p>
-                    </div>
-                  </CardBody>
-                </Card>
-
-                <Card className="bg-content2">
-                  <CardBody className="p-4 flex items-center gap-3">
-                    <Calendar className="w-6 h-6 text-primary" />
-                    <div>
-                      <p className="text-sm text-default-500">Service Date</p>
-                      <p className="font-semibold">
-                        {new Date(gigDetails.sessionDate).toLocaleDateString()}
-                      </p>
-                    </div>
-                  </CardBody>
-                </Card>
-
-                <Card className="bg-content2">
-                  <CardBody className="p-4 flex items-center gap-3">
-                    <Coins className="w-6 h-6 text-warning" />
-                    <div>
-                      <p className="text-sm text-default-500">Minimum Bid</p>
-                      <p className="font-semibold">{gigDetails.minBid} Coins</p>
-                    </div>
-                  </CardBody>
-                </Card>
-
-                <Card className="bg-content2">
-                  <CardBody className="p-4 flex items-center gap-3">
-                    <Award className="w-6 h-6 text-success" />
-                    <div>
-                      <p className="text-sm text-default-500">
-                        Current Highest Bid
-                      </p>
-                      <p className="font-semibold">
-                        {gigDetails.currentBid
-                          ? `${gigDetails.currentBid} Coins`
-                          : "No bids yet"}
-                      </p>
-                    </div>
-                  </CardBody>
-                </Card>
-              </div>
-            </div>
-
-            <div>
-              <h2 className="text-xl font-semibold mb-3">Bidding Progress</h2>
-              <div className="space-y-2">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm">
-                    Min Bid: {gigDetails.minBid} Coins
-                  </span>
-                  <span className="text-sm">
-                    Current: {gigDetails.currentBid || "No bids"}
-                    {gigDetails.currentBid ? " Coins" : ""}
-                  </span>
-                </div>
-                <Progress
-                  aria-label="Loading..."
-                  value={bidPercentage}
-                  color={
-                    bidPercentage > 150
-                      ? "success"
-                      : bidPercentage > 120
-                      ? "warning"
-                      : "primary"
+                <GigDetailCardSection
+                  Icon={<Clock className="w-6 h-6 text-primary" />}
+                  content={gigDetails.sessionDuration + " minutes"}
+                  heading={"Duration"}
+                />
+                <GigDetailCardSection
+                  Icon={<Calendar className="w-6 h-6 text-primary" />}
+                  content={new Date(
+                    gigDetails.sessionDate
+                  ).toLocaleDateString()}
+                  heading={"Service Date"}
+                />
+                <GigDetailCardSection
+                  Icon={<Calendar className="w-6 h-6 text-primary" />}
+                  content={gigDetails.minBid + " Coins"}
+                  heading={"Minimum Bid"}
+                />
+                <GigDetailCardSection
+                  Icon={<Award className="w-6 h-6 text-success" />}
+                  content={
+                    gigDetails.currentBid
+                      ? `${gigDetails.currentBid} Coins`
+                      : "No bids yet"
                   }
-                  showValueLabel={true}
-                  className="h-3"
+                  heading={"Your Bid Status"}
                 />
               </div>
             </div>

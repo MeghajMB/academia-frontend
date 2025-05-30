@@ -1,58 +1,98 @@
 "use client";
 
 import useGigApi from "@/hooks/api/useGigApi";
-import { useAppSelector } from "@/lib/hooks";
 import type React from "react";
 import { useEffect, useState } from "react";
-import { Button } from "@heroui/react";
+import { Button, Pagination, Select, SelectItem } from "@heroui/react";
 import { PlusIcon } from "lucide-react";
-import { GigCard } from "@/components/ui/cards/GigCard";
-import { IGig } from "@/types/gig";
-import CreateGigModal from "@/components/ui/modals/CreateGigModal";
+import { GigCard } from "@/features/gig/components/GigCard";
+import { ICreateGigDTO, IGig } from "@/types/gig";
+import CreateGigModal from "@/features/gig/components/CreateGigModal";
 
 function GigPage() {
-  const { getActiveGigOfInstructorApi, createGigApi } = useGigApi();
-  const { id } = useAppSelector((state) => state.auth.user);
+  const { getGigsOfInstructorApi, createGigApi } = useGigApi();
   const [gigs, setGigs] = useState<IGig[]>([]);
+  const [gigStatus, setGigStatus] = useState<
+    "active" | "expired" | "completed" | "no-bids" | "missed"
+  >("active");
+  const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     async function fetchData() {
       try {
-        if (!id) {
-          setIsLoading(false);
+        setIsLoading(true);
+        const response = await getGigsOfInstructorApi({
+          page: currentPage,
+          status: gigStatus,
+        });
+        if (response.status == "error") {
+          console.error("Error fetching gigs:", response.message);
           return;
         }
-        setIsLoading(true);
-        const response = await getActiveGigOfInstructorApi(id);
-        setGigs(response);
+        setGigs(response.data);
         setIsLoading(false);
       } catch (error) {
         console.error("Error fetching gigs:", error);
+      } finally {
         setIsLoading(false);
       }
     }
     fetchData();
-  }, []);
+  }, [gigStatus, currentPage]);
 
-  const handleCreateGig = async (data) => {
-    if (!id) return;
-    const response = await createGigApi(data);
-    setGigs((prevGigs) => [...prevGigs, response]);
+  const handleCreateGig = async (data: ICreateGigDTO) => {
+    try {
+      const response = await createGigApi(data);
+      if (response.status == "error") {
+        throw new Error(response.message);
+      }
+      setGigs((prevGigs) => [
+        ...prevGigs,
+        { ...response.data, currentBidder: null },
+      ]);
+    } catch (error) {
+      if (error instanceof Error) throw new Error(error.message);
+    }
   };
 
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-2xl font-bold">My Gigs</h1>
-        <Button
-          color="primary"
-          startContent={<PlusIcon size={16} />}
-          onPress={() => setIsModalOpen(true)}
-        >
-          Create Gig
-        </Button>
+        <div className="flex space-x-2 items-center">
+          <Button
+            color="primary"
+            startContent={<PlusIcon size={16} />}
+            onPress={() => setIsModalOpen(true)}
+          >
+            Create Gig
+          </Button>
+          <Select
+            className="max-w-48"
+            label="Purchase Type"
+            placeholder="Select a type"
+            selectedKeys={[gigStatus]}
+            variant="bordered"
+            onChange={(e) =>
+              setGigStatus(
+                e.target.value as unknown as
+                  | "active"
+                  | "expired"
+                  | "completed"
+                  | "no-bids"
+                  | "missed"
+              )
+            }
+          >
+            {["active", "expired", "completed", "no-bids", "missed"].map(
+              (status) => (
+                <SelectItem key={status}>{status}</SelectItem>
+              )
+            )}
+          </Select>
+        </div>
       </div>
 
       {isLoading ? (
@@ -67,19 +107,37 @@ function GigPage() {
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {gigs.map((gig) => (
-            <GigCard key={gig.id} gig={gig} />
-          ))}
+        <div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {gigs.map((gig) => (
+              <GigCard key={gig.id} gig={gig} />
+            ))}
+          </div>
+          <Pagination
+            isCompact
+            showControls
+            showShadow
+            classNames={{
+              cursor: "bg-foreground text-background",
+            }}
+            color="secondary"
+            isDisabled={false}
+            page={currentPage}
+            total={1}
+            variant="light"
+            onChange={(page) => setCurrentPage(page)}
+          />
         </div>
       )}
 
       {/* Create Gig Modal */}
-      <CreateGigModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onGigCreated={handleCreateGig}
-      />
+      {isModalOpen && (
+        <CreateGigModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          onGigCreated={handleCreateGig}
+        />
+      )}
     </div>
   );
 }

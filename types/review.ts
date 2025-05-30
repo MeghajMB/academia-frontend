@@ -1,6 +1,7 @@
-export interface IReview {
+export interface Review {
     id: string
     studentId: {
+      id:string
       name: string
       avatar?: string
     }

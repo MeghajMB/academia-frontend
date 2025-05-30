@@ -9,7 +9,7 @@ export default function Courseayout({
 }) {
   return (
     <>
-      <ProtectedRoute role={["instructor", "student", "admin"]}>
+      <ProtectedRoute role={["instructor", "student"]}>
         {children}
       </ProtectedRoute>
     </>

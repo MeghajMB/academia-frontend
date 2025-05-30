@@ -20,13 +20,13 @@ const useTopBidders = (gigId: string) => {
     socket.emit("joinBiddingRoom", gigId);
 
     // Listen for updates
-    socket.on(`updateBids${gigId}`, (bidders: Bid[]) => {
+    socket.on(`topBids${gigId}`, (bidders: Bid[]) => {
       setTopBidders(bidders);
     });
 
     return () => {
       socket.emit("leaveBiddingRoom", gigId);
-      socket.off(`updateBids${gigId}`);
+      socket.off(`topBids${gigId}`);
     };
   }, [gigId]);
 

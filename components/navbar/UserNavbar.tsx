@@ -5,10 +5,10 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
-import type { RootState } from "@/lib/store";
+import type { RootState } from "@/store/store";
 import { customAxios } from "@/api/axios";
-import { logout } from "@/lib/features/auth/authSlice";
-import { useAppDispatch, useAppSelector } from "@/lib/hooks";
+import { logout } from "@/store/features/auth/authSlice";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import {
   Navbar,
   NavbarBrand,
@@ -34,23 +34,34 @@ import {
   Home,
   Briefcase,
   ChevronDown,
+  Wallet,
+  GraduationCap,
 } from "lucide-react";
 import ProfilePicture from "@/public/images/blankUserProfile.jpeg";
 import useNotification from "@/hooks/socket/useSocketNotification";
+import Image from "next/image";
+import AcademiaLogo from "@/public/images/academia-logo.png";
 const UserNavbar: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
   const [loading, setLoading] = useState(false);
   const [isClient, setIsClient] = useState(false);
   const { user } = useAppSelector((state: RootState) => state.auth);
+  const { notificationCount, notifications } = useAppSelector(
+    (state) => state.notification
+  );
   const dispatch = useAppDispatch();
   const router = useRouter();
   const path = usePathname();
 
   useEffect(() => {
-    setIsClient(true);
-  }, []);
+    if (user.role !== "admin") {
+      setIsClient(true);
+    } else {
+      setIsClient(false);
+    }
+  }, [user.role]);
 
-  const { notifications, notificationCount } = useNotification(user.id);
+  useNotification(user.id);
 
   async function handleLogout() {
     setLoading(true);
@@ -67,14 +78,19 @@ const UserNavbar: React.FC = () => {
 
   let instructorRoute;
   if (user?.role === "student") {
-    instructorRoute = { path: "/home/teaching", label: "Become an Instructor" };
+    instructorRoute = {
+      path: "/teaching",
+      label: "Become an Instructor",
+    };
   } else {
-    instructorRoute = { path: "/instructor", label: "Instructor" };
+    instructorRoute = {
+      path: "/instructor",
+      label: "Instructor",
+    };
   }
 
   const navigationItems = [
     { path: "/home", label: "Home", icon: <Home size={18} /> },
-    instructorRoute,
     { path: "/home/courses", label: "Courses", icon: <BookOpen size={18} /> },
     {
       path: "/home/gigs",
@@ -86,6 +102,11 @@ const UserNavbar: React.FC = () => {
       label: "My Learning",
       icon: <BookOpen size={18} />,
     },
+    {
+      path: "/home/my-session",
+      label: "My Session",
+      icon: <Briefcase size={18} />,
+    },
     { path: "/home/shop", label: "Shop", icon: <ShoppingCart size={18} /> },
   ];
 
@@ -94,7 +115,9 @@ const UserNavbar: React.FC = () => {
       <Navbar className="bg-black">
         <NavbarContent>
           <NavbarBrand>
-            <div className="w-8 h-8 bg-primary rounded"></div>
+            <div className="w-8 h-8 bg-primary rounded relative">
+              <Image src={AcademiaLogo.src} alt="logo" fill />
+            </div>
             <p className="font-bold text-inherit ml-2">Academia</p>
           </NavbarBrand>
         </NavbarContent>
@@ -107,8 +130,7 @@ const UserNavbar: React.FC = () => {
       maxWidth="xl"
       isMenuOpen={isMenuOpen}
       onMenuOpenChange={setIsMenuOpen}
-      className="bg-black border-b border-divider"
-      isBordered
+      className="bg-black"
       isBlurred={false}
     >
       <NavbarContent>
@@ -126,7 +148,9 @@ const UserNavbar: React.FC = () => {
             }}
             className="flex items-center cursor-pointer"
           >
-            <div className="w-8 h-8 bg-primary rounded"></div>
+            <div className="w-8 h-8 bg-primary rounded relative">
+              <Image src={AcademiaLogo.src} alt="logo" fill />
+            </div>
             <span className="text-xl font-bold ml-2">Academia</span>
           </motion.div>
         </NavbarBrand>
@@ -165,7 +189,7 @@ const UserNavbar: React.FC = () => {
             <NavbarItem>
               <Button
                 as={Link}
-                href="/signUp"
+                href="/login?page=sign-up"
                 variant="flat"
                 color="secondary"
                 className="hover:text-indigo-400 hover:bg-indigo-700/20 transition-colors"
@@ -204,17 +228,15 @@ const UserNavbar: React.FC = () => {
                   </DropdownItem>
                   {notifications.map((notification) => {
                     return (
-                      <DropdownItem key={notification.message}>
+                      <DropdownItem key={notification.id}>
                         {notification.title}
                       </DropdownItem>
                     );
                   })}
-                  <DropdownItem
-                    key="view-all"
-                    href="/home/notification"
-                    color="secondary"
-                  >
-                    View All Notifications
+                  <DropdownItem key="view-all" color="secondary">
+                    <Link href="/home/notification">
+                      View All Notifications
+                    </Link>
                   </DropdownItem>
                 </>
               </DropdownMenu>
@@ -248,8 +270,25 @@ const UserNavbar: React.FC = () => {
                   key="profile"
                   startContent={<UserIcon size={16} />}
                   textValue="Profile"
+                  href="/home/profile"
                 >
-                  <Link href="/home/profile">My Profile</Link>
+                  My Profile
+                </DropdownItem>
+                <DropdownItem
+                  key={instructorRoute.path}
+                  startContent={<GraduationCap size={16} />}
+                  textValue={instructorRoute.label}
+                  href={instructorRoute.path}
+                >
+                  {instructorRoute.label}
+                </DropdownItem>
+                <DropdownItem
+                  key="wallet"
+                  startContent={<Wallet size={16} />}
+                  textValue="Wallet"
+                  href="/home/wallet"
+                >
+                  Wallet
                 </DropdownItem>
                 <DropdownItem
                   key="logout"
@@ -285,7 +324,7 @@ const UserNavbar: React.FC = () => {
             <NavbarMenuItem>
               <Button
                 as={Link}
-                href="/signUp"
+                href="/login?page=sign-up"
                 color="primary"
                 variant="flat"
                 className="w-full justify-start"

@@ -1,4 +1,4 @@
-import createCourseApi from "@/services/courseApi";
+import createCourseApi from "@/services/queries/implementations/courseApi";
 import useAxiosPrivate from "../useAxiosPrivate";
 
 export default function useCourseApi() {

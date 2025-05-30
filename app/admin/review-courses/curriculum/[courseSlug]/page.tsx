@@ -1,0 +1,83 @@
+"use client";
+import LoadingPage from "@/app/loading";
+import CourseContent from "@/features/course/components/course-view/CourseContent";
+import CourseLectureView from "@/features/course/components/course-view/CourseLectureView";
+import useCourseApi from "@/hooks/api/useCourseApi";
+import { ILecture, ISection } from "@/types/course";
+import { Spinner } from "@heroui/react";
+import { useParams } from "next/navigation";
+import React, { useEffect, useState } from "react";
+
+export default function PreviewCurriculumPage() {
+  const { courseSlug } = useParams();
+  const { fetchCurriculum } = useCourseApi();
+  const [sections, setSections] = useState<ISection[]>([]);
+  const [isClient, setIsClient] = useState(false);
+  const [showContent, setShowContent] = useState(false);
+  const [activeLecture, setActiveLecture] = useState<ILecture | null>(null);
+
+  useEffect(() => {
+    async function getCurriculum() {
+      try {
+        if (courseSlug && typeof courseSlug == "string") {
+          const response = await fetchCurriculum(courseSlug, "admin");
+          if (response.status == "error") {
+            console.log(response.message);
+            return;
+          }
+          setSections(response.data);
+          setActiveLecture(response.data[0].lectures[0] || null);
+          setIsClient(true);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    getCurriculum();
+  }, []);
+
+  if (!isClient) {
+    return <Spinner />;
+  }
+  return (
+    <>
+      {" "}
+      <div className="flex flex-col lg:flex-row w-full min-h-screen  text-white">
+        {/* Left Section */}
+        <div
+          className={`w-full ${
+            showContent ? "hidden lg:block" : ""
+          } lg:w-2/3 p-4`}
+        >
+          <CourseLectureView
+            activeLecture={activeLecture}
+            courseId={courseSlug as string}
+          />
+        </div>
+
+        {/* Right Section */}
+        <div
+          className={`w-full ${
+            showContent ? "block" : "hidden lg:block"
+          } lg:w-1/3 p-4`}
+        >
+          <CourseContent
+            sections={sections}
+            setActiveLecture={setActiveLecture}
+            activeLecture={activeLecture}
+          />
+        </div>
+
+        {/* Mobile Toggle Button */}
+        <div className="w-full bg-gray-800 p-2 flex lg:hidden">
+          <button
+            onClick={() => setShowContent(!showContent)}
+            className="w-full text-center py-2 bg-blue-600 rounded-lg"
+          >
+            {showContent ? "Back to Overview" : "View Course Content"}
+          </button>
+        </div>
+      </div>
+    </>
+  );
+}

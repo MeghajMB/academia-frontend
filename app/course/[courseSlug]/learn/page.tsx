@@ -1,12 +1,12 @@
 "use client";
-import CourseContent from "@/components/course/courseView/CourseContent";
-import CourseLectureView from "@/components/course/courseView/CourseLectureView";
-import LoadingPage from "@/components/LoadingPage";
-import PageNotFound from "@/components/PageNotFound";
+import CourseContent from "@/features/course/components/course-view/CourseContent";
+import CourseLectureView from "@/features/course/components/course-view/CourseLectureView";
+import LoadingPage from "@/components/common/LoadingPage";
 import useCourseApi from "@/hooks/api/useCourseApi";
 import { ILecture, ISection } from "@/types/course";
 import { useParams } from "next/navigation";
 import React, { useCallback, useEffect, useState } from "react";
+import { ErrorState } from "@/components/common/ErrorState";
 
 export default function LearnPage() {
   const { courseSlug } = useParams();
@@ -22,14 +22,18 @@ export default function LearnPage() {
       try {
         if (courseSlug && typeof courseSlug == "string") {
           const response = await fetchCurriculum(courseSlug, "student");
-          setSections(response);
-          // ✅ Find the first incomplete lecture
-          const firstIncompleteLecture = response
-            .flatMap((section:ISection) => section.lectures)
-            .find((lecture:ILecture) => lecture.progress !== "completed");
+          if (response.status == "error") {
+            setError(true);
+            return;
+          }
+          setSections(response.data);
+
+          const firstIncompleteLecture = response.data
+            .flatMap((section: ISection) => section.lectures)
+            .find((lecture: ILecture) => lecture.progress !== "completed");
 
           setActiveLecture(
-            firstIncompleteLecture || response[0]?.lectures[0] 
+            firstIncompleteLecture || response.data[0]?.lectures[0]
           );
           //
           setIsClient(true);
@@ -45,14 +49,31 @@ export default function LearnPage() {
   const handleLectureComplete = useCallback(async () => {
     try {
       if (!activeLecture) return;
-      await markLectureCompleted(courseSlug as string, activeLecture.id);
+      const response = await markLectureCompleted(
+        courseSlug as string,
+        activeLecture.id
+      );
+      if (response.status == "error") {
+        throw new Error(response.message);
+      }
+      setSections((prev) => {
+        return prev.map((section) => {
+          const updatedLectures = section.lectures.map((lecture) => {
+            if (lecture.id == activeLecture.id) {
+              return { ...lecture, progress: "completed" } as ILecture;
+            }
+            return lecture;
+          });
+          return { ...section, lectures: updatedLectures };
+        });
+      });
     } catch (error) {
       console.log(error);
     }
   }, [activeLecture, courseSlug]);
 
   if (error) {
-    return <PageNotFound />;
+    return <ErrorState />;
   }
 
   if (!isClient) {
@@ -60,7 +81,7 @@ export default function LearnPage() {
   }
   return (
     <>
-      <div className="flex flex-col lg:flex-row w-full min-h-screen text-white pt-24 px-7">
+      <div className="flex flex-col lg:flex-row w-full min-h-screen text-white pt-10 px-7">
         {/* Left Section */}
         <div
           className={`w-full ${

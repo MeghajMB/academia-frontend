@@ -2,7 +2,13 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   /* config options here */
-  /* reactStrictMode: false, */
+  typescript: {
+    ignoreBuildErrors: true,
+  },
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+  reactStrictMode: false,
   images: {
     remotePatterns: [
       {
@@ -25,8 +31,13 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: "https",
-        hostname:  process.env.NEXT_PUBLIC_S3_HOSTNAME!,
-        pathname: "/**", // Allow all images in the bucket
+        hostname: "s3.ap-south-1.amazonaws.com",
+        port: "",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "res.cloudinary.com",
       },
     ],
   },

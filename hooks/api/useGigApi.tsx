@@ -1,4 +1,4 @@
-import createGigApi from "@/services/gigApi";
+import createGigApi from "@/services/queries/implementations/gigApi";
 import useAxiosPrivate from "../useAxiosPrivate";
 
 export default function useGigApi() {

@@ -1,9 +1,8 @@
 "use client";
-import { RootState } from "@/lib/store";
+import { RootState } from "@/store/store";
 import { ReactNode, useEffect, useState } from "react";
-import { useAppSelector } from "@/lib/hooks";
-import LoadingPage from "@/app/loading";
-import PageNotFound from "@/components/PageNotFound";
+import { useAppSelector } from "@/store/hooks";
+import Unauthorized from "@/components/common/UnAuthorized";
 
 interface ProtectedRouteProps {
   role: string[];
@@ -28,10 +27,14 @@ export default function ProtectedRoute({
   }, [user.role, role]);
 
   if (isLoading) {
-    return <LoadingPage />;
+    return null;
   }
   if (error) {
-    return <PageNotFound />;
+    return (
+      <div className="mt-12">
+        <Unauthorized />
+      </div>
+    );
   }
   return <>{children}</>;
 }

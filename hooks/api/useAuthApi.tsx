@@ -1,4 +1,4 @@
-import createAuthApi from "@/services/authApi";
+import createAuthApi from "@/services/queries/implementations/authApi";
 import useAxiosPrivate from "../useAxiosPrivate";
 
 export default function useAuthApi() {

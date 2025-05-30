@@ -14,48 +14,73 @@ import { Bell, Mail, CreditCard, Info, Filter, Check } from "lucide-react";
 import { INotification } from "@/types/notification";
 import moment from "moment";
 import useNotificationApi from "@/hooks/api/useNotificationApi";
-import { useAppSelector } from "@/lib/hooks";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import {
+  clearNotifications,
+  removeNotification,
+} from "@/store/features/notification/notificationSlice";
 
 // Mock data for notifications
 
 function NotificationPage() {
   const [notifications, setNotifications] = useState<INotification[]>([]);
   const [filter, setFilter] = useState<string>("all");
-  const {fetchUnreadNotificationApi,markNotificationAsReadApi} = useNotificationApi();
-  const {id}=useAppSelector(state=>state.auth.user)
-
+  const {
+    fetchUnreadNotificationApi,
+    markNotificationAsReadApi,
+    markAllNotificationAsReadApi,
+  } = useNotificationApi();
+  const { id } = useAppSelector((state) => state.auth.user);
+  const dispatch = useAppDispatch();
   useEffect(() => {
-    async function fetchData(){
+    async function fetchData() {
       try {
-        if(!id)return;
-        const notifications=await fetchUnreadNotificationApi(id);
-        setNotifications(notifications)
-        console.log(notifications)
+        if (!id) return;
+        const notificationResponse = await fetchUnreadNotificationApi(id);
+        if (notificationResponse.status == "error") {
+          return;
+        }
+        console.log(notificationResponse);
+        setNotifications(notificationResponse.data);
       } catch (error) {
-        console.log(error)
+        console.log(error);
       }
-    }fetchData()
+    }
+    fetchData();
   }, []);
 
   // Function to mark a notification as read
-  const markAsRead =async (index: number,notificationId:string) => {
+  const markAsRead = async (index: number, notificationId: string) => {
     try {
-      await markNotificationAsReadApi(notificationId);
+      const response = await markNotificationAsReadApi(notificationId);
+      if (response.status == "error") {
+        return;
+      }
+      dispatch(removeNotification(notificationId));
       const updatedNotifications = [...notifications];
       updatedNotifications[index].isRead = true;
       setNotifications(updatedNotifications);
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
   };
 
   // Function to mark all notifications as read
-  const markAllAsRead = () => {
-    const updatedNotifications = notifications.map((notification) => ({
-      ...notification,
-      isRead: true,
-    }));
-    setNotifications(updatedNotifications);
+  const markAllAsRead = async () => {
+    try {
+      const response = await markAllNotificationAsReadApi();
+      if (response.status == "error") {
+        throw new Error(response.message)
+      }
+      dispatch(clearNotifications());
+      const updatedNotifications = notifications.map((notification) => ({
+        ...notification,
+        isRead: true,
+      }));
+      setNotifications(updatedNotifications);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   // Filter notifications based on selected filter
@@ -150,7 +175,7 @@ function NotificationPage() {
                 !notification.isRead ? "border-l-4 border-primary" : ""
               }`}
               isPressable
-              onPress={() => markAsRead(index,notification.id)}
+              onPress={() => markAsRead(index, notification.id)}
             >
               <div className="flex items-start gap-4">
                 <div className="rounded-full bg-gray-100 p-2">

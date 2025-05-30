@@ -1,5 +1,4 @@
 "use client";
-
 import { useEffect, useState } from "react";
 import ProfilePicture from "@/public/images/blankUserProfile.jpeg";
 import {
@@ -13,10 +12,10 @@ import {
   Divider,
 } from "@heroui/react";
 import useGigApi from "@/hooks/api/useGigApi";
-import CountDownTimer from "@/components/CountDownTimer";
+import CountDownTimer from "@/components/common/CountDownTimer";
 import Link from "next/link";
 import { Calendar, Clock, Coins } from "lucide-react";
-import NoContentAvailable from "@/components/ui/NoContentAvailable";
+import NoContentAvailable from "@/components/common/NoContentAvailable";
 
 interface IGigDetails {
   id: string;
@@ -24,10 +23,11 @@ interface IGigDetails {
   instructorName: string;
   instructorProfilePicture: string;
   title: string;
-  sessionDuration: string;
+  sessionDuration: number;
   minBid: number;
   biddingExpiresAt: string;
   sessionDate: string;
+  biddingAllowed: boolean;
 }
 
 const GigListing = () => {
@@ -36,8 +36,11 @@ const GigListing = () => {
 
   useEffect(() => {
     async function fetchData() {
-      const data = await getAllActiveGigApi();
-      setGigs(data);
+      const response = await getAllActiveGigApi();
+      if (response.status == "error") {
+        return;
+      }
+      setGigs(response.data);
     }
     fetchData();
   }, []);
@@ -68,10 +71,10 @@ const GigListing = () => {
                 size="md"
                 isBordered
                 color="primary"
-                alt={"gig.instructorName"}
+                alt="Profile Picture"
               />
               <div className="flex flex-col">
-                <p className="text-md font-semibold">{"gig.instructorName"}</p>
+                <p className="text-md font-semibold">{gig.instructorName}</p>
                 <p className="text-small text-default-500">Instructor</p>
               </div>
             </CardHeader>
@@ -83,7 +86,7 @@ const GigListing = () => {
                 <div className="flex items-center gap-2">
                   <Coins className="w-4 h-4 text-warning" />
                   <span className="text-sm">
-                    <span className="font-semibold">Min Bid:</span>{" "}
+                    <span className="font-semibold">Min Bid:</span>
                     <Chip size="sm" color="warning" variant="flat">
                       {gig.minBid} Coins
                     </Chip>
@@ -93,7 +96,7 @@ const GigListing = () => {
                 <div className="flex items-center gap-2">
                   <Clock className="w-4 h-4 text-secondary" />
                   <span className="text-sm">
-                    <span className="font-semibold">Duration:</span>{" "}
+                    <span className="font-semibold">Duration:</span>
                     {gig.sessionDuration} minutes
                   </span>
                 </div>
@@ -101,7 +104,7 @@ const GigListing = () => {
                 <div className="flex items-center gap-2">
                   <Calendar className="w-4 h-4 text-success" />
                   <span className="text-sm">
-                    <span className="font-semibold">Service Date:</span>{" "}
+                    <span className="font-semibold">Session Date:</span>
                     {new Date(gig.sessionDate).toLocaleDateString()}
                   </span>
                 </div>

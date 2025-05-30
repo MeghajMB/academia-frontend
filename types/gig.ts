@@ -1,25 +1,27 @@
 export interface ICreateGigDTO {
-  title: string;
+  sessionDate: string;
   description: string;
-  price: number;
   biddingAllowed: boolean;
-  duration: string;
+  sessionDuration: number;
   maxParticipants: number;
-  date: string; // Received as a string
+  minBid: number;
+  title: string;
 }
 
 export interface IGig {
   id: string;
-  instructorId: string;
-  title: string;
+  sessionDate: string;
   description: string;
+  biddingAllowed:boolean;
   sessionDuration: number;
+  maxParticipants:number;
   minBid: number;
+  status: "completed" | "active" | "expired" | "no-bids" | "missed";
   currentBid: number;
   currentBidder: string | null;
-  status: "active" | "expired";
+  title: string;
+
+  instructorId: string;
   biddingExpiresAt: string;
-  serviceDate: string;
   createdAt: string;
-  updatedAt: string;
 }
