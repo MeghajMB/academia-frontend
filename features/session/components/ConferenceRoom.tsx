@@ -42,6 +42,8 @@ function ConferenceRoom({
     handleDisconnect();
     setHasDisconnected(true);
   }
+  console.log("this is the remote streams")
+  console.log(remoteStreams)
   return (
     <>
       <Button onClick={toggleAudio}>

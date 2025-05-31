@@ -481,7 +481,7 @@ function useMediaSoup() {
   }, [socket]);
   /* Cleanup useEffect */
   useEffect(() => {
-    console.log("cleanup triggered")
+    console.log("cleanup triggered");
     return () => {
       videoProducer?.close();
       audioProducer?.close();
@@ -655,6 +655,7 @@ function useMediaSoup() {
   /* Function to disconnect call */
   const handleDisconnect = useCallback(() => {
     // Stop local media tracks
+    console.log("Disconnect triggered");
     if (videoRef.current?.srcObject) {
       const stream = videoRef.current.srcObject as MediaStream;
       stream.getTracks().forEach((track) => {
