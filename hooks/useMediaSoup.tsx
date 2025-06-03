@@ -257,7 +257,13 @@ function useMediaSoup() {
         console.error("no device in recieveTransport");
         return;
       }
-      const transport = device.createRecvTransport(data);
+      const transport = device.createRecvTransport({
+        ...data,
+        iceServers: [
+          { urls: "stun:stun.l.google.com:19302" },
+          { urls: "stun:global.stun.twilio.com:3478" },
+        ],
+      });
       setConsumerTransport(transport);
       console.log("Successfully Created recieve transport");
       /**
