@@ -113,9 +113,11 @@ function useMediaSoup() {
           //sets the new device and rtpcapabilities
           setDevice(newDevice);
           console.log("Successfully set the new device");
+          const sctpCapabilities = newDevice.sctpCapabilities;
           socket.emit("createTransport", {
             sessionId: sessionId,
             transportType: "sender",
+            sctpCapabilities,
           });
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
@@ -144,9 +146,19 @@ function useMediaSoup() {
           console.error("no device in sendTransport");
           return;
         }
-        const transport = device.createSendTransport(data);
+        const transport = device.createSendTransport({
+          ...data,
+          iceServers: [
+            { urls: "stun:stun.l.google.com:19302" },
+            { urls: "stun:global.stun.twilio.com:3478" },
+          ],
+        });
         setProducerTransport(transport);
         console.log("Successfully Created send transport");
+        console.log("Ice candidates and ice parameters");
+        console.log("----------------------------------------------------");
+        console.log(data.iceCandidates);
+        console.log(data.iceParameters);
         /**
          * Set up the initial connection using conect event
          */
@@ -245,7 +257,13 @@ function useMediaSoup() {
         console.error("no device in recieveTransport");
         return;
       }
-      const transport = device.createRecvTransport(data);
+      const transport = device.createRecvTransport({
+        ...data,
+        iceServers: [
+          { urls: "stun:stun.l.google.com:19302" },
+          { urls: "stun:global.stun.twilio.com:3478" },
+        ],
+      });
       setConsumerTransport(transport);
       console.log("Successfully Created recieve transport");
       /**
