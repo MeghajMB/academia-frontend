@@ -151,6 +151,11 @@ function useMediaSoup() {
           iceServers: [
             { urls: "stun:stun.l.google.com:19302" },
             { urls: "stun:global.stun.twilio.com:3478" },
+            {
+              urls: "turn:global.relay.metered.ca:80",
+              username: "openrelayproject",
+              credential: "openrelayproject",
+            },
           ],
         });
         setProducerTransport(transport);
@@ -262,6 +267,25 @@ function useMediaSoup() {
         iceServers: [
           { urls: "stun:stun.l.google.com:19302" },
           { urls: "stun:global.stun.twilio.com:3478" },
+
+          {
+            credential: "ViUCb0/rDO2hn0ybSI+650OZ74bMCoIg5A0CD9rNfxQ=",
+            urls: "turn:global.turn.twilio.com:3478?transport=udp",
+            username:
+              "aff41892bcedc66a6542964a178b50a0186edf7f46ecbece22d6e58ec08707fd",
+          },
+          {
+            credential: "ViUCb0/rDO2hn0ybSI+650OZ74bMCoIg5A0CD9rNfxQ=",
+            urls: "turn:global.turn.twilio.com:3478?transport=tcp",
+            username:
+              "aff41892bcedc66a6542964a178b50a0186edf7f46ecbece22d6e58ec08707fd",
+          },
+          {
+            credential: "ViUCb0/rDO2hn0ybSI+650OZ74bMCoIg5A0CD9rNfxQ=",
+            urls: "turn:global.turn.twilio.com:443?transport=tcp",
+            username:
+              "aff41892bcedc66a6542964a178b50a0186edf7f46ecbece22d6e58ec08707fd",
+          },
         ],
       });
       setConsumerTransport(transport);
