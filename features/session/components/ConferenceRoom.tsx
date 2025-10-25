@@ -1,7 +1,7 @@
-import { Button } from "@heroui/react";
 import React from "react";
 import DummyProfilePicture from "@/public/images/blankUserProfile.jpeg";
 import Image from "next/image";
+import MediaControls from "./MediaControls";
 
 function ConferenceRoom({
   isAudioMuted,
@@ -42,21 +42,10 @@ function ConferenceRoom({
     handleDisconnect();
     setHasDisconnected(true);
   }
-  console.log("this is the remote streams")
-  console.log(remoteStreams)
+  console.log("this is the remote streams");
+  console.log(remoteStreams);
   return (
     <>
-      <Button onClick={toggleAudio}>
-        {isAudioMuted ? "Unmute Audio" : "Mute Audio"}
-      </Button>
-      <Button onClick={toggleVideo}>
-        {isVideoPaused ? "Unpause Video" : "Pause Video"}
-      </Button>
-      <Button onClick={toggleScreenShare}>
-        {isScreenSharing ? "Stop screen share" : "Start screen share"}
-      </Button>
-      <Button onClick={handleDisconnectUser}>Disconnect</Button>
-
       <div className="flex gap-8 flex-col relative">
         <div className="relative">
           <video
@@ -149,6 +138,15 @@ function ConferenceRoom({
           ))}
         </div>
       </div>
+      <MediaControls
+        isAudioMuted={isAudioMuted}
+        handleDisconnectUser={handleDisconnectUser}
+        isScreenSharing={isScreenSharing}
+        isVideoPaused={isVideoPaused}
+        toggleAudio={toggleAudio}
+        toggleScreenShare={toggleScreenShare}
+        toggleVideo={toggleVideo}
+      />
     </>
   );
 }

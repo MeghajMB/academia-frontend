@@ -11,7 +11,7 @@ import {
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
-import ProtectedRoute from "@/hoc/ProtectedRoute";
+import ProtectedRoute from "@/layouts/ProtectedRoute";
 
 const menuItems = [
   { title: "Profile", icon: UserIcon, path: "/instructor" },

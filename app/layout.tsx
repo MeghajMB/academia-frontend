@@ -5,7 +5,7 @@ import "./globals.css";
 import StoreProvider from "./StoreProvider";
 import Navbar from "@/components/navbar/Navbar";
 import { ToastContainer } from "react-toastify";
-import PersistLogin from "@/hoc/PersistLogin";
+import PersistLogin from "@/layouts/PersistLogin";
 import { Providers } from "./Providers";
 
 const geistSans = Geist({

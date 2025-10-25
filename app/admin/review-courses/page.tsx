@@ -4,7 +4,7 @@ import { EyeIcon, SearchIcon } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import AdminTable from "@/components/common/Table";
-import ProtectedRoute from "@/hoc/ProtectedRoute";
+import ProtectedRoute from "@/layouts/ProtectedRoute";
 import useAdminApi from "@/hooks/api/useAdminApi";
 import { toast } from "react-toastify";
 import Link from "next/link";

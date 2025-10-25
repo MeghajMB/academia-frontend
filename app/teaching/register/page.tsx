@@ -1,4 +1,4 @@
-import ProtectedRoute from "@/hoc/ProtectedRoute";
+import ProtectedRoute from "@/layouts/ProtectedRoute";
 import InstructorRegister from "./InstructorRegister";
 
 export default function Page() {

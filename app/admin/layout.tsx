@@ -1,6 +1,6 @@
 import React from "react";
 import AdminNavbar from "@/components/navbar/AdminNavbar";
-import ProtectedRoute from "@/hoc/ProtectedRoute";
+import ProtectedRoute from "@/layouts/ProtectedRoute";
 
 export default function AdminLayout({
   children,

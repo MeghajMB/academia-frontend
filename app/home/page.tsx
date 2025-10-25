@@ -1,5 +1,5 @@
 "use client";
-import ProtectedRoute from "@/hoc/ProtectedRoute";
+import ProtectedRoute from "@/layouts/ProtectedRoute";
 import Section from "@/components/static/Section";
 import Carousel from "@/components/static/Carousal";
 

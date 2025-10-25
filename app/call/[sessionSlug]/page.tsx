@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import useMediaSoup from "@/hooks/useMediaSoup";
+import useMediaSoup from "@/hooks/mediasoup/useMediaSoup";
 import JoinRoom from "@/features/session/components/JoinRoom";
 import ConferenceRoom from "@/features/session/components/ConferenceRoom";
 import { useParams } from "next/navigation";
@@ -40,6 +40,7 @@ export default function MediasoupPage() {
           accessToken: accessToken,
         });
         console.log(response);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (error) {
         setError(true);
         console.log("cant join room");
@@ -48,7 +49,7 @@ export default function MediasoupPage() {
       }
     }
     joinTheSession();
-  }, [sessionSlug]);
+  }, [accessToken, sessionSlug]);
   if (error) {
     return (
       <ErrorState

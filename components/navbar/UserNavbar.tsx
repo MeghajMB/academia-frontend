@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import type { RootState } from "@/store/store";
-import { customAxios } from "@/api/axios";
+import { customAxios } from "@/lib/axios";
 import { logout } from "@/store/features/auth/authSlice";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import {

@@ -14,21 +14,17 @@ export default function ProtectedRoute({
   children,
 }: ProtectedRouteProps) {
   const { user } = useAppSelector((state: RootState) => state.auth);
-  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(false);
 
   useEffect(() => {
-    if (role.includes(user.role as string)) {
-      setIsLoading(false);
+    if (user && role.includes(user.role as string)) {
+      // Authorized
+      setError(false);
     } else {
-      setIsLoading(false);
       setError(true);
     }
-  }, [user.role, role]);
+  }, [user, role]);
 
-  if (isLoading) {
-    return null;
-  }
   if (error) {
     return (
       <div className="mt-12">

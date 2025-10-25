@@ -1,5 +1,5 @@
 "use client";
-import { axiosPrivate } from "@/api/axios";
+import { axiosPrivate } from "@/lib/axios";
 import { login, logout } from "@/store/features/auth/authSlice";
 import { AxiosError } from "axios";
 

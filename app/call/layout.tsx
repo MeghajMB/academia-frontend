@@ -1,5 +1,5 @@
 import React from "react";
-import ProtectedRoute from "@/hoc/ProtectedRoute";
+import ProtectedRoute from "@/layouts/ProtectedRoute";
 
 export default function CallLayout({
   children,

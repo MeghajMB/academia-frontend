@@ -80,6 +80,7 @@ function LoginComponent({
                 required
                 variant="bordered"
                 placeholder="Enter your email"
+                autoComplete="username"
                 value={credentials.email}
                 errorMessage={errors.email || ""}
                 onChange={(e) =>
@@ -104,6 +105,7 @@ function LoginComponent({
                   placeholder="Enter your password"
                   errorMessage={errors.password || ""}
                   value={credentials.password}
+                  autoComplete="current-password"
                   onChange={(e) =>
                     setCredentials({
                       ...credentials,

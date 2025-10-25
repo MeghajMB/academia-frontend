@@ -2,18 +2,37 @@
 import { getSocket } from "@/lib/socket";
 import { useEffect, useCallback, useRef, useState } from "react";
 import * as mediasoupClient from "mediasoup-client";
+import useRouterCapabilities from "./useRouterCapabilities";
+import useSendTransport from "./useSendTransport";
+import useRecieveTransport from "./useRecieveTransport";
+import useConsumeMedia from "./useConsumeMedia";
 
-interface ITransportParams {
+export interface ITransportParams {
   id: string;
   iceParameters: mediasoupClient.types.IceParameters;
   iceCandidates: mediasoupClient.types.IceCandidate[];
   dtlsParameters: mediasoupClient.types.DtlsParameters;
 }
-interface IConsumerInfo {
+export interface IConsumerInfo {
   id: string;
   producerId: string;
   kind: mediasoupClient.types.MediaKind;
   rtpParameters: mediasoupClient.types.RtpParameters;
+}
+export interface RemoteStreams {
+  [userId: string]: {
+    producerId: string;
+    stream: MediaStream;
+    kind: "audio" | "video";
+    type: "camera" | "screen" | "mic";
+    profilePicture: string;
+    userName: string;
+    paused: boolean;
+  }[];
+}
+export interface Producer {
+  producerId: string;
+  status: "consumed" | "pending";
 }
 
 function useMediaSoup() {
@@ -22,17 +41,7 @@ function useMediaSoup() {
   const [sessionId, setSessionId] = useState<string | null>(null);
 
   /* State to store the details of the remote streams */
-  const [remoteStreams, setRemoteStreams] = useState<{
-    [userId: string]: {
-      producerId: string;
-      stream: MediaStream;
-      kind: "audio" | "video";
-      type: "camera" | "screen" | "mic";
-      profilePicture: string;
-      userName: string;
-      paused: boolean;
-    }[];
-  }>({});
+  const [remoteStreams, setRemoteStreams] = useState<RemoteStreams>({});
 
   /* State for storing mediasoup device */
   const [device, setDevice] = useState<mediasoupClient.Device | null>(null);
@@ -44,9 +53,7 @@ function useMediaSoup() {
     useState<mediasoupClient.types.Transport | null>(null); // Transport for receiving media
 
   /* State to store all the productIds for consuming */
-  const [producerIds, setProducerIds] = useState<
-    { producerId: string; status: "consumed" | "pending" }[]
-  >([]);
+  const [producerIds, setProducerIds] = useState<Producer[]>([]);
 
   /* State to store auido, video and screen producers */
   const [videoProducer, setVideoProducer] =
@@ -97,171 +104,14 @@ function useMediaSoup() {
    * get the rtpCapabilities and set the device
    * after setting the device,emits a event 'createtransport' to create a sender transport
    */
-  useEffect(() => {
-    socket.on(
-      "routerCapabilities",
-      async (data: {
-        routerRtpCapabilities: mediasoupClient.types.RtpCapabilities;
-      }) => {
-        try {
-          if (!sessionId || device) return;
-          const newDevice = new mediasoupClient.Device();
-          await newDevice.load({
-            routerRtpCapabilities: data.routerRtpCapabilities,
-          });
-          //emits an event to create transport
-          //sets the new device and rtpcapabilities
-          setDevice(newDevice);
-          console.log("Successfully set the new device");
-          const sctpCapabilities = newDevice.sctpCapabilities;
-          socket.emit("createTransport", {
-            sessionId: sessionId,
-            transportType: "sender",
-            sctpCapabilities,
-          });
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        } catch (error: any) {
-          console.log(error);
-          if (error.name === "UnsupportedError") {
-            console.error("Browser not supported");
-          }
-        }
-      }
-    );
-    return () => {
-      socket.off("routerCapabilities");
-    };
-  }, [device, sessionId, socket]);
+  useRouterCapabilities({ socket, sessionId, device, setDevice });
   /**
    * step:3
    * After creating a web transport in the backend it sends an event 'sendTransportCreated'
    * create a send transport and store it in producer transport.This is used to send media to the backend
    * After creating the sendTransport emit an event to produce another transport for recievetransport
    */
-  useEffect(() => {
-    socket.on("sendTransportCreated", async (data: ITransportParams) => {
-      {
-        /* Creaete the producer transport in the client side */
-        if (!device) {
-          console.error("no device in sendTransport");
-          return;
-        }
-        const transport = device.createSendTransport({
-          ...data,
-          iceServers: [
-            { urls: "stun:stun.l.google.com:19302" },
-            { urls: "stun:global.stun.twilio.com:3478" },
-            {
-              credential: "ViUCb0/rDO2hn0ybSI+650OZ74bMCoIg5A0CD9rNfxQ=",
-              urls: "turn:global.turn.twilio.com:3478?transport=udp",
-              username:
-                "aff41892bcedc66a6542964a178b50a0186edf7f46ecbece22d6e58ec08707fd",
-            },
-            {
-              credential: "ViUCb0/rDO2hn0ybSI+650OZ74bMCoIg5A0CD9rNfxQ=",
-              urls: "turn:global.turn.twilio.com:3478?transport=tcp",
-              username:
-                "aff41892bcedc66a6542964a178b50a0186edf7f46ecbece22d6e58ec08707fd",
-            },
-            {
-              credential: "ViUCb0/rDO2hn0ybSI+650OZ74bMCoIg5A0CD9rNfxQ=",
-              urls: "turn:global.turn.twilio.com:443?transport=tcp",
-              username:
-                "aff41892bcedc66a6542964a178b50a0186edf7f46ecbece22d6e58ec08707fd",
-            },
-          ],
-        });
-        setProducerTransport(transport);
-        console.log("Successfully Created send transport");
-        console.log("Ice candidates and ice parameters");
-        console.log("----------------------------------------------------");
-        console.log(data.iceCandidates);
-        console.log(data.iceParameters);
-        /**
-         * Set up the initial connection using conect event
-         */
-        transport?.on(
-          "connect",
-          async (
-            {
-              dtlsParameters,
-            }: { dtlsParameters: ITransportParams["dtlsParameters"] },
-            callback: () => void,
-            errback: (err: Error) => void
-          ) => {
-            try {
-              console.log("----------> producer transport has connected");
-              // Notify the server that the transport is ready to connect with the provided DTLS parameters
-              await new Promise((resolve, reject) => {
-                socket.emit(
-                  "connectProducerTransport",
-                  { dtlsParameters, sessionId, transportId: transport.id },
-                  (data: { status: "ok" | "error"; message?: string }) => {
-                    if (data.status === "error") {
-                      reject(new Error(data.message));
-                    } else {
-                      resolve("Success");
-                    }
-                  }
-                );
-              });
-              callback();
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            } catch (error: any) {
-              // Errback to indicate failure
-              console.error("Connect consumer transport error:", error);
-              errback(error);
-            }
-          }
-        );
-        /**
-         * transport.on produce event is triggered when we call producerTransport.produce({ track });
-         * This event norifies the server that a new media is available
-         */
-        transport?.on(
-          "produce",
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          async (parameters: any, callback: any, errback: any) => {
-            const { kind, rtpParameters, appData } = parameters;
-
-            try {
-              // Notify the server to start producing media with the provided parameters
-              socket.emit(
-                "transport-produce",
-                {
-                  kind,
-                  rtpParameters,
-                  sessionId,
-                  transportId: transport.id,
-                  appData,
-                },
-                (data: {
-                  id: string;
-                  status: "ok" | "error";
-                  message?: string;
-                }) => {
-                  if (data.status == "error") {
-                    throw new Error(data.message);
-                  }
-                  callback({ id: data.id });
-                }
-              );
-            } catch (error) {
-              // Errback to indicate failure
-              errback(error);
-            }
-          }
-        );
-        socket.emit("createTransport", {
-          sessionId: sessionId,
-          transportType: "consumer",
-        });
-      }
-    });
-    return () => {
-      socket.off("sendTransportCreated");
-    };
-  }, [device, sessionId, socket]);
+  useSendTransport({ socket, device, sessionId, setProducerTransport });
   /**
    * Step:4
    * setup recieve transport
@@ -269,98 +119,13 @@ function useMediaSoup() {
    * create a receive transport for recieving media
    * Fetch all the active producers once recieve transport is created
    */
-  useEffect(() => {
-    socket.on("recvTransportCreated", async (data: ITransportParams) => {
-      if (!device) {
-        console.error("no device in recieveTransport");
-        return;
-      }
-      const transport = device.createRecvTransport({
-        ...data,
-        iceServers: [
-          { urls: "stun:stun.l.google.com:19302" },
-          { urls: "stun:global.stun.twilio.com:3478" },
-
-          {
-            credential: "ViUCb0/rDO2hn0ybSI+650OZ74bMCoIg5A0CD9rNfxQ=",
-            urls: "turn:global.turn.twilio.com:3478?transport=udp",
-            username:
-              "aff41892bcedc66a6542964a178b50a0186edf7f46ecbece22d6e58ec08707fd",
-          },
-          {
-            credential: "ViUCb0/rDO2hn0ybSI+650OZ74bMCoIg5A0CD9rNfxQ=",
-            urls: "turn:global.turn.twilio.com:3478?transport=tcp",
-            username:
-              "aff41892bcedc66a6542964a178b50a0186edf7f46ecbece22d6e58ec08707fd",
-          },
-          {
-            credential: "ViUCb0/rDO2hn0ybSI+650OZ74bMCoIg5A0CD9rNfxQ=",
-            urls: "turn:global.turn.twilio.com:443?transport=tcp",
-            username:
-              "aff41892bcedc66a6542964a178b50a0186edf7f46ecbece22d6e58ec08707fd",
-          },
-        ],
-      });
-      setConsumerTransport(transport);
-      console.log("Successfully Created recieve transport");
-      /**
-       * This event is triggered when "consumerTransport.consume" is called
-       * for the first time on the client-side.
-       * */
-      transport?.on(
-        "connect",
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        async ({ dtlsParameters }: any, callback: any, errback: any) => {
-          try {
-            // Notifying the server to connect the receive transport with the provided DTLS parameters
-            socket.emit(
-              "connectConsumerTransport",
-              {
-                dtlsParameters,
-                sessionId,
-                transportId: transport.id,
-              },
-              (data: { status: "ok" | "error"; message?: string }) => {
-                if (data.status == "error") {
-                  throw new Error(data.message);
-                }
-              }
-            );
-            callback();
-          } catch (error) {
-            errback(error);
-          }
-        }
-      );
-      /* emit an event to fetch all active producers(producerId) and store it in the state */
-      socket.emit(
-        "getProducers",
-        { sessionId },
-        ({
-          producerIds,
-        }: {
-          producerIds: {
-            kind: "video" | "audio";
-            producerId: string;
-            userId: string;
-            userName: string;
-          }[];
-        }) => {
-          console.log("These are the producer Ids");
-          console.log(producerIds);
-          setProducerIds(
-            producerIds.map((producerData) => ({
-              producerId: producerData.producerId,
-              status: "pending",
-            }))
-          );
-        }
-      );
-    });
-    return () => {
-      socket.off("recvTransportCreated");
-    };
-  }, [device, sessionId, socket]);
+  useRecieveTransport({
+    device,
+    sessionId,
+    setConsumerTransport,
+    setProducerIds,
+    socket,
+  });
 
   /**
    * In this use effect,we are checking for new producers and update the producerId state
@@ -383,103 +148,15 @@ function useMediaSoup() {
    * In this useEffect,we are consuming the producers.
    * emits an event 'consumeMedia' to start consuming this new producer
    */
-  useEffect(() => {
-    if (!consumerTransport || !device || !producerIds.length) return;
-    const pendingProducers = producerIds.filter((p) => p.status === "pending");
-
-    if (!pendingProducers.length) return;
-    const consumeProducer = async (producerDetails: {
-      producerId: string;
-      status: "consumed" | "pending";
-    }) => {
-      socket.emit(
-        "consumeMedia",
-        {
-          sessionId,
-          consumerTransportId: consumerTransport.id,
-          producerId: producerDetails.producerId,
-          rtpCapabilities: device.rtpCapabilities,
-        },
-        async ({
-          status,
-          consumerData,
-        }: {
-          status: "ok" | "error";
-          consumerData: IConsumerInfo & {
-            userId: string;
-            userName: string;
-            profilePicture: string;
-            type: "camera" | "screen" | "mic";
-            pause: boolean;
-          };
-        }) => {
-          if (status === "error") {
-            console.error("Consume error:");
-            return;
-          }
-          console.log("This is the consumer data");
-          console.log(consumerData);
-          const consumer = await consumerTransport.consume({
-            id: consumerData.id,
-            producerId: consumerData.producerId,
-            kind: consumerData.kind,
-            rtpParameters: consumerData.rtpParameters,
-          });
-
-          setRemoteStreams((prev) => {
-            const newData = { ...prev };
-            if (newData[consumerData.userId]) {
-              // Check if producerId already exists
-              const exists = newData[consumerData.userId].some(
-                (stream) => stream.producerId === consumerData.producerId
-              );
-              if (!exists) {
-                newData[consumerData.userId].push({
-                  stream: new MediaStream([consumer.track]),
-                  kind: consumerData.kind,
-                  producerId: consumerData.producerId,
-                  type: consumerData.type,
-                  userName: consumerData.userName,
-                  profilePicture: consumerData.profilePicture,
-                  paused: consumerData.pause,
-                });
-              }
-            } else {
-              newData[consumerData.userId] = [
-                {
-                  stream: new MediaStream([consumer.track]),
-                  kind: consumerData.kind,
-                  producerId: consumerData.producerId,
-                  type: consumerData.type,
-                  userName: consumerData.userName,
-                  paused: consumerData.pause,
-                  profilePicture: consumerData.profilePicture,
-                },
-              ];
-            }
-            return newData;
-          });
-
-          setProducerIds((prev) =>
-            prev.map((p) =>
-              p.producerId === producerDetails.producerId
-                ? { ...p, status: "consumed" }
-                : p
-            )
-          );
-          socket.emit("resumePausedConsumer", {
-            sessionId,
-            consumerId: consumer.id,
-          });
-        }
-      );
-    };
-
-    Promise.all(pendingProducers.map(consumeProducer)).catch((err) =>
-      console.error("Batch consume error:", err)
-    );
-  }, [producerIds, consumerTransport, device, socket, sessionId]);
-
+  useConsumeMedia({
+    consumerTransport,
+    device,
+    producerIds,
+    sessionId,
+    setProducerIds,
+    setRemoteStreams,
+    socket,
+  });
   /**
    * this useeffect is triggered when a producer state has changed(mute/unmute/pause/unpause)
    */
@@ -569,7 +246,7 @@ function useMediaSoup() {
         const videoTrack = stream.getVideoTracks()[0];
         const audioTrack = stream.getAudioTracks()[0];
         videoRef.current.srcObject = stream;
-
+        console.log("Going to create video producer");                                              /* --------- */
         const videoProd = await producerTransport.produce({
           track: videoTrack,
           appData: { type: "camera", paused: initialVideoPaused },

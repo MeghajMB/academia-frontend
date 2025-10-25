@@ -1,4 +1,4 @@
-import ProtectedRoute from "@/hoc/ProtectedRoute";
+import ProtectedRoute from "@/layouts/ProtectedRoute";
 import React from "react";
 
 function TeachingLayout({ children }: { children: React.ReactNode }) {
